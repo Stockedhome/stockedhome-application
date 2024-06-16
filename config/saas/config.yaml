@@ -1,0 +1,21 @@
+# The root URI of the application. This is used to generate URLs for the application.
+# Any requests made to the server from a non-root URI will be redirected to the root.
+#
+# This should NOT be used as a security measure.
+# If your application is only accessible from your home network, do not forward ports to the application.
+# The best attack surface is no attack surface.
+canonicalRoot: https://stockedhome.app/web
+
+
+
+# Whether to trust local network users to select their own account
+# Useful when you have a local setup without a public IP address
+#
+# This will disable the existing public-key cryptography logins and allow anyone on your local network to select their own account.
+# ⚠ This effectively disables all security! ⚠
+# ⚠ Use at your own risk! ⚠
+trustLocalNetwork: false
+
+# If you're using a local setup, you may desire to use a single household for all users
+# That way, you don't have to worry about the hassle that might cause.
+singleHousehold: false

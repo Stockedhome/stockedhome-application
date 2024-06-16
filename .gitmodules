@@ -1,0 +1,6 @@
+[submodule "src/forks/solito"]
+	path = src/forks/solito
+	url = https://github.com/Stockedhome/fork-solito.git
+[submodule "src/platforms/next/public/assets"]
+	path = src/platforms/next/public/assets
+	url = https://github.com/Stockedhome/stockedhome-assets.git

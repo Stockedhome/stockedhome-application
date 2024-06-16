@@ -1,0 +1,85 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Dev Server - Web",
+			"detail": "Runs `yarn web`",
+			"type": "shell",
+			"command": "yarn",
+			"args": ["web"],
+			"group": {
+				"kind": "build",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"icon": {
+				"id": "server-process",
+				"color": "terminal.ansiCyan",
+			},
+			"isBackground": true,
+			"problemMatcher": [
+				{ // Mark as done when Next.js is started up
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": "^ ○ Compiling (?!/_error).*?$",
+						"endsPattern": "^(?: ✓ | ⨯ ).*?$",
+					},
+					"pattern": {
+						"regexp": "^bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb---this-is-not-real-regex---bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+					},
+				}
+			],
+		},
+		{
+			"label": "Dev Server - Mobile App",
+			"detail": "Runs `yarn native`",
+			"type": "shell",
+			"command": "yarn",
+			"args": ["native"],
+			"group": {
+				"kind": "build",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"icon": {
+				"id": "server-environment",
+				"color": "terminal.ansiCyan",
+			},
+			"isBackground": true,
+			"problemMatcher": [
+				{ // Mark as done when Expo is started up
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": "^bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb---this-is-not-real-regex---bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+						"endsPattern": "^› Metro waiting on .*?$",
+					},
+					"pattern": {
+						"regexp": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb---this-is-not-real-regex---bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+					},
+				}
+
+			],
+		},
+		{
+			"label": "Dev Server - All",
+			"detail": "Runs all dev server tasks",
+			"dependsOn": ["Dev Server - Web", "Dev Server - Mobile App"],
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		}
+	]
+}

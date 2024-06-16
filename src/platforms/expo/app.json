@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Stockedhome",
+    "slug": "stockedhome",
+    "version": "1.0.0",
+    "scheme": "stockedhome",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "bundleIdentifier": "app.stockedhome.mobile"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}

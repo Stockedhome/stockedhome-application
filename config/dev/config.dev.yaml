@@ -1,0 +1,14 @@
+# Configuration for the server started with a NODE_ENV of anything other than "production"
+# The configs are separated for ease of development. The default config shouldn't be nearly so open.
+
+# Whether to trust local network users to select their own account
+# Useful when you have a local setup without a public IP address
+#
+# This will disable the existing public-key cryptography and allow anyone on your local network to select their own account.
+# ⚠ This effectively disables all security! ⚠
+# ⚠ Use at your own risk! ⚠
+trustLocalNetwork: true
+
+# If you're using a local setup, you may desire to use a single household for all users
+# That way, you don't have to worry about the hassle that might cause.
+singleHousehold: true

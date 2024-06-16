@@ -1,0 +1,62 @@
+on:
+    workflow_dispatch:
+
+jobs:
+    lib:
+        runs-on: ubuntu-latest
+        concurrency:
+          group: testing
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 14.x
+            - name: Install dependencies
+              run: pnpm install
+            - name: Test
+              run: pnpm test
+            - name: Generate Prisma Client
+              run: pnpm prisma generate
+            - name: Generate GraphQL Types
+              run: pnpm codegen
+
+    site:
+        runs-on: ubuntu-latest
+        concurrency:
+          group: testing
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 14.x
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm build
+            - name: Deploy
+              run: pnpm deploy
+
+    app:
+        runs-on: ubuntu-latest
+        concurrency:
+          group: testing
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 14.x
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm build
+            - name: Test
+              run: pnpm test
+            - name: Generate Prisma Client
+              run: pnpm prisma generate
+            - name: Generate GraphQL Types
+              run: pnpm codegen
+            - name: Deploy
+              run: pnpm deploy

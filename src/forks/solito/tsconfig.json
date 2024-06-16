@@ -1,0 +1,25 @@
+{
+  "extends": "expo-module-scripts/tsconfig.base",
+  "compilerOptions": {
+    "outDir": "./build",
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": false,
+    "jsx": "react-jsx"
+  },
+  "include": ["./src"],
+  "exclude": ["**/__mocks__/*", "**/__tests__/*", "**.*.test.ts"],
+  "ts-node": {
+    // these options are overrides used only by ts-node
+    "compilerOptions": {
+      "module": "CommonJS",
+      "lib": ["ESNext"],
+      "types": ["node"],
+      "target": "ESNext"
+    }
+  }
+}

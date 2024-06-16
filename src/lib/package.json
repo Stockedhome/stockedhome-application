@@ -1,0 +1,9 @@
+{
+  "version": "0.0.0",
+  "name": "lib",
+  "main": "index.ts",
+  "description": "Handled the business logic of the application.",
+  "dependencies": {
+  },
+  "sideEffects": false
+}

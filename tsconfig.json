@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "target": "ES2018",
+    "module": "ESNext",
+    "paths": {
+      "interface/*": ["./interface/*"],
+      "solito/*": ["./solito/src/*"],
+    },
+    "allowJs": true,
+  },
+  "extends": "./node_modules/expo/tsconfig.base.json"
+}

@@ -1,0 +1,3830 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "An API for getting data about products available to Amazon Business customers. This includes information such as the product title, the merchant selling the product, and the current price.",
+        "license": {
+            "name": "Amazon Software License",
+            "url": "https://aws.amazon.com/asl/"
+        },
+        "title": "Amazon Business API for Products",
+        "version": "2020-08-26"
+    },
+    "externalDocs": {
+        "description": "Learn more about Amazon Business",
+        "url": "https://business.amazon.com"
+    },
+    "host": "api.business.amazon.com",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/products/2020-08-26/products": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "A list of keywords to use for finding products based on indexed data.",
+                        "in": "query",
+                        "name": "keywords",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The region where the customer wants to purchase the product.",
+                        "enum": [
+                            "DE",
+                            "FR",
+                            "UK",
+                            "IT",
+                            "ES",
+                            "US",
+                            "CA",
+                            "JP"
+                        ],
+                        "x-docgen-enum-table-extension": [
+                            {
+                                "value": "DE",
+                                "description": "Germany"
+                            },
+                            {
+                                "value": "FR",
+                                "description": "France"
+                            },
+                            {
+                                "value": "UK",
+                                "description": "United Kingdom"
+                            },
+                            {
+                                "value": "IT",
+                                "description": "Italy"
+                            },
+                            {
+                                "value": "ES",
+                                "description": "Spain"
+                            },
+                            {
+                                "value": "US",
+                                "description": "United States of America"
+                            },
+                            {
+                                "value": "CA",
+                                "description": "Canada"
+                            },
+                            {
+                                "value": "JP",
+                                "description": "Japan"
+                            }
+                        ],
+                        "in": "query",
+                        "name": "productRegion",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field determines the region where to ship the product based on the value in the shippingPostalCode.",
+                        "in": "query",
+                        "name": "shippingRegion",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The locale of the request in the form of an IETF language tag. Each ProductRegion supports one or more locales. This value should comply with java.util.Locale.",
+                        "pattern": "^[-_]+$",
+                        "in": "query",
+                        "name": "locale",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The shipping postal or zip code for customer's request. This parameter doesn't hold geocode.",
+                        "in": "query",
+                        "name": "shippingPostalCode",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list of data facets to include in the response. Separate each facet with a comma.",
+                        "in": "query",
+                        "enum": [
+                            "OFFERS",
+                            "IMAGES"
+                        ],
+                        "name": "facets",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?facets=FOO,BAR"
+                    },
+                    {
+                        "description": "The zero-based number of the page being requested. If not specified, a default value of 0 will be used. When passed, the value must be equal or greater than zero, and strictly less than the number of pages returned in the response.",
+                        "in": "query",
+                        "name": "pageNumber",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "The number of items desired in SearchProductsResult response. If not specified, a default value of 24 will be used. Maximum items that can be fetched in single request is 24.",
+                        "in": "query",
+                        "name": "pageSize",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "A value that identifies the group within the business account that a customer belongs to. The customer can set this in Amazon Business account information. GroupTag is necessary only if the account associated with x-amz-user-email belongs to more than one group.",
+                        "in": "query",
+                        "name": "groupTag",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned result to this specified category. Categories can be found under refinements->categories->id of this API call's response. Sample categories: 'Electronics', 'Appliances', or 'Baby'",
+                        "in": "query",
+                        "name": "category",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned result to this specified subcategory ID. Subcategory IDs can be found under refinements->subcategories->id of this API call's response when a category or subcategory is specified. Note: there can be multiple levels of subcategories in a category. Sample subcategory IDs: '4997' or '4799'",
+                        "in": "query",
+                        "name": "subCategory",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned results to one of the following specified availability IDs: \n2661600011 (In Stock only) \n2661601011 (Include Out of Stock)",
+                        "in": "query",
+                        "name": "availability",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The deliveryDay feature is used to refine the keyword search results. By default, the search returns results with all the available delivery dates. In the returned result refinement, there should be one 'Get It Today' ID, and one 'Get It Tomorrow' ID. If the customer sets the deliveryDay with 'Get It Today' ID, the results will return products that could arrive today or zero matching if no product could arrive today. If the customer sets the deliveryDay with 'Get It Tomorrow' ID, the results will return products that could arrive tomorrow or zero matching if no product could arrive tomorrow.",
+                        "in": "query",
+                        "name": "deliveryDay",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The eligibleForFreeShipping is used to refine the keyword search results. By default, the search should return results with both 'Free Shipping' and not 'Free Shipping by Amazon Business.' In the returned result refinement, there should be one eligibleForFreeShipping Id. It represents 'Free Shipping by Amazon Business.' If the customer sets the eligibleForFreeShipping as this ID, the result will only return products with 'Free Shipping by Amazon Business.'",
+                        "in": "query",
+                        "name": "eligibleForFreeShipping",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The prime eligible refinement is used to filter prime eligible products. By default, the search returns results with prime eligible and non-prime eligible products.",
+                        "in": "query",
+                        "name": "primeEligible",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned result to this specified Universal Product Code (UPC). UPC is printed on product packaging.",
+                        "in": "query",
+                        "name": "upc",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned results to this specified ISBN (International Standard Book Number). ISBN is a 13-digit number that uniquely identifies a book.",
+                        "in": "query",
+                        "name": "isbn",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned results to this specified Stock Keeping Unit (SKU). SKU is a merchant-specific identifier.",
+                        "in": "query",
+                        "name": "sku",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned results to this specified EAN (European Article Number). EAN is a 13-digit product identifier.",
+                        "in": "query",
+                        "name": "ean",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned results to this specified part number. Part number is a unique number issued by manufacturers to identify individual products.",
+                        "in": "query",
+                        "name": "partNumber",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field restricts the returned results to this specified OEM (Original Equipment Manufacturer) part number. OEM part number is an identifier that indicates the original manufacturer of the part of the product.",
+                        "in": "query",
+                        "name": "oemPartNumber",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list of search refinements to refine keyword search for relevant results. Separate each refinement with a comma.",
+                        "in": "query",
+                        "name": "searchRefinements",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "brandtextbin#GE,brandtextbin#Sony,review-rating#2661618011"
+                    },
+                    {
+                        "description": "The email address of the customer requesting this resource.",
+                        "in": "header",
+                        "name": "x-amz-user-email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list specifying the product fields for inclusion in the response object. Excluding this query parameter results in response returning all inclusions except upcValues and eanValues.",
+                        "enum": [
+                            "ALL",
+                            "bookInformation",
+                            "byLine",
+                            "customerReviewsSummary",
+                            "editorialReviews",
+                            "features",
+                            "format",
+                            "mediaInformation",
+                            "productDescription",
+                            "productDetails",
+                            "productOverview",
+                            "productVariations",
+                            "taxonomies",
+                            "title",
+                            "upcValues",
+                            "eanValues"
+                        ],
+                        "in": "query",
+                        "name": "inclusionsForProducts",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?inclusionsForProducts=FOO,BAR"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list specifying the offer fields for inclusion in the response object. Excluding this parameter results in response returning all inclusions.",
+                        "enum": [
+                            "ALL",
+                            "availability",
+                            "buyingGuidance",
+                            "buyingRestrictions",
+                            "condition",
+                            "fulfillmentType",
+                            "merchant",
+                            "price",
+                            "productCondition",
+                            "productConditionNote",
+                            "quantityLimits",
+                            "quantityPrice",
+                            "taxExclusivePrice",
+                            "deliveryInformation",
+                            "listPrice",
+                            "shippingOptions",
+                            "quantityInStock",
+                            "badges"
+                        ],
+                        "in": "query",
+                        "name": "inclusionsForOffers",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?inclusionsForOffers=FOO,BAR"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search success",
+                        "schema": {
+                            "$ref": "#/definitions/SearchProductsResult"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        },
+                        "x-amazon-spds-sandbox-behaviors": [
+                            {
+                                "request": {
+                                    "parameters": {
+                                        "productRegion": {
+                                            "value": "US"
+                                        },
+                                        "locale": {
+                                            "value": "es_US"
+                                        },
+                                        "facets": {
+                                            "value": [
+                                                "OFFERS"
+                                            ]
+                                        },
+                                        "keywords": {
+                                            "value": "[keyword]"
+                                        }
+                                    }
+                                },
+                                "response": {
+                                    "matchingProductCount": 1,
+                                    "numberOfPages": 1,
+                                    "refinements": {
+                                        "categories": [
+                                            {
+                                                "id": "[categoryId]",
+                                                "displayName": "[categoryDisplayName]"
+                                            }
+                                        ],
+                                        "subCategories": [],
+                                        "availabilityOptions": [
+                                            {
+                                                "id": "[availabilityOptionId]",
+                                                "displayName": "[availabilityOptionDisplayName]"
+                                            }
+                                        ],
+                                        "deliveryDayOptions": [
+                                            {
+                                                "id": "[deliveryDayOptionId]",
+                                                "displayName": "[deliveryDayOptionDisplayName]"
+                                            }
+                                        ],
+                                        "eligibleForFreeShippingOptions": [
+                                            {
+                                                "id": "[eligibleForFreeShippingOptionId]",
+                                                "displayName": "[availabilityOptionDisplayName]"
+                                            }
+                                        ],
+                                        "primeEligible": [
+                                            {
+                                                "id": "[primeEligibleId]",
+                                                "displayName": "[primeEligibleDisplayName]"
+                                            }
+                                        ]
+                                    },
+                                    "products": [
+                                        {
+                                            "asin": "[asin]",
+                                            "asinType": "STANDARD",
+                                            "signedProductId": "[signedProductId]",
+                                            "title": "[asinTitle]",
+                                            "features": [
+                                                "[feature1]"
+                                            ],
+                                            "editorialReviews": [
+                                                {
+                                                    "content": "[editorialReviewContent]",
+                                                    "source": "[editorialReviewSource]"
+                                                }
+                                            ],
+                                            "taxonomies": [
+                                                {
+                                                    "title": "[taxonomyTitle]",
+                                                    "taxonomyCode": "[taxonomyCode]",
+                                                    "type": "UNSPSC"
+                                                }
+                                            ],
+                                            "format": "[format]",
+                                            "bookInformation": [
+                                                {
+                                                    "isbn": [
+                                                        {
+                                                            "isbn10": "[isbn10]",
+                                                            "isbn13": "[isbn13]"
+                                                        }
+                                                    ],
+                                                    "publishedDate": "[publishedDate]",
+                                                    "publicationLanguage": "[publicationLanguage]"
+                                                }
+                                            ],
+                                            "byLine": [
+                                                {
+                                                    "name": "[name]",
+                                                    "roles": [
+                                                        "[role1]"
+                                                    ]
+                                                }
+                                            ],
+                                            "mediaInformation": [
+                                                {
+                                                    "editions": [
+                                                        "edition1"
+                                                    ],
+                                                    "mediaFormats": [
+                                                        "mediaFormat1"
+                                                    ]
+                                                }
+                                            ],
+                                            "productOverview": {
+                                                "[attributeKey1]": "[attributeValue1]"
+                                            },
+                                            "productDetails": {
+                                                "[attributeKey1]": {
+                                                    "[attributeKey1]": "[attributeValue1]"
+                                                }
+                                            },
+                                            "productVariations": {
+                                                "dimensions": [
+                                                    {
+                                                        "index": 0,
+                                                        "displayString": "[dimensionKeys]",
+                                                        "dimensionValues": [
+                                                            {
+                                                                "index": 0,
+                                                                "displayString": "[value]"
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "variations": [
+                                                    {
+                                                        "asin": "[asin]",
+                                                        "variationValues": [
+                                                            {
+                                                                "index": 0,
+                                                                "value": "[value]"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "customerReviewsSummary": {
+                                                "numberOfReviews": 1,
+                                                "starRating": 5.0
+                                            },
+                                            "productDescription": "[productDescription]",
+                                            "upcValues": [
+                                                "[upcValue1]"
+                                            ],
+                                            "eanValues": [
+                                                "[eanValue1]"
+                                            ],
+                                            "url": "[url]",
+                                            "includedDataTypes": {
+                                                "OFFERS": [
+                                                    {
+                                                        "offerId": "[offerId]",
+                                                        "merchant": {
+                                                            "merchantId": "[merchantId]",
+                                                            "name": "[merchantName]",
+                                                            "meanFeedbackRating": 5.0,
+                                                            "totalFeedbackCount": 1
+                                                        },
+                                                        "price": {
+                                                            "value": {
+                                                                "amount": 1.00,
+                                                                "currencyCode": "USD"
+                                                            },
+                                                            "formattedPrice": "[formattedPrice]",
+                                                            "priceType": "NEW"
+                                                        },
+                                                        "listPrice": {
+                                                            "value": {
+                                                                "amount": 2.00,
+                                                                "currencyCode": "USD"
+                                                            },
+                                                            "formattedPrice": "[formattedPrice]",
+                                                            "priceType": "NEW"
+                                                        },
+                                                        "taxExclusivePrice": {
+                                                            "taxExclusiveAmount": {
+                                                                "amount": 1.00,
+                                                                "currencyCode": "USD"
+                                                            },
+                                                            "formattedPrice": "[formattedPrice]",
+                                                            "displayString": "[taxExclusivePriceDisplayString]",
+                                                            "label": "Sin IVA"
+                                                        },
+                                                        "quantityLimits": {
+                                                            "minQuantity": 1,
+                                                            "maxQuantity": 30
+                                                        },
+                                                        "productCondition": "NEW",
+                                                        "productConditionNote": "[productConditionNote]",
+                                                        "condition": {
+                                                            "conditionValue": "NEW",
+                                                            "conditionNote": "[productConditionNote]",
+                                                            "subCondition": "ACCEPTABLE"
+                                                        },
+                                                        "availability": "[availability]",
+                                                        "fulfillmentType": "AMAZON",
+                                                        "buyingGuidance": "NONE",
+                                                        "buyingRestrictions": [],
+                                                        "shippingOptions": [
+                                                            {
+                                                                "shippingCost": {
+                                                                    "value": {
+                                                                        "amount": 9.00,
+                                                                        "currencyCode": "USD"
+                                                                    }
+                                                                },
+                                                                "deliveryRange": {
+                                                                    "max": "2022-01-01T00:00:01.000Z",
+                                                                    "min": "2022-01-01T00:00:01.000Z"
+                                                                }
+                                                            }
+                                                        ],
+                                                        "quantityInStock": 1000,
+                                                        "badges": [
+                                                            {
+                                                                "name": "[badge1]"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "400": {
+                        "description": "The service was unable to process the request. Reasons for the error are described in an error response object.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        },
+                        "x-amazon-spds-sandbox-behaviors": [
+                            {
+                                "request": {
+                                    "parameters": {
+                                        "productRegion": {
+                                            "value": "US"
+                                        },
+                                        "keywords": {
+                                            "value": "pen"
+                                        },
+                                        "facets": {
+                                            "values": [
+                                                "OFFERS",
+                                                "IMAGES"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "response": {
+                                    "errors": [
+                                        {
+                                            "code": "INVALID_REQUEST_PARAMETER",
+                                            "message": "Missing required request parameters: [locale]"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "401": {
+                        "description": "The request's authorization header isn't formatted correctly or doesn't contain a valid authorization input.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Indicates that access to the resource is forbidden. Possible reasons include Access Denied, Unauthorized, Expired Token, or Invalid Signature.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The resource specified doesn't exist.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "The frequency of requests was greater than allowed.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Encountered an unexpected condition which prevented the server from fulfilling the request.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Temporary overloading or maintenance of the server.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "search"
+                ],
+                "description": "Search for a list of products by querying on their attributes and indexed fields.",
+                "operationId": "searchProductsRequest",
+                "summary": "Search for a list products by keyword, and by other additional filter criteria."
+            }
+        },
+        "/products/2020-08-26/products/{productId}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The Amazon Standard Item Identifier (ASIN) for the product.",
+                        "in": "path",
+                        "name": "productId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The region where the customer wants to purchase the product.",
+                        "enum": [
+                            "DE",
+                            "FR",
+                            "UK",
+                            "IT",
+                            "ES",
+                            "US",
+                            "CA",
+                            "JP"
+                        ],
+                        "x-docgen-enum-table-extension": [
+                            {
+                                "value": "DE",
+                                "description": "Germany"
+                            },
+                            {
+                                "value": "FR",
+                                "description": "France"
+                            },
+                            {
+                                "value": "UK",
+                                "description": "United Kingdom"
+                            },
+                            {
+                                "value": "IT",
+                                "description": "Italy"
+                            },
+                            {
+                                "value": "ES",
+                                "description": "Spain"
+                            },
+                            {
+                                "value": "US",
+                                "description": "United States of America"
+                            },
+                            {
+                                "value": "CA",
+                                "description": "Canada"
+                            },
+                            {
+                                "value": "JP",
+                                "description": "Japan"
+                            }
+                        ],
+                        "in": "query",
+                        "name": "productRegion",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field determines the region where to ship the product based on the value in the shippingPostalCode.",
+                        "in": "query",
+                        "name": "shippingRegion",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The locale of the request, in the form of an IETF language tag. Each ProductRegion supports one or more locales. This value should comply with java.util.Locale.",
+                        "pattern": "^[-_]+$",
+                        "in": "query",
+                        "name": "locale",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The shipping postal or zip code for the customer's request. This parameter doesn't support geocode.",
+                        "in": "query",
+                        "name": "shippingPostalCode",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The number of units the customer intends to purchase. This helps Amazon Business determine quantity-based discounts if an eligible offer is present. Defaults to 1.",
+                        "in": "query",
+                        "name": "quantity",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list of data facets to include in the response. Separate each facet with a comma.",
+                        "in": "query",
+                        "enum": [
+                            "OFFERS",
+                            "IMAGES"
+                        ],
+                        "name": "facets",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?facets=FOO,BAR"
+                    },
+                    {
+                        "description": "The email address of the customer requesting this resource.",
+                        "in": "header",
+                        "name": "x-amz-user-email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list specifying the product fields for inclusion in the response object. Excluding the query parameter results in the response including all inclusions except upcValues and eanValues.",
+                        "enum": [
+                            "ALL",
+                            "bookInformation",
+                            "byLine",
+                            "customerReviewsSummary",
+                            "editorialReviews",
+                            "features",
+                            "format",
+                            "mediaInformation",
+                            "productDescription",
+                            "productDetails",
+                            "productOverview",
+                            "productVariations",
+                            "taxonomies",
+                            "title",
+                            "upcValues",
+                            "eanValues"
+                        ],
+                        "in": "query",
+                        "name": "inclusionsForProducts",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?inclusionsForProducts=FOO,BAR"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list specifying the offer fields for inclusion in the response object. Excluding this query parameter results in the response including all inclusions.",
+                        "enum": [
+                            "ALL",
+                            "availability",
+                            "buyingGuidance",
+                            "buyingRestrictions",
+                            "condition",
+                            "fulfillmentType",
+                            "merchant",
+                            "price",
+                            "productCondition",
+                            "productConditionNote",
+                            "quantityLimits",
+                            "quantityPrice",
+                            "taxExclusivePrice",
+                            "deliveryInformation",
+                            "listPrice",
+                            "shippingOptions",
+                            "quantityInStock",
+                            "badges"
+                        ],
+                        "in": "query",
+                        "name": "inclusionsForOffers",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?inclusionsForOffers=FOO,BAR"
+                    },
+                    {
+                        "description": "A value that identifies the group within the business account that a customer belongs to. The customer can set this in Amazon Business account information. GroupTag is necessary only if the customer account belongs to more than one group.",
+                        "in": "query",
+                        "name": "groupTag",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product successfully retrieved.",
+                        "schema": {
+                            "$ref": "#/definitions/ProductsResult"
+                        },
+                        "x-amzn-RateLimit-Limit": {
+                            "description": "The rate limit (requests per second) for this operation.",
+                            "type": "string"
+                        },
+                        "x-amzn-requestid": {
+                            "description": "A unique request reference identifier.",
+                            "type": "string"
+                        },
+                        "x-amazon-spds-sandbox-behaviors": [
+                            {
+                                "request": {
+                                    "parameters": {
+                                        "productId": {
+                                            "value": "[productId]"
+                                        },
+                                        "productRegion": {
+                                            "value": "US"
+                                        },
+                                        "locale": {
+                                            "value": "es_US"
+                                        },
+                                        "facets": {
+                                            "value": [
+                                                "OFFERS"
+                                            ]
+                                        },
+                                        "shippingPostalCode": {
+                                            "value": "99999"
+                                        }
+                                    }
+                                },
+                                "response": {
+                                    "asin": "[asin]",
+                                    "asinType": "STANDARD",
+                                    "signedProductId": "[signedProductId]",
+                                    "title": "[asinTitle]",
+                                    "features": [
+                                        "[feature1]"
+                                    ],
+                                    "editorialReviews": [
+                                        {
+                                            "content": "[editorialReviewContent]",
+                                            "source": "[editorialReviewSource]"
+                                        }
+                                    ],
+                                    "taxonomies": [
+                                        {
+                                            "title": "[taxonomyTitle]",
+                                            "taxonomyCode": "[taxonomyCode]",
+                                            "type": "UNSPSC"
+                                        }
+                                    ],
+                                    "format": "[format]",
+                                    "bookInformation": [
+                                        {
+                                            "isbn": [
+                                                {
+                                                    "isbn10": "[isbn10]",
+                                                    "isbn13": "[isbn13]"
+                                                }
+                                            ],
+                                            "publishedDate": "[publishedDate]",
+                                            "publicationLanguage": "[publicationLanguage]"
+                                        }
+                                    ],
+                                    "byLine": [
+                                        {
+                                            "name": "[name]",
+                                            "roles": [
+                                                "[role1]"
+                                            ]
+                                        }
+                                    ],
+                                    "mediaInformation": [
+                                        {
+                                            "editions": [
+                                                "edition1"
+                                            ],
+                                            "mediaFormats": [
+                                                "mediaFormat1"
+                                            ]
+                                        }
+                                    ],
+                                    "productOverview": {
+                                        "[attributeKey1]": "[attributeValue1]"
+                                    },
+                                    "productDetails": {
+                                        "[attributeKey1]": {
+                                            "[attributeKey1]": "[attributeValue1]"
+                                        }
+                                    },
+                                    "productVariations": {
+                                        "dimensions": [
+                                            {
+                                                "index": 0,
+                                                "displayString": "[dimensionKeys]",
+                                                "dimensionValues": [
+                                                    {
+                                                        "index": 0,
+                                                        "displayString": "[value]"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "variations": [
+                                            {
+                                                "asin": "[asin]",
+                                                "variationValues": [
+                                                    {
+                                                        "index": 0,
+                                                        "value": "[value]"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "customerReviewsSummary": {
+                                        "numberOfReviews": 1,
+                                        "starRating": 5.0
+                                    },
+                                    "productDescription": "[productDescription]",
+                                    "upcValues": [
+                                        "[upcValue1]"
+                                    ],
+                                    "eanValues": [
+                                        "[eanValue1]"
+                                    ],
+                                    "url": "[url]",
+                                    "includedDataTypes": {
+                                        "OFFERS": [
+                                            {
+                                                "offerId": "[offerId]",
+                                                "merchant": {
+                                                    "merchantId": "[merchantId]",
+                                                    "name": "[merchantName]",
+                                                    "meanFeedbackRating": 5.0,
+                                                    "totalFeedbackCount": 1
+                                                },
+                                                "price": {
+                                                    "value": {
+                                                        "amount": 1.00,
+                                                        "currencyCode": "USD"
+                                                    },
+                                                    "formattedPrice": "[formattedPrice]",
+                                                    "priceType": "NEW"
+                                                },
+                                                "listPrice": {
+                                                    "value": {
+                                                        "amount": 2.00,
+                                                        "currencyCode": "USD"
+                                                    },
+                                                    "formattedPrice": "[formattedPrice]",
+                                                    "priceType": "NEW"
+                                                },
+                                                "taxExclusivePrice": {
+                                                    "taxExclusiveAmount": {
+                                                        "amount": 1.00,
+                                                        "currencyCode": "USD"
+                                                    },
+                                                    "formattedPrice": "[formattedPrice]",
+                                                    "displayString": "[taxExclusivePriceDisplayString]",
+                                                    "label": "Sin IVA"
+                                                },
+                                                "quantityLimits": {
+                                                    "minQuantity": 1,
+                                                    "maxQuantity": 30
+                                                },
+                                                "productCondition": "NEW",
+                                                "productConditionNote": "[productConditionNote]",
+                                                "condition": {
+                                                    "conditionValue": "NEW",
+                                                    "conditionNote": "[productConditionNote]",
+                                                    "subCondition": "ACCEPTABLE"
+                                                },
+                                                "availability": "[availability]",
+                                                "fulfillmentType": "AMAZON",
+                                                "buyingGuidance": "NONE",
+                                                "buyingRestrictions": [],
+                                                "shippingOptions": [
+                                                    {
+                                                        "shippingCost": {
+                                                            "value": {
+                                                                "amount": 9.00,
+                                                                "currencyCode": "USD"
+                                                            }
+                                                        },
+                                                        "deliveryRange": {
+                                                            "max": "2022-01-01T00:00:01.000Z",
+                                                            "min": "2022-01-01T00:00:01.000Z"
+                                                        }
+                                                    }
+                                                ],
+                                                "quantityInStock": 1000,
+                                                "badges": [
+                                                    {
+                                                        "name": "[badge1]"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    "400": {
+                        "description": "The service was unable to process your request. Reasons for the error are described in an error response object.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorList"
+                        },
+                        "x-amazon-spds-sandbox-behaviors": [
+                            {
+                                "request": {
+                                    "parameters": {
+                                        "productId": {
+                                            "value": "B07VDJ5RVF"
+                                        },
+                                        "locale": {
+                                            "value": "es_US"
+                                        },
+                                        "facets": {
+                                            "value": [
+                                                "OFFERS"
+                                            ]
+                                        },
+                                        "shippingPostalCode": {
+                                            "value": "99999"
+                                        }
+                                    }
+                                },
+                                "response": {
+                                    "errors": [
+                                        {
+                                            "code": "INVALID_REQUEST_PARAMETER",
+                                            "message": "Missing required request parameters: [productRegion]"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "401": {
+                        "description": "The request's authorization header isn't formatted correctly or doesn't contain a valid authorization input.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Indicates that access to the resource is forbidden. Possible reasons include Access Denied, Unauthorized, Expired Token, or Invalid Signature.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The resource specified doesn't exist.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "The frequency of requests was greater than allowed.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Encountered an unexpected condition which prevented the server from fulfilling the request.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Temporary overloading or maintenance of the server.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "products"
+                ],
+                "description": "Retrieves a product with its ASIN identifier.",
+                "operationId": "productsRequest",
+                "summary": "Retrieves product data based on an ASIN identifier."
+            }
+        },
+        "/products/2020-08-26/products/{productId}/offers": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "The Amazon Standard Item Identifier (ASIN) for the product.",
+                        "in": "path",
+                        "name": "productId",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The region where the customer wants to purchase the product.",
+                        "enum": [
+                            "DE",
+                            "FR",
+                            "UK",
+                            "IT",
+                            "ES",
+                            "US",
+                            "CA",
+                            "JP"
+                        ],
+                        "x-docgen-enum-table-extension": [
+                            {
+                                "value": "DE",
+                                "description": "Germany"
+                            },
+                            {
+                                "value": "FR",
+                                "description": "France"
+                            },
+                            {
+                                "value": "UK",
+                                "description": "United Kingdom"
+                            },
+                            {
+                                "value": "IT",
+                                "description": "Italy"
+                            },
+                            {
+                                "value": "ES",
+                                "description": "Spain"
+                            },
+                            {
+                                "value": "US",
+                                "description": "United States of America"
+                            },
+                            {
+                                "value": "CA",
+                                "description": "Canada"
+                            },
+                            {
+                                "value": "JP",
+                                "description": "Japan"
+                            }
+                        ],
+                        "in": "query",
+                        "name": "productRegion",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "This field determines the region where to ship the product based on the value in the shippingPostalCode.",
+                        "in": "query",
+                        "name": "shippingRegion",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The locale of the request, in the form of an IETF language tag. Each ProductRegion supports one or more locales. This value should comply with java.util.Locale.",
+                        "pattern": "^[-_]+$",
+                        "in": "query",
+                        "name": "locale",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The shipping postal or zip code for customer's request. This parameter doesn't hold geocode.",
+                        "in": "query",
+                        "name": "shippingPostalCode",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "description": "The zero-based number of the page being requested. If not specified, a default value of 0 will be used. When passed, the value must be equal or greater than zero, and less than the number of pages returned in the response.",
+                        "in": "query",
+                        "name": "pageNumber",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "The number of items desired for each page in the response. If not specified, a default value of 24 will be used. Maximum items that can be fetched in single request is 24.",
+                        "in": "query",
+                        "name": "pageSize",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "description": "A value that identifies the group within the business account that a customer belongs to. The customer can set this in Amazon Business account information. GroupTag is necessary only if the customer account belongs to more than one group.",
+                        "in": "query",
+                        "name": "groupTag",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list of filter ids for use to query results.",
+                        "in": "query",
+                        "name": "filterIds",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "The number of units the customer intends to purchase. This helps Amazon Business determines quantity-based discounts if an eligible offer is present. Defaults to 1.",
+                        "in": "query",
+                        "name": "quantity",
+                        "required": false,
+                        "type": "integer",
+                        "default": 1
+                    },
+                    {
+                        "description": "The email address of the customer requesting this resource",
+                        "in": "header",
+                        "name": "x-amz-user-email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list specifying the offer fields for inclusion in the response object. Excluding this query parameter results in the response including all inclusions.",
+                        "enum": [
+                            "ALL",
+                            "availability",
+                            "buyingGuidance",
+                            "buyingRestrictions",
+                            "condition",
+                            "fulfillmentType",
+                            "merchant",
+                            "price",
+                            "productCondition",
+                            "productConditionNote",
+                            "quantityLimits",
+                            "quantityPrice",
+                            "taxExclusivePrice",
+                            "deliveryInformation",
+                            "listPrice",
+                            "shippingOptions",
+                            "quantityInStock",
+                            "badges"
+                        ],
+                        "in": "query",
+                        "name": "inclusionsForOffers",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?inclusionsForOffers=FOO,BAR"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search success",
+                        "schema": {
+                            "$ref": "#/definitions/OffersResult"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        },
+                        "x-amazon-spds-sandbox-behaviors": [
+                            {
+                                "request": {
+                                    "parameters": {
+                                        "productRegion": {
+                                            "value": "DE"
+                                        },
+                                        "locale": {
+                                            "value": "es_US"
+                                        },
+                                        "productId": {
+                                            "value": "B07VDJ5RVF"
+                                        },
+                                        "pageNumber": {
+                                            "value": "1"
+                                        },
+                                        "pageSize": {
+                                            "value": "12"
+                                        },
+                                        "filterIds": {
+                                            "value": [
+                                                "NEW",
+                                                "PRIME"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "response": {
+                                    "offerCount": 2,
+                                    "numberOfPages": 1,
+                                    "featuredOffer": {
+                                        "availability": "[availability]",
+                                        "buyingGuidance": "NONE",
+                                        "deliveryInformation": "[deliveryInformation]",
+                                        "fulfillmentType": "AMAZON_FULFILLMENT",
+                                        "offerId": "[offerId]",
+                                        "merchant": {
+                                            "name": "[merchantName]",
+                                            "merchantId": "[merchantId]",
+                                            "meanFeedbackRating": 5.0,
+                                            "totalFeedbackCount": 1
+                                        },
+                                        "price": {
+                                            "value": {
+                                                "amount": 1.00,
+                                                "currencyCode": "USD"
+                                            },
+                                            "formattedPrice": "[formattedPrice]",
+                                            "priceType": "NEW"
+                                        },
+                                        "listPrice": {
+                                            "value": {
+                                                "amount": 2.00,
+                                                "currencyCode": "USD"
+                                            },
+                                            "formattedPrice": "[formattedPrice]",
+                                            "priceType": "NEW"
+                                        },
+                                        "taxExclusivePrice": {
+                                            "taxExclusiveAmount": {
+                                                "amount": 1.0,
+                                                "currencyCode": "USD"
+                                            },
+                                            "formattedPrice": "[formattedPrice]",
+                                            "displayString": "[taxExclusivePriceDisplayString]",
+                                            "label": "[taxExclusivePriceLabel]"
+                                        },
+                                        "quantityLimits": {
+                                            "minQuantity": 1,
+                                            "maxQuantity": 6
+                                        },
+                                        "quantityPrice": {
+                                            "quantityPriceTiers": [
+                                                {
+                                                    "quantityDisplay": "string",
+                                                    "unitPrice": {
+                                                        "amount": 0,
+                                                        "currencyCode": "USD"
+                                                    },
+                                                    "minQuantity": 0,
+                                                    "price": {
+                                                        "value": {
+                                                            "amount": 0,
+                                                            "currencyCode": "USD"
+                                                        },
+                                                        "formattedPrice": "[formattedPrice]",
+                                                        "priceType": "NEW"
+                                                    },
+                                                    "savingMessage": "string",
+                                                    "taxExclusivePrice": {
+                                                        "taxExclusiveAmount": {
+                                                            "amount": 0,
+                                                            "currencyCode": "USD"
+                                                        },
+                                                        "displayString": "[taxExclusivePriceDisplayString]",
+                                                        "formattedPrice": "[formattedPrice]",
+                                                        "label": "[taxExclusivePriceLabel]"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        "productCondition": "NEW",
+                                        "productConditionNote": "[productConditionNote]",
+                                        "condition": {
+                                            "conditionValue": "NEW",
+                                            "conditionNote": "string",
+                                            "subCondition": "ACCEPTABLE"
+                                        },
+                                        "buyingRestrictions": [],
+                                        "shippingOptions": [
+                                            {
+                                                "shippingCost": {
+                                                    "value": {
+                                                        "amount": 9.00,
+                                                        "currencyCode": "USD"
+                                                    }
+                                                },
+                                                "deliveryRange": {
+                                                    "max": "2022-01-01T00:00:01.000Z",
+                                                    "min": "2022-01-01T00:00:01.000Z"
+                                                }
+                                            }
+                                        ],
+                                        "quantityInStock": 1000,
+                                        "badges": [
+                                            {
+                                                "name": "[badge1]"
+                                            }
+                                        ]
+                                    },
+                                    "offers": [
+                                        {
+                                            "offerId": "[offerId]",
+                                            "merchant": {
+                                                "name": "[merchantName]",
+                                                "merchantId": "[merchantId]",
+                                                "meanFeedbackRating": 5.0,
+                                                "totalFeedbackCount": 1
+                                            },
+                                            "deliveryInformation": "[deliveryInformation]",
+                                            "price": {
+                                                "value": {
+                                                    "amount": 1.00,
+                                                    "currencyCode": "USD"
+                                                },
+                                                "formattedPrice": "[formattedPrice]",
+                                                "priceType": "NEW"
+                                            },
+                                            "listPrice": {
+                                                "value": {
+                                                    "amount": 2.00,
+                                                    "currencyCode": "USD"
+                                                },
+                                                "formattedPrice": "[formattedPrice]",
+                                                "priceType": "NEW"
+                                            },
+                                            "taxExclusivePrice": {
+                                                "taxExclusiveAmount": {
+                                                    "amount": 1.0,
+                                                    "currencyCode": "USD"
+                                                },
+                                                "formattedPrice": "[formattedPrice]",
+                                                "displayString": "[taxExclusivePriceDisplayString]",
+                                                "label": "[taxExclusivePriceLabel]"
+                                            },
+                                            "quantityLimits": {
+                                                "minQuantity": 1,
+                                                "maxQuantity": 6
+                                            },
+                                            "quantityPrice": {
+                                                "quantityPriceTiers": [
+                                                    {
+                                                        "quantityDisplay": "string",
+                                                        "unitPrice": {
+                                                            "amount": 0,
+                                                            "currencyCode": "USD"
+                                                        },
+                                                        "minQuantity": 0,
+                                                        "price": {
+                                                            "value": {
+                                                                "amount": 0,
+                                                                "currencyCode": "USD"
+                                                            },
+                                                            "formattedPrice": "[formattedPrice]",
+                                                            "priceType": "NEW"
+                                                        },
+                                                        "savingMessage": "string",
+                                                        "taxExclusivePrice": {
+                                                            "taxExclusiveAmount": {
+                                                                "amount": 0,
+                                                                "currencyCode": "USD"
+                                                            },
+                                                            "displayString": "[taxExclusivePriceDisplayString]",
+                                                            "formattedPrice": "[formattedPrice]",
+                                                            "label": "[taxExclusivePriceLabel]"
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "productCondition": "NEW",
+                                            "productConditionNote": "[productConditionNote]",
+                                            "condition": {
+                                                "conditionValue": "NEW",
+                                                "conditionNote": "string",
+                                                "subCondition": "ACCEPTABLE"
+                                            },
+                                            "availability": "[availability]",
+                                            "fulfillmentType": "THIRD_PARTY",
+                                            "buyingGuidance": "NONE",
+                                            "buyingRestrictions": [],
+                                            "shippingOptions": [
+                                                {
+                                                    "shippingCost": {
+                                                        "value": {
+                                                            "amount": 9.00,
+                                                            "currencyCode": "USD"
+                                                        }
+                                                    },
+                                                    "deliveryRange": {
+                                                        "max": "2022-01-01T00:00:01.000Z",
+                                                        "min": "2022-01-01T00:00:01.000Z"
+                                                    }
+                                                }
+                                            ],
+                                            "quantityInStock": 1000,
+                                            "badges": [
+                                                {
+                                                    "name": "[badge1]"
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "filterGroups": [
+                                        {
+                                            "displayName": "[displayName]",
+                                            "items": [
+                                                {
+                                                    "displayName": "[itemDisplayName]",
+                                                    "id": "[itemId]"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "400": {
+                        "description": "The service was unable to process the request. Reasons for the error are described in an error response object.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        },
+                        "x-amazon-spds-sandbox-behaviors": [
+                            {
+                                "request": {
+                                    "parameters": {
+                                        "productRegion": {
+                                            "value": "US"
+                                        },
+                                        "productId": {
+                                            "value": "B07VDJ5RVF"
+                                        }
+                                    }
+                                },
+                                "response": {
+                                    "errors": [
+                                        {
+                                            "code": "INVALID_REQUEST_PARAMETER",
+                                            "message": "Missing required request parameters: [locale]"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "401": {
+                        "description": "The request's authorization header isn't formatted correctly or doesn't contain a valid authorization input.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Indicates that access to the resource is forbidden. Possible reasons include Access Denied, Unauthorized, Expired Token, or Invalid Signature.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The resource specified doesn't exist.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "The frequency of requests was greater than allowed.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Encountered an unexpected condition which prevented the server from fulfilling the request.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Temporary overloading or maintenance of the server.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "search"
+                ],
+                "description": "Search for offers of a specific product.",
+                "operationId": "searchOffersRequest",
+                "summary": "Paginated and filtered search for offers of a specific product."
+            }
+        },
+        "/products/2020-08-26/products/getProductsByAsins": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "productsByAsins",
+                        "schema": {
+                            "$ref": "#/definitions/ProductsByAsinsRequest"
+                        }
+                    },
+                    {
+                        "description": "The email address of the customer requesting this resource.",
+                        "in": "header",
+                        "name": "x-amz-user-email",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list specifying the product fields for inclusion in the response object. Excluding this query parameter results in the response including all inclusions except upcValues and eanValues.",
+                        "enum": [
+                            "ALL",
+                            "bookInformation",
+                            "byLine",
+                            "customerReviewsSummary",
+                            "editorialReviews",
+                            "features",
+                            "format",
+                            "mediaInformation",
+                            "productDescription",
+                            "productDetails",
+                            "productOverview",
+                            "productVariations",
+                            "taxonomies",
+                            "title",
+                            "upcValues",
+                            "eanValues"
+                        ],
+                        "in": "query",
+                        "name": "inclusionsForProducts",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?inclusionsForProducts=FOO,BAR"
+                    },
+                    {
+                        "collectionFormat": "csv",
+                        "description": "A list specifying the offer fields for inclusion in the response object. Excluding this query parameter results in the response including all inclusions.",
+                        "enum": [
+                            "ALL",
+                            "availability",
+                            "buyingGuidance",
+                            "buyingRestrictions",
+                            "condition",
+                            "fulfillmentType",
+                            "merchant",
+                            "price",
+                            "productCondition",
+                            "productConditionNote",
+                            "quantityLimits",
+                            "quantityPrice",
+                            "taxExclusivePrice",
+                            "deliveryInformation",
+                            "listPrice",
+                            "shippingOptions",
+                            "quantityInStock",
+                            "badges"
+                        ],
+                        "in": "query",
+                        "name": "inclusionsForOffers",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "x-example": "/path?inclusionsForOffers=FOO,BAR"
+                    },
+                    {
+                        "description": "A value that identifies the group within the business account that a customer belongs to. The customer can set this in Amazon Business account information. GroupTag is necessary only if the customer account belongs to more than one group.",
+                        "in": "query",
+                        "name": "groupTag",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Products successfully retrieved.",
+                        "schema": {
+                            "$ref": "#/definitions/ProductsByAsinsResponse"
+                        },
+                        "x-amzn-RateLimit-Limit": {
+                            "description": "The rate limit (requests per second) for this operation.",
+                            "type": "string"
+                        },
+                        "x-amzn-requestid": {
+                            "description": "A unique request reference identifier.",
+                            "type": "string"
+                        },
+                        "x-amazon-spds-sandbox-behaviors": [
+                            {
+                                "request": {
+                                    "parameters": {
+                                        "body": {
+                                            "value": {
+                                                "locale": "en_US",
+                                                "productRegion": "US",
+                                                "productIds": [
+                                                    "asin1",
+                                                    "asin2",
+                                                    "asin3"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                "response": {
+                                    "matchingProductCount": 1,
+                                    "products": [
+                                        {
+                                            "asin": "[productId]",
+                                            "asinType": "STANDARD",
+                                            "signedProductId": "[signedProductId]",
+                                            "title": "[productTitle]",
+                                            "features": [
+                                                [
+                                                    "feature1"
+                                                ],
+                                                [
+                                                    "feature2"
+                                                ],
+                                                [
+                                                    "feature3"
+                                                ]
+                                            ],
+                                            "editorialReviews": [
+                                                {
+                                                    "content": "[editorialReviewContent]",
+                                                    "source": "[editorialReviewSource]"
+                                                }
+                                            ],
+                                            "format": "[format]",
+                                            "bookInformation": [
+                                                {
+                                                    "isbn": [
+                                                        {
+                                                            "isbn10": "[isbn10]",
+                                                            "isbn13": "[isbn13]"
+                                                        }
+                                                    ],
+                                                    "publishedDate": "[publishedDate]",
+                                                    "publicationLanguage": "[publicationLanguage]"
+                                                }
+                                            ],
+                                            "byLine": [
+                                                {
+                                                    "name": "[name]",
+                                                    "roles": [
+                                                        "[role1]"
+                                                    ]
+                                                }
+                                            ],
+                                            "mediaInformation": [
+                                                {
+                                                    "editions": [
+                                                        "edition1"
+                                                    ],
+                                                    "mediaFormats": [
+                                                        "mediaFormat1"
+                                                    ]
+                                                }
+                                            ],
+                                            "productOverview": {
+                                                "[attributeKey1]": "[attributeValue1]"
+                                            },
+                                            "productDetails": {
+                                                "[attributeKey1]": {
+                                                    "[attributeKey1]": "[attributeValue1]"
+                                                }
+                                            },
+                                            "productVariations": {
+                                                "dimensions": [
+                                                    {
+                                                        "index": 0,
+                                                        "displayString": "[dimensionKeys]",
+                                                        "dimensionValues": [
+                                                            {
+                                                                "index": 0,
+                                                                "displayString": "[value]"
+                                                            }
+                                                        ]
+                                                    }
+                                                ],
+                                                "variations": [
+                                                    {
+                                                        "asin": "[asin]",
+                                                        "variationValues": [
+                                                            {
+                                                                "index": 0,
+                                                                "value": "[value]"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "taxonomies": [
+                                                {
+                                                    "title": "[taxonomyTitle]",
+                                                    "taxonomyCode": "[taxonomyCode]",
+                                                    "type": "UNSPSC"
+                                                }
+                                            ],
+                                            "customerReviewsSummary": {
+                                                "numberOfReviews": 99,
+                                                "starRating": 4.9
+                                            },
+                                            "productDescription": "[productDescription]",
+                                            "upcValues": [
+                                                "[upcValue1]"
+                                            ],
+                                            "eanValues": [
+                                                "[eanValue1]"
+                                            ],
+                                            "url": "[productUrl]",
+                                            "includedDataTypes": {
+                                                "OFFERS": [
+                                                    {
+                                                        "offerId": "[offerId]",
+                                                        "merchant": {
+                                                            "merchantId": "[merchantId]",
+                                                            "name": "[merchantName]",
+                                                            "meanFeedbackRating": 4.5,
+                                                            "totalFeedbackCount": 2
+                                                        },
+                                                        "price": {
+                                                            "value": {
+                                                                "amount": 39.89,
+                                                                "currencyCode": "EUR"
+                                                            },
+                                                            "formattedPrice": "EUR 39.89",
+                                                            "priceType": "BUSINESS"
+                                                        },
+                                                        "listPrice": {
+                                                            "value": {
+                                                                "amount": 49.89,
+                                                                "currencyCode": "EUR"
+                                                            },
+                                                            "formattedPrice": "EUR 49.89",
+                                                            "priceType": "BUSINESS"
+                                                        },
+                                                        "taxExclusivePrice": {
+                                                            "taxExclusiveAmount": {
+                                                                "amount": 34.39,
+                                                                "currencyCode": "EUR"
+                                                            },
+                                                            "formattedPrice": "34.39 EUR",
+                                                            "displayString": "[taxExclusivePriceDisplayString]",
+                                                            "label": "[taxExclusivePriceLabel]"
+                                                        },
+                                                        "quantityLimits": {
+                                                            "minQuantity": 1,
+                                                            "maxQuantity": 30
+                                                        },
+                                                        "productCondition": "NEW",
+                                                        "productConditionNote": "[productConditionNote]",
+                                                        "condition": {
+                                                            "conditionValue": "NEW",
+                                                            "conditionNote": "[productConditionNote]",
+                                                            "subCondition": "ACCEPTABLE"
+                                                        },
+                                                        "availability": "[availability]",
+                                                        "fulfillmentType": "AMAZON",
+                                                        "buyingGuidance": "NONE",
+                                                        "buyingRestrictions": [],
+                                                        "shippingOptions": [
+                                                            {
+                                                                "shippingCost": {
+                                                                    "value": {
+                                                                        "amount": 9.00,
+                                                                        "currencyCode": "USD"
+                                                                    }
+                                                                },
+                                                                "deliveryRange": {
+                                                                    "max": "2022-01-01T00:00:01.000Z",
+                                                                    "min": "2022-01-01T00:00:01.000Z"
+                                                                }
+                                                            }
+                                                        ],
+                                                        "quantityInStock": 1000,
+                                                        "badges": [
+                                                            {
+                                                                "name": "[badge1]"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "400": {
+                        "description": "The service was unable to process your request. Reasons for the error are described in an error response object.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorList"
+                        }
+                    },
+                    "401": {
+                        "description": "The request's authorization header isn't formatted correctly or doesn't contain a valid authorization input.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Indicates that access to the resource is forbidden. Possible reasons include Access Denied, Unauthorized, Expired Token, or Invalid Signature.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "The resource specified doesn't exist.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "The frequency of requests was greater than allowed.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Encountered an unexpected condition which prevented the server from fulfilling the request.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Temporary overloading or maintenance of the server.",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorResponse"
+                        },
+                        "headers": {
+                            "x-amzn-RateLimit-Limit": {
+                                "description": "The rate limit (requests per second) for this operation.",
+                                "type": "string"
+                            },
+                            "x-amzn-requestid": {
+                                "description": "A unique request reference identifier.",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "products"
+                ],
+                "description": "Retrieves products for the ASIN identifier present in the list of ASINs.",
+                "operationId": "getProductsByAsins",
+                "summary": "The result for list of ASIN search."
+            }
+        }
+    },
+    "definitions": {
+        "AsinType": {
+            "description": "The type of ASIN returned in the request.",
+            "type": "string",
+            "enum": [
+                "STANDARD",
+                "VARIATION_PARENT",
+                "VARIATION_CHILD"
+            ],
+            "x-docgen-enum-table-extension": [
+                {
+                    "value": "STANDARD",
+                    "description": "Available for direct purchase."
+                },
+                {
+                    "value": "VARIATION_PARENT",
+                    "description": "Not available for direct purchase but is linked to one or more VARIATION_CHILD."
+                },
+                {
+                    "value": "VARIATION_CHILD",
+                    "description": "Has specific settings for certain attributes such as the size and color of a shirt. This type of ASIN can have different prices and can be offered by different merchants."
+                }
+            ]
+        },
+        "Category": {
+            "description": "The search category is used to give information about relevant categories a product belongs to. Use category to limit the results for a particular category in subsequent requests.",
+            "required": [
+                "displayName",
+                "id"
+            ],
+            "properties": {
+                "displayName": {
+                    "description": "Display name is used to share more human friendly readable description of category.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Identifies a search category within a product region.",
+                    "type": "string"
+                }
+            },
+            "title": "Category",
+            "type": "object"
+        },
+        "ErrorResponse": {
+            "description": "The response returned for unsuccessful request.",
+            "properties": {
+                "errors": {
+                    "description": "A list of errors encountered while processing the request.",
+                    "$ref": "#/definitions/ErrorList"
+                }
+            },
+            "type": "object"
+        },
+        "ErrorList": {
+            "description": "A list of errors in the response.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Error"
+            }
+        },
+        "Error": {
+            "description": "Provides the error detail as part of the error response.",
+            "properties": {
+                "code": {
+                    "description": "The error code in the error response.",
+                    "type": "string",
+                    "enum": [
+                        "PRODUCT_NOT_FOUND",
+                        "PAGE_NOT_FOUND",
+                        "INVALID_REQUEST_PARAMETER",
+                        "SERVICE_ERROR",
+                        "EMAIL_ID_NOT_FOUND",
+                        "UNAUTHORIZED",
+                        "REQUEST_RATE_LIMIT_EXCEEDED"
+                    ],
+                    "x-docgen-enum-table-extension": [
+                        {
+                            "value": "PRODUCT_NOT_FOUND",
+                            "description": "The product doesn't exist in the product catalog."
+                        },
+                        {
+                            "value": "PAGE_NOT_FOUND",
+                            "description": "The page or resource can't be found."
+                        },
+                        {
+                            "value": "INVALID_REQUEST_PARAMETER",
+                            "description": "Some parameters are missing or incorrect."
+                        },
+                        {
+                            "value": "SERVICE_ERROR",
+                            "description": "The service was unable to process the request."
+                        },
+                        {
+                            "value": "EMAIL_ID_NOT_FOUND",
+                            "description": "The email ID doesn't exist or there's missing characters or numbers."
+                        },
+                        {
+                            "value": "UNAUTHORIZED",
+                            "description": "The request lacks valid authentication credentials for the requested resource."
+                        },
+                        {
+                            "value": "REQUEST_RATE_LIMIT_EXCEEDED",
+                            "description": "The request rate exceeds the maximum allowed transactions per second (TPS) rate."
+                        }
+                    ]
+                },
+                "message": {
+                    "description": "A message that describes the error condition.",
+                    "type": "string"
+                },
+                "details": {
+                    "description": "Additional details that can help the customer understand or fix the issue.",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "code",
+                "message"
+            ],
+            "type": "object"
+        },
+        "BuyingRestriction": {
+            "description": "If present, this object shows restrictions that would prevent the customer from buying the product.",
+            "required": [
+                "title",
+                "type"
+            ],
+            "properties": {
+                "title": {
+                    "description": "A displayable string which explains the restriction.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The type of buying restrictions that exist for a product. Possible value: PROFESSIONAL_USE",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ImageData": {
+            "description": "A structure which holds the data for a given image.",
+            "required": [
+                "height",
+                "url",
+                "width"
+            ],
+            "properties": {
+                "height": {
+                    "description": "The height of the image in pixels.",
+                    "type": "integer"
+                },
+                "url": {
+                    "description": "The URL to use when retrieving an image.",
+                    "type": "string"
+                },
+                "width": {
+                    "description": "The width of the image in pixels.",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "ImageItem": {
+            "description": "A structure which holds the data for a given image.",
+            "required": [
+                "altText"
+            ],
+            "properties": {
+                "altText": {
+                    "description": "The text to use for the image's alt property.",
+                    "type": "string"
+                },
+                "large": {
+                    "$ref": "#/definitions/ImageData",
+                    "description": "The data for a large rendering of the image. The image resolution is 500px x 500px, but can vary."
+                },
+                "medium": {
+                    "$ref": "#/definitions/ImageData",
+                    "description": "The data for a medium rendering of the image. The image resolution is 250px x 250px, but can vary."
+                },
+                "small": {
+                    "$ref": "#/definitions/ImageData",
+                    "description": "The data for a small rendering of the image. The image resolution is 160px x 160px, but can vary."
+                },
+                "thumbnail": {
+                    "$ref": "#/definitions/ImageData",
+                    "description": "The data for a very small rendering of the image. The image resolution  is 40px x 40px, but can vary."
+                }
+            },
+            "type": "object"
+        },
+        "ImagesFacet": {
+            "description": "A list of image data for the product. The first item in the list is the product's primary image as shown on the Amazon Business website. Additional images show different views of the product or other visual information useful to the customer.",
+            "items": {
+                "$ref": "#/definitions/ImageItem"
+            },
+            "type": "array"
+        },
+        "Merchant": {
+            "description": "Information about the merchant selling the product.",
+            "required": [
+                "merchantId",
+                "name",
+                "meanFeedbackRating",
+                "totalFeedbackCount"
+            ],
+            "properties": {
+                "merchantId": {
+                    "description": "The unique id of the merchant selling the product.",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "The displayable name of the merchant selling the product.",
+                    "type": "string"
+                },
+                "meanFeedbackRating": {
+                    "description": "The mean of the total ratings given to the merchant selling the product.",
+                    "type": "number",
+                    "format": "double"
+                },
+                "totalFeedbackCount": {
+                    "description": "The total number of reviews for the merchant selling the product.",
+                    "type": "number",
+                    "format": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "Condition": {
+            "description": "Information about the condition of the product.",
+            "required": [
+                "conditionValue",
+                "conditionNote",
+                "subCondition"
+            ],
+            "properties": {
+                "conditionValue": {
+                    "description": "The possible condition of the product being sold by the merchant.",
+                    "$ref": "#/definitions/ConditionValue"
+                },
+                "conditionNote": {
+                    "description": "Additional details on the product's condition.",
+                    "type": "string"
+                },
+                "subCondition": {
+                    "description": "The possible sub condition of the product being sold by the merchant.",
+                    "$ref": "#/definitions/SubCondition"
+                }
+            },
+            "type": "object"
+        },
+        "ConditionValue": {
+            "description": "The possible condition of the product being sold by the merchant.",
+            "type": "string",
+            "enum": [
+                "NEW",
+                "USED",
+                "COLLECTIBLE",
+                "REFURBISHED",
+                "OTHER",
+                "UNKNOWN"
+            ],
+            "x-docgen-enum-table-extension": [
+                {
+                    "value": "NEW",
+                    "description": "A brand-new, unused item in perfect condition."
+                },
+                {
+                    "value": "USED",
+                    "description": "A used item may be fairly worn or in perfect condition but still works perfectly."
+                },
+                {
+                    "value": "COLLECTIBLE",
+                    "description": "Collectible items are rare, signed, out of print or distribution, or unique. The Seller should provide details why the product is collectible."
+                },
+                {
+                    "value": "REFURBISHED",
+                    "description": "A product that's professionally restored to working condition before resale. The product is inspected, cleaned, and repaired to meet manufacturer specifications. The product might not be in its original packaging. The manufacturer warranty or warranty of the refurbishing service company  might apply. The warranty should be in the Condition comments."
+                },
+                {
+                    "value": "OTHER",
+                    "description": "Refers to the condition of the product that isn't new, used, collectible, refurbished, or unknown."
+                },
+                {
+                    "value": "UNKNOWN",
+                    "description": "The condition of the product is unknown."
+                }
+            ]
+        },
+        "SubCondition": {
+            "description": "The possible sub condition of the product being sold by the merchant.",
+            "type": "string",
+            "enum": [
+                "ACCEPTABLE",
+                "CLUB",
+                "GOOD",
+                "LIKE_NEW",
+                "NEW",
+                "OEM",
+                "OPEN_BOX",
+                "REFURBISHED",
+                "UNKNOWN",
+                "VERY_GOOD"
+            ],
+            "x-docgen-enum-table-extension": [
+                {
+                    "value": "ACCEPTABLE",
+                    "description": "The product is fairly worn but it continues to work perfectly. The signs of wear can include scratches, dents, and other aesthetic problems. The product might be marked or have identifying information on it, and show other signs of previous use."
+                },
+                {
+                    "value": "CLUB",
+                    "description": "A product or service that is communal or has collective ownership-consumption arrangement."
+                },
+                {
+                    "value": "GOOD",
+                    "description": "The product shows wear from consistent use but remains in good condition. The product might be marked or have identifying information on it, and show other signs of previous use. The product works perfectly."
+                },
+                {
+                    "value": "LIKE_NEW",
+                    "description": "An item in perfect working condition. The original plastic wrap might be missing. The original packaging might have minor damage or item might have been repackaged. All accessories are present."
+                },
+                {
+                    "value": "NEW",
+                    "description": "An apparently untouched product in perfect condition. The original plastic wrap might be missing but the original packaging is intact and pristine; instructions are included. There are absolutely no signs of wear. Suitable for presenting as a gift."
+                },
+                {
+                    "value": "OEM",
+                    "description": "Original Equipment Manufacturer (OEM) is defined as a company that provides parts for the finished products of other companies."
+                },
+                {
+                    "value": "OPEN_BOX",
+                    "description": "The product is in the box either with original, visible, or slightly visible UPC."
+                },
+                {
+                    "value": "REFURBISHED",
+                    "description": "A refurbished product in used condition. The manufacturer warranty no longer applies."
+                },
+                {
+                    "value": "UNKNOWN",
+                    "description": "The condition of the product is unknown."
+                },
+                {
+                    "value": "VERY_GOOD",
+                    "description": "A well-cared product with limited use but still in great condition. The product is complete, unmarked, and undamaged but might show some limited signs of wear. The product works perfectly."
+                }
+            ]
+        },
+        "Offer": {
+            "description": "An offer for a product being sold by a merchant. This object contains details that would help a buyer decide whether to purchase or not to purchase a product.",
+            "required": [
+                "availability",
+                "buyingGuidance",
+                "buyingRestrictions",
+                "fulfillmentType",
+                "merchant",
+                "offerId",
+                "price",
+                "productCondition",
+                "productConditionNote",
+                "condition",
+                "quantityLimits",
+                "taxExclusivePrice",
+                "deliveryInformation",
+                "listPrice",
+                "shippingOptions",
+                "quantityInStock",
+                "badges"
+            ],
+            "properties": {
+                "availability": {
+                    "description": "Displays the available dates to ship the product after purchased.",
+                    "type": "string"
+                },
+                "buyingGuidance": {
+                    "description": "Some organizations establish guided buying policies to inform Amazon Business whether their organization supports the purchase of specified types of products. If an organization hasn't configured such policies, an API call returns the value \"NONE\" for the BuyingGuidance property.",
+                    "type": "string",
+                    "enum": [
+                        "PREFERRED",
+                        "RESTRICTED",
+                        "BLOCKED",
+                        "NONE",
+                        "NEGOTIATED",
+                        "UNKNOWN"
+                    ],
+                    "x-docgen-enum-table-extension": [
+                        {
+                            "value": "PREFERRED",
+                            "description": "Your organization has identified this item as preferred and wants you to choose it over similar products."
+                        },
+                        {
+                            "value": "RESTRICTED",
+                            "description": "Your organization has identified this item as non-compliant with your organization's purchasing standards."
+                        },
+                        {
+                            "value": "BLOCKED",
+                            "description": "Your organization has blocked the purchase of this item."
+                        },
+                        {
+                            "value": "NONE",
+                            "description": "Your organization didn't specify a buying guidance for this product."
+                        },
+                        {
+                            "value": "NEGOTIATED",
+                            "description": "This item has a custom offer that’s included in a pricing deal for your organization and is shown as featured offer. Your organization encourages you to buy this offer."
+                        },
+                        {
+                            "value": "UNKNOWN",
+                            "description": "The buying guidance is unknown."
+                        }
+                    ]
+                },
+                "buyingRestrictions": {
+                    "description": "When present, entries in this property describe the reasons a buyer is restricted from buying a product.",
+                    "items": {
+                        "$ref": "#/definitions/BuyingRestriction"
+                    },
+                    "type": "array"
+                },
+                "fulfillmentType": {
+                    "description": "The fulfillment system to use for the purchased product purchase.",
+                    "type": "string",
+                    "enum": [
+                        "AMAZON_FULFILLMENT",
+                        "MERCHANT_FULFILLMENT",
+                        "OTHER"
+                    ],
+                    "x-docgen-enum-table-extension": [
+                        {
+                            "value": "AMAZON_FULFILLMENT",
+                            "description": "Amazon Business picks, packs, and ships the product directly to the buyer on behalf of the seller."
+                        },
+                        {
+                            "value": "MERCHANT_FULFILLMENT",
+                            "description": "Sellers pick, pack, and ship the product directly to the buyer."
+                        },
+                        {
+                            "value": "OTHER",
+                            "description": "Amazon Business or the third-party sellers ship the product from their own sources of inventory directly to buyer."
+                        }
+                    ]
+                },
+                "merchant": {
+                    "$ref": "#/definitions/Merchant"
+                },
+                "offerId": {
+                    "description": "The Amazon Business offer identifier to use when purchasing a product.",
+                    "type": "string"
+                },
+                "price": {
+                    "$ref": "#/definitions/Price"
+                },
+                "shippingOptions": {
+                    "description": "The options for shipping a product offer.",
+                    "items": {
+                        "$ref": "#/definitions/ShippingOption"
+                    },
+                    "type": "array"
+                },
+                "badges": {
+                    "description": "The types of badges available for a product offer.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Badge"
+                    }
+                },
+                "quantityInStock": {
+                    "description": "The number of items in stock for a product offer.",
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "listPrice": {
+                    "$ref": "#/definitions/Price"
+                },
+                "productCondition": {
+                    "description": "The possible condition of the product being sold by the merchant.",
+                    "type": "string",
+                    "enum": [
+                        "NEW",
+                        "USED",
+                        "COLLECTIBLE",
+                        "REFURBISHED",
+                        "OTHER",
+                        "UNKNOWN"
+                    ],
+                    "x-docgen-enum-table-extension": [
+                        {
+                            "value": "NEW",
+                            "description": "A brand-new, unused item in perfect condition."
+                        },
+                        {
+                            "value": "USED",
+                            "description": "A used item may be fairly worn or in perfect condition but still works perfectly."
+                        },
+                        {
+                            "value": "COLLECTIBLE",
+                            "description": "Collectible items are rare, signed, out of print or distribution, or unique. The Seller should provide details why the product is collectible."
+                        },
+                        {
+                            "value": "REFURBISHED",
+                            "description": "A product that's professionally restored to working condition before resale. The product is inspected, cleaned, and repaired to meet manufacturer specifications. The product might not be in its original packaging. The manufacturer warranty or warranty of the refurbishing service company  might apply. The warranty should be in the Condition comments."
+                        },
+                        {
+                            "value": "OTHER",
+                            "description": "Refers to the condition of the product that isn't new, used, collectible, refurbished, or unknown."
+                        },
+                        {
+                            "value": "UNKNOWN",
+                            "description": "The condition of the product is unknown."
+                        }
+                    ]
+                },
+                "productConditionNote": {
+                    "description": "Additional details on the product's condition.",
+                    "type": "string"
+                },
+                "condition": {
+                    "description": "Information about the condition of the product.",
+                    "$ref": "#/definitions/Condition"
+                },
+                "quantityLimits": {
+                    "$ref": "#/definitions/OfferQuantityLimits"
+                },
+                "quantityPrice": {
+                    "$ref": "#/definitions/QuantityPrice"
+                },
+                "taxExclusivePrice": {
+                    "$ref": "#/definitions/TaxExclusivePrice"
+                },
+                "deliveryInformation": {
+                    "description": "Information regarding the estimated delivery time and delivery price.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ShippingOption": {
+            "description": "The available options for shipping a product offer.",
+            "required": [
+                "shippingCost",
+                "deliveryRange"
+            ],
+            "properties": {
+                "shippingCost": {
+                    "description": "The cost related to shipping an item.",
+                    "$ref": "#/definitions/ShippingDetails"
+                },
+                "deliveryRange": {
+                    "description": "The delivery window for shipping a product offer.",
+                    "$ref": "#/definitions/DeliveryDateRange"
+                }
+            },
+            "type": "object"
+        },
+        "Badge": {
+            "description": "The available badge for a product offer.",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "description": "The name of a badge for a product offer.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ShippingDetails": {
+            "description": "The charges related to shipping a product offer.",
+            "required": [
+                "value"
+            ],
+            "properties": {
+                "value": {
+                    "description": "An object that contains numerical amount value and the currency code.",
+                    "$ref": "#/definitions/Money"
+                }
+            },
+            "type": "object"
+        },
+        "DeliveryDateRange": {
+            "description": "Indicates the minimum and maximum delivery date and time to ship a product offer.",
+            "required": [
+                "max",
+                "min"
+            ],
+            "properties": {
+                "max": {
+                    "description": "The maximum local delivery date and time to ship a product offer.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "min": {
+                    "description": "The minimum local delivery date and time to ship a product offer.",
+                    "type": "string",
+                    "format": "date-time"
+                }
+            },
+            "type": "object"
+        },
+        "OfferQuantityLimits": {
+            "description": "The number of items allowed to purchase a product in a single order. Some products have both a min and max quantity.",
+            "required": [
+                "maxQuantity",
+                "minQuantity"
+            ],
+            "properties": {
+                "maxQuantity": {
+                    "description": "The largest number of products the customer can buy in an order.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "minQuantity": {
+                    "description": "The smallest number of products the customer can buy in an order.",
+                    "format": "int64",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "ProductOffersFacet": {
+            "description": "A list of product offers, showing who is selling the product and at what price. This data is returned in the facets property, referenced by the key \"OFFERS\". The response returns, at most, 10 offers.",
+            "items": {
+                "$ref": "#/definitions/Offer"
+            },
+            "type": "array"
+        },
+        "SearchOffersFacet": {
+            "description": "For searches, the response returns a single offer for each matching product in the result.",
+            "items": {
+                "$ref": "#/definitions/Offer"
+            },
+            "type": "array"
+        },
+        "Money": {
+            "description": "An object that holds the numerical value and the currency code associated with the money.",
+            "required": [
+                "amount",
+                "currencyCode"
+            ],
+            "properties": {
+                "amount": {
+                    "description": "The numerical value of the money.",
+                    "format": "double",
+                    "type": "number"
+                },
+                "currencyCode": {
+                    "description": "The currency code for that price amount depending on the requested locale",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Price": {
+            "description": "The actual price the customers pay for the product.",
+            "required": [
+                "value",
+                "formattedPrice",
+                "priceType"
+            ],
+            "properties": {
+                "value": {
+                    "description": "An object that contains numerical amount value and the currency code.",
+                    "$ref": "#/definitions/Money"
+                },
+                "formattedPrice": {
+                    "description": "A displayable version of the price and currency code.",
+                    "type": "string"
+                },
+                "priceType": {
+                    "description": "A description of the type of price. Some prices are indicative of special business pricing for a customer.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "TaxExclusivePrice": {
+            "description": "The price of the product without tax.",
+            "required": [
+                "displayString",
+                "formattedPrice",
+                "label",
+                "taxExclusiveAmount"
+            ],
+            "properties": {
+                "taxExclusiveAmount": {
+                    "description": "An object that contains numerical amount value and the currency code.",
+                    "$ref": "#/definitions/Money"
+                },
+                "displayString": {
+                    "description": "A displayable message about the tax exclusion.",
+                    "type": "string"
+                },
+                "formattedPrice": {
+                    "description": "A displayable version of the price and currency code.",
+                    "type": "string"
+                },
+                "label": {
+                    "description": "A displayable description of the type of tax exclusion.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "EditorialReview": {
+            "description": "An editorial review for the product.",
+            "required": [
+                "content",
+                "source"
+            ],
+            "properties": {
+                "content": {
+                    "description": "The editorial review content.",
+                    "type": "string"
+                },
+                "source": {
+                    "description": "The editorial review content source.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Taxonomy": {
+            "description": "A taxonomy data entry for the product.",
+            "required": [
+                "taxonomyCode",
+                "title",
+                "type"
+            ],
+            "properties": {
+                "taxonomyCode": {
+                    "description": "The taxonomy code.",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "A displayable string with the name of product category.",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The taxonomy types supported by Amazon Business.",
+                    "type": "string",
+                    "enum": [
+                        "UNSPSC",
+                        "ECLASS"
+                    ],
+                    "x-docgen-enum-table-extension": [
+                        {
+                            "value": "UNSPSC",
+                            "description": "United Nations Standard Products and Services Code (UNSPSC) taxonomy differs from ECLASS. Products belonging to one category in UNSPSC are in several segments in ECLASS."
+                        },
+                        {
+                            "value": "ECLASS",
+                            "description": "A standard requirement for a number of European customers, especially in Germany. ECLASS combines different product types together."
+                        }
+                    ]
+                }
+            },
+            "type": "object"
+        },
+        "ISBN": {
+            "description": "International Standard Book Number (ISBN) associated with the product.",
+            "properties": {
+                "isbn10": {
+                    "description": "A 10-digit ISBN associated with the product.",
+                    "type": "string"
+                },
+                "isbn13": {
+                    "description": "A 13-digit ISBN associated with the product.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "BookInformation": {
+            "description": "Book details (if applicable).",
+            "properties": {
+                "isbn": {
+                    "$ref": "#/definitions/ISBN",
+                    "description": "A 10 or 13-digit ISBN associated with the product."
+                },
+                "publicationDate": {
+                    "description": "The date the book was published.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "publishedLanguage": {
+                    "description": "The language used for publishing the book.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Contributor": {
+            "description": "A contributor's entry for the product.",
+            "properties": {
+                "name": {
+                    "description": "The name of the contributor.",
+                    "type": "string"
+                },
+                "roles": {
+                    "description": "The role or roles of the contributor in the context of the product.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "MediaInformation": {
+            "description": "If applicable, media type information of the product.",
+            "properties": {
+                "editions": {
+                    "description": "Available editions of the product.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "mediaFormats": {
+                    "description": "Available formats of the media product.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "CustomerReviewsSummary": {
+            "description": "Information on the product's rating count and star rating.",
+            "required": [
+                "numberOfReviews",
+                "starRating"
+            ],
+            "type": "object",
+            "properties": {
+                "numberOfReviews": {
+                    "description": "The number of customer reviews for a product.",
+                    "type": "integer"
+                },
+                "starRating": {
+                    "description": "The star rating for a product.",
+                    "type": "number",
+                    "format": "double"
+                }
+            }
+        },
+        "DimensionValue": {
+            "description": "The value of a dimension and its index. \n exp. {index:0, displayString:red}",
+            "properties": {
+                "index": {
+                    "description": "index of the value",
+                    "type": "integer"
+                },
+                "displayString": {
+                    "description": "The string of the dimension value in its readable form. \n exp. red, sm, 12-packs",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Dimension": {
+            "description": "A dimension with its index, categorical name in its readable form, and a list of values. \n exp. [{index:0, displayString:color, dimensionValues: [{index:0, displayString:red}, ...]}, ...]",
+            "type": "object",
+            "properties": {
+                "index": {
+                    "description": "The index of the dimension.",
+                    "type": "integer"
+                },
+                "displayString": {
+                    "description": "The categorical name of the dimension in its readable form. \n exp. color, size",
+                    "type": "string"
+                },
+                "dimensionValues": {
+                    "type": "array",
+                    "description": "The value of a dimension and its index. \n exp. {index:0, displayString:red}",
+                    "items": {
+                        "$ref": "#/definitions/DimensionValue"
+                    }
+                }
+            }
+        },
+        "VariationValue": {
+            "description": "Contains index that maps to a dimension and value maps to a dimensionValue to represent the variation properties for a child product. \n exp. {index:0, value: 0}",
+            "type": "object",
+            "properties": {
+                "index": {
+                    "description": "The index of the dimension.",
+                    "type": "integer"
+                },
+                "value": {
+                    "description": "The value that maps to dimensionValue.",
+                    "type": "integer"
+                }
+            }
+        },
+        "Variation": {
+            "description": "A child product (variation) that contains its ASIN and a list of variationValues showing its variation properties. \n exp. [ASIN: B07J3G6312: [{index:0, value: 0}, ...]]",
+            "type": "object",
+            "properties": {
+                "asin": {
+                    "description": "The ASIN of the child product. \n exp. B07J3G6312",
+                    "type": "string"
+                },
+                "variationValues": {
+                    "type": "array",
+                    "description": "Contains index that maps to a dimension and value maps to a dimensionValue to represent the variation properties for a child product. \n exp. {index:0, value: 0}",
+                    "items": {
+                        "$ref": "#/definitions/VariationValue"
+                    }
+                }
+            }
+        },
+        "ProductVariations": {
+            "description": "Variations (Child products) for the products including all of the categorical dimensions and their values. exp. \n Dimensions: [{index:0, displayString:color, dimensionValues: [{index:0, displayString:red}, ...]}, ...], Variations: [ASIN: B07J3G6312: [{index:0, value: 0}, ...]] \n should be interpret as B07J3G6312: [color: red]",
+            "type": "object",
+            "required": [
+                "dimensions",
+                "variations"
+            ],
+            "properties": {
+                "dimensions": {
+                    "description": "A list of dimensions with their index, categorical names in their readable form, and lists of values for these dimensions. \n exp. [{index:0, displayString:color, dimensionValues: [{index:0, displayString:red}, ...]}, ...]",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Dimension"
+                    }
+                },
+                "variations": {
+                    "description": "A list of child products (variations) which contain their ASINs and lists of variationValues showing their variation properties. \n exp. [ASIN: B07J3G6312: [{index:0, value: 0}, ...], ...]",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Variation"
+                    }
+                }
+            }
+        },
+        "ProductsResult": {
+            "description": "The result of a request for product data.",
+            "required": [
+                "asin",
+                "asinType",
+                "signedProductId",
+                "includedDataTypes",
+                "features",
+                "taxonomies",
+                "title",
+                "url",
+                "format",
+                "bookInformation",
+                "byLine",
+                "mediaInformation",
+                "productDescription",
+                "productOverview",
+                "productDetails",
+                "customerReviewsSummary",
+                "productVariations",
+                "upcValues",
+                "eanValues"
+            ],
+            "properties": {
+                "asin": {
+                    "description": "The Amazon Business ASIN product identifier.",
+                    "type": "string"
+                },
+                "asinType": {
+                    "description": "The type ASIN returned in the request.",
+                    "$ref": "#/definitions/AsinType"
+                },
+                "signedProductId": {
+                    "description": "Product id signed with information about the request for which it was returned.",
+                    "type": "string"
+                },
+                "includedDataTypes": {
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "description": "A list of additional data groups, as specified in the request. Each facet contains a logic grouping of data about the product.",
+                    "type": "object"
+                },
+                "features": {
+                    "description": "A list descriptive features of the product, typically shown as a bulleted list.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "editorialReviews": {
+                    "description": "A list of editorial reviews for the product.",
+                    "items": {
+                        "$ref": "#/definitions/EditorialReview"
+                    },
+                    "type": "array"
+                },
+                "taxonomies": {
+                    "description": "A list taxonomy classifications for the product.",
+                    "items": {
+                        "$ref": "#/definitions/Taxonomy"
+                    },
+                    "type": "array"
+                },
+                "title": {
+                    "description": "The title of the product shown at the top of an Amazon Business product page.",
+                    "type": "string"
+                },
+                "url": {
+                    "description": "A URL to the product on the Amazon Business website.",
+                    "type": "string"
+                },
+                "format": {
+                    "description": "The type of product on the Amazon Business website. For books, this is the binding.",
+                    "type": "string"
+                },
+                "bookInformation": {
+                    "description": "If applicable, a book-specific details for the product.",
+                    "$ref": "#/definitions/BookInformation"
+                },
+                "byLine": {
+                    "description": "A product's by-line contributor information such as brand, author, and editor.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Contributor"
+                    }
+                },
+                "mediaInformation": {
+                    "description": "If applicable, a media type information for the product.",
+                    "$ref": "#/definitions/MediaInformation"
+                },
+                "productOverview": {
+                    "description": "The general descriptive fields for the product.",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "type": "object"
+                },
+                "productDetails": {
+                    "description": "The nested key or value pairs indicating additional information for product parts.",
+                    "additionalProperties": {
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "type": "object"
+                    },
+                    "type": "object"
+                },
+                "productVariations": {
+                    "description": "The variations (Child products) for this products and dimensions for all variations exp. \n {dimensions: {color: {0:red, 1:blue, ...}, size: {0:xs, 1:sm, ...}, ...}, \n variations: {B07J3G6312: [1,0], B07J348978: [0,0], ...}}",
+                    "$ref": "#/definitions/ProductVariations"
+                },
+                "customerReviewsSummary": {
+                    "description": "The information on the product's rating count and star rating.",
+                    "$ref": "#/definitions/CustomerReviewsSummary"
+                },
+                "productDescription": {
+                    "description": "The description for the given product.",
+                    "type": "string"
+                },
+                "upcValues": {
+                    "description": "A list of 12-digit Universal Product Codes (UPC) printed on retail product packaging for easy identification. UPC is used only in the US and Canada.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "eanValues": {
+                    "description": "A list of 13-digit European Article Numbers (EAN) printed on retail product packaging for easy identification. EAN is used globally except in US and Canada.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "title": "Products Result",
+            "type": "object"
+        },
+        "QuantityPrice": {
+            "description": "Provides information about the different prices a customer can get for higher quantities.",
+            "type": "object",
+            "properties": {
+                "quantityPriceTiers": {
+                    "description": "A collection of quantity price tier.",
+                    "items": {
+                        "$ref": "#/definitions/QuantityPriceTier"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "QuantityPriceTier": {
+            "description": "Defines the price for items if the quantity being purchased falls within the quantities specified in quantityDisplay field.",
+            "required": [
+                "quantityDisplay",
+                "unitPrice"
+            ],
+            "properties": {
+                "quantityDisplay": {
+                    "description": "A localized string indicating the quantity range for which the price in the tier applies.",
+                    "type": "string"
+                },
+                "unitPrice": {
+                    "description": "The price for each unit of item in this quantity tier.",
+                    "$ref": "#/definitions/Money"
+                },
+                "minQuantity": {
+                    "description": "[DEPRECATED: Please use unitPrice and quantityDisplay instead] The minimum quantity of items that a customer needs to buy to reach this price tier.",
+                    "format": "int64",
+                    "type": "integer"
+                },
+                "price": {
+                    "description": "[DEPRECATED: Please use unitPrice and quantityDisplay instead]",
+                    "$ref": "#/definitions/Price"
+                },
+                "savingMessage": {
+                    "description": "[DEPRECATED: Please use unitPrice and quantityDisplay instead] The savings message of the tier. This exists only when the tier's price is lower than the basis price of the current buying option.",
+                    "type": "string"
+                },
+                "taxExclusivePrice": {
+                    "description": "[DEPRECATED: Please use unitPrice and quantityDisplay instead]",
+                    "$ref": "#/definitions/TaxExclusivePrice"
+                }
+            },
+            "type": "object"
+        },
+        "RefinementResult": {
+            "description": "The data that describes the refinements used to narrow down results. These values remain the same for all pages in the result.",
+            "required": [
+                "categories",
+                "subCategories",
+                "availabilityOptions",
+                "deliveryDayOptions",
+                "eligibleForFreeShippingOptions",
+                "primeEligible"
+            ],
+            "properties": {
+                "categories": {
+                    "description": "A list of categories that matches the search keyword. A category id is sent in the subsequent request to get a shorter list of relevant search results.",
+                    "items": {
+                        "$ref": "#/definitions/Category"
+                    },
+                    "type": "array"
+                },
+                "subCategories": {
+                    "description": "A list of sub categories that matches a given category. A search subcategory Id is sent in the next request to get a shorter list of relevant products.",
+                    "items": {
+                        "$ref": "#/definitions/SubCategory"
+                    },
+                    "type": "array"
+                },
+                "availabilityOptions": {
+                    "description": "Two availability ids for 'in stock only' and 'include out of stock' would appear in the search refinement. Availability Id is sent as parameter in the next request to get filtered list of products. The availability filtering returns products whose offers are aligned with the availability ID request.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Availability"
+                    }
+                },
+                "deliveryDayOptions": {
+                    "description": "Two delivery day ids for 'Get It Today' and 'Get It by Tomorrow' would appear in the search refinement.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DeliveryDay"
+                    }
+                },
+                "eligibleForFreeShippingOptions": {
+                    "description": "One eligibleForFreeShippingOption Id would appear in the search refinement. EligibleForFreeShippingOption ID is sent as parameter in the next request to get a more filtered list of products. This filtering returns products with 'Free Shipping by Amazon Business.'",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/EligibleForFreeShipping"
+                    }
+                },
+                "primeEligible": {
+                    "description": "This can be used as a query parameter to fetch only prime eligible items.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PrimeEligible"
+                    }
+                }
+            },
+            "title": "Refinement Result",
+            "type": "object"
+        },
+        "SearchFacetType": {
+            "description": "A list of supported data facets for product search.",
+            "enum": [
+                "OFFERS",
+                "IMAGES"
+            ],
+            "type": "string"
+        },
+        "ProductsByAsinsResponse": {
+            "description": "The data that describes the results for the list of ASIN search.",
+            "required": [
+                "matchingProductCount",
+                "products",
+                "notFoundAsins"
+            ],
+            "properties": {
+                "matchingProductCount": {
+                    "description": "The number of products that matches the search query. This number can be larger than the number of matching products the customer can view. The value is the same for all the pages in the result.",
+                    "type": "integer"
+                },
+                "products": {
+                    "description": "A list of products that matches the search criteria.",
+                    "items": {
+                        "$ref": "#/definitions/ProductsResult"
+                    },
+                    "type": "array"
+                },
+                "notFoundAsins": {
+                    "description": "A list of ASIN for which their is no product found.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "title": "GetProductsByAsins API Search results",
+            "type": "object"
+        },
+        "ProductsByAsinsRequest": {
+            "description": "The request object to use when searching for a list of ASINs.",
+            "type": "object",
+            "required": [
+                "locale",
+                "productIds",
+                "productRegion"
+            ],
+            "properties": {
+                "productIds": {
+                    "description": "Accepts a list of ASINs as input. The response will return product information for each of the ASINs provided. The maximum number of ASINs allowed for each call is 30.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "productRegion": {
+                    "description": "The region where the customer wants to purchase the product.",
+                    "type": "string",
+                    "enum": [
+                        "DE",
+                        "FR",
+                        "UK",
+                        "IT",
+                        "ES",
+                        "US",
+                        "CA",
+                        "JP"
+                    ],
+                    "x-docgen-enum-table-extension": [
+                        {
+                            "value": "DE",
+                            "description": "Germany"
+                        },
+                        {
+                            "value": "FR",
+                            "description": "France"
+                        },
+                        {
+                            "value": "UK",
+                            "description": "United Kingdom"
+                        },
+                        {
+                            "value": "IT",
+                            "description": "Italy"
+                        },
+                        {
+                            "value": "ES",
+                            "description": "Spain"
+                        },
+                        {
+                            "value": "US",
+                            "description": "United States of America"
+                        },
+                        {
+                            "value": "CA",
+                            "description": "Canada"
+                        },
+                        {
+                            "value": "JP",
+                            "description": "Japan"
+                        }
+                    ]
+                },
+                "shippingRegion": {
+                    "description": "This field determines the region where to ship the product based on the value in the shippingPostalCode.",
+                    "type": "string"
+                },
+                "locale": {
+                    "description": "The locale of the request in the form of an IETF language tag. Each ProductRegion supports one or more locales. This value should comply with java.util.Locale.",
+                    "type": "string",
+                    "pattern": "^[-_]+$"
+                },
+                "shippingPostalCode": {
+                    "description": "The shipping postal or zip code for customer's request. This parameter doesn't support geocode.",
+                    "type": "string"
+                },
+                "quantity": {
+                    "description": "The number of units the customer intends to purchase. This helps Amazon Business determine quantity-based discounts if an eligible offer is present. Defaults to 1.",
+                    "type": "integer"
+                },
+                "facets": {
+                    "description": "A list of data facets to include in the response. Separate each facet with a comma.",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "OFFERS",
+                            "IMAGES"
+                        ],
+                        "x-docgen-enum-table-extension": [
+                            {
+                                "value": "OFFERS",
+                                "description": "Offers for an item in the Amazon Business catalog."
+                            },
+                            {
+                                "value": "IMAGES",
+                                "description": "Images for an item in the Amazon Business catalog."
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "SearchProductsResult": {
+            "description": "The data that describes the results of the search query.",
+            "required": [
+                "matchingProductCount",
+                "numberOfPages",
+                "products",
+                "refinements",
+                "searchRefinements"
+            ],
+            "properties": {
+                "matchingProductCount": {
+                    "description": "The number of products that matches the search query. This number can be  larger than the number of matching products the customer can view. The value is the same for all the pages in the result.",
+                    "type": "integer"
+                },
+                "searchRefinements": {
+                    "description": "Search refinements are used to share the refinements available for search result. Use searchRefinements in subsequent request to narrow down the results. For example: Search category is a type of search refinement. If a search category refinement is used in the request, the search result will limit to a given search category.",
+                    "items": {
+                        "$ref": "#/definitions/SearchRefinementResult"
+                    },
+                    "type": "array"
+                },
+                "refinements": {
+                    "$ref": "#/definitions/RefinementResult",
+                    "description": "Search refinements is used to share the refinements available for search result. Use searchRefinements in subsequent request to narrow down the results. For example: Search category is a type of search refinement. If a search category refinement is used in the request, the search result will limit to a given search category."
+                },
+                "numberOfPages": {
+                    "description": "The number of pages of results.",
+                    "type": "integer"
+                },
+                "products": {
+                    "description": "A list of products that matches the search criteria.",
+                    "items": {
+                        "$ref": "#/definitions/ProductsResult"
+                    },
+                    "type": "array"
+                }
+            },
+            "title": "Search products result",
+            "type": "object"
+        },
+        "SearchRefinementResult": {
+            "description": "Search refinements are used to share the refinements available for search result. Use searchRefinements in subsequent request to narrow down the results. For example: Search category is a type of search refinement. If a search category refinement is used in the request, the search result will limit to a given search category.",
+            "type": "object",
+            "required": [
+                "displayValue",
+                "refinementValues",
+                "selectionType"
+            ],
+            "properties": {
+                "selectionType": {
+                    "description": "SelectionType is used to identify selection allowed for a given refinement. For example: MultiSelect allows to search with multiple values of a refinement. InsteadSelect allows to search with only a single refinement value.",
+                    "type": "string"
+                },
+                "displayValue": {
+                    "description": "Human friendly name of a given refinement type.",
+                    "type": "string"
+                },
+                "refinementValues": {
+                    "description": "RefinementValues holds items for a given refinement. For example: If \"Brand\" is a refinement, the refinementValues will have different brands available for a given product.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RefinementValue"
+                    }
+                }
+            }
+        },
+        "RefinementValue": {
+            "description": "RefinementValue holds items for a given refinement. For example: If \"Brand\" is a refinement, the refinementValues will have different brands available for a given product.",
+            "type": "object",
+            "required": [
+                "displayName",
+                "searchRefinementValue"
+            ],
+            "properties": {
+                "displayName": {
+                    "description": "The name of the item in a refinement.",
+                    "type": "string"
+                },
+                "searchRefinementValue": {
+                    "description": "The searchRefinementValue is used to make search request for a given refinement.",
+                    "type": "string"
+                }
+            },
+            "title": "RefinementValue"
+        },
+        "SubCategory": {
+            "description": "The search subcategory provides information on relevant search subcategories for products within a category. Use subcategory to limit the results for a particular search subcategory in subsequent requests.",
+            "type": "object",
+            "required": [
+                "displayName",
+                "id"
+            ],
+            "properties": {
+                "displayName": {
+                    "description": "Display name is used to share more human friendly readable description of sub category.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Identifies a search subcategory across a product region.",
+                    "type": "string"
+                }
+            },
+            "title": "SubCategory"
+        },
+        "Availability": {
+            "description": "Limits the product offers by 'in stock only' or 'include out of stock'. Use availability to limit the subsequent search requests.",
+            "type": "object",
+            "required": [
+                "displayName",
+                "id"
+            ],
+            "properties": {
+                "displayName": {
+                    "description": "Availability display name would be more user friendly to illustrate the meaning of its id.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Identifies the availability option for the product. Use the Id to filter ASINs belonging to given availability option.",
+                    "type": "string"
+                }
+            },
+            "title": "Availability"
+        },
+        "DeliveryDay": {
+            "description": "The deliveryDay is used to limit the product offers to be Get It Today or Get It by Tomorrow.",
+            "type": "object",
+            "required": [
+                "displayName",
+                "id"
+            ],
+            "properties": {
+                "displayName": {
+                    "description": "DeliveryDay display name is used to share more human friendly readable description.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Identifies the product offers with 'Get It Today' or 'Get It by Tomorrow' option.",
+                    "type": "string"
+                }
+            },
+            "title": "DeliveryDay"
+        },
+        "EligibleForFreeShipping": {
+            "description": "The EligibleForFreeShipping is used to limit the product with only 'Free Shipping by Amazon Business.' Use EligibleForFreeShipping to limit the subsequent search requests.",
+            "type": "object",
+            "required": [
+                "displayName",
+                "id"
+            ],
+            "properties": {
+                "displayName": {
+                    "description": "EligibleForFreeShipping display name is used to share more human friendly readable description.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Identifies the search with only 'Free Shipping by Amazon Business.'",
+                    "type": "string"
+                }
+            },
+            "title": "EligibleForFreeShipping"
+        },
+        "PrimeEligible": {
+            "description": "The prime eligible refinement is used to give information about relevant prime eligible products.",
+            "type": "object",
+            "required": [
+                "displayName",
+                "id"
+            ],
+            "properties": {
+                "displayName": {
+                    "description": "The prime eligible refinement is used to give information about relevant prime eligible products.",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "Identifies a prime eligible option.",
+                    "type": "string"
+                }
+            },
+            "title": "PrimeEligible"
+        },
+        "Region": {
+            "description": "A region where a product can be purchased.",
+            "enum": [
+                "DE",
+                "FR",
+                "UK",
+                "IT",
+                "ES",
+                "US",
+                "CA",
+                "JP"
+            ],
+            "type": "string"
+        },
+        "OffersResult": {
+            "description": "The data that describes the results of the offer query.",
+            "type": "object",
+            "properties": {
+                "offerCount": {
+                    "description": "The number of offers for the ASIN after filters are applied.",
+                    "type": "integer"
+                },
+                "numberOfPages": {
+                    "description": "The number of pages of results.",
+                    "type": "integer"
+                },
+                "featuredOffer": {
+                    "description": "A featured offer that is selected based on eligibility requirements and criteria.",
+                    "$ref": "#/definitions/Offer",
+                    "type": "object"
+                },
+                "offers": {
+                    "description": "A list of offers in a page.",
+                    "items": {
+                        "$ref": "#/definitions/Offer"
+                    },
+                    "type": "array"
+                },
+                "filterGroups": {
+                    "description": "A list of filter groups.",
+                    "items": {
+                        "$ref": "#/definitions/OfferFilterGroup"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "OfferFilterGroup": {
+            "description": "A grouping of related filters.",
+            "type": "object",
+            "properties": {
+                "displayName": {
+                    "description": "Displayable and localized filter group description.",
+                    "type": "string"
+                },
+                "filters": {
+                    "description": "A list of filters for the group.",
+                    "items": {
+                        "$ref": "#/definitions/OfferFilter"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "OfferFilter": {
+            "description": "A filter to apply when getting offers for a product.",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "Filter identifier. Pass on filterIds request parameter to apply this filter on the search request.",
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "Displayable and localized filter description.",
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "description": "Get data about a particular product.",
+            "name": "products"
+        }
+    ],
+    "x-components": {}
+}
