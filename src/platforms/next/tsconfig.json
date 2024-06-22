@@ -1,7 +1,7 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2022",
     "lib": [
       "dom",
       "dom.iterable",
@@ -24,7 +24,7 @@
         "name": "next"
       }
     ],
-    "rootDir": "../../..",
+    "rootDir": "../../.."
   },
   "include": [
     "next-env.d.ts",
@@ -32,8 +32,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "../interface/**/*.ts", "next.config.js", "../config.ts",
-  ],
+    "../interface/**/*.ts",
+    "next.config.mjs",
+    "../../*.ts"  ],
   "exclude": [
     "node_modules"
   ]

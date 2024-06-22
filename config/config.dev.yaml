@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=./_schema.json
+
+# The root URI of the application. This is used to generate URLs for the application.
+# Any requests made to the server from a non-root URI will be redirected to the root.
+#
+# This should NOT be used as a security measure.
+# If your application is only accessible from your home network, do not forward ports to the application.
+# The best attack surface is no attack surface.
+canonicalRoot: https://self.bellcube.dev/web
+
+# Configuration for the server started with a NODE_ENV of anything other than "production"
+# The configs are separated for ease of development. The default config shouldn't be nearly so open.
+
+# Whether to trust local network users to select their own account
+# Useful when you have a local setup without a public IP address
+#
+# This will disable the existing public-key cryptography and allow anyone on your local network to select their own account.
+# ⚠ This effectively disables all security! ⚠
+# ⚠ Use at your own risk! ⚠
+trustLocalNetwork: true
+
+# If you're using a local setup, you may desire to use a single household for all users.
+# That way, you don't have to worry about the hassle that might cause.
+singleHousehold: true
+
+# If true, extract the user's IP address from the X-Forwarded-For header, provided by a reverse proxy like Nginx or Cloudflare.
+#
+# If you do not have a reverse proxy, this should be set to false.
+# This should only be enabled if you trust your proxy to set the header correctly.
+#
+# If your hosting provider provides a NextRequest.ip value, it will always be used.
+#
+# IF YOUR HOSTING PROVIDER DOES NOT PROVIDE A NextRequest.ip VALUE:
+# Because Next.js does not provide a way to get the user's IP address from the connection directly,
+# setting this to false disables IP address matching when creating a new keypair, thus lowering security.
+# In local environments, this is not a concern. For SAAS hosting, disabling this is a noteworthy security downgrade.
+trustProxy: true

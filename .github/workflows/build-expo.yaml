@@ -1,0 +1,67 @@
+on:
+    workflow_dispatch:
+    workflow_call:
+      inputs:
+        platform:
+          type: string
+          description: 'Platforms to build for'
+          required: true
+          default: '["ios","android"]'
+        profile:
+          type: string
+          description: 'Build profile'
+          required: true
+          default: 'production'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: ${{ fromJson( github.event.inputs.platform ) }}
+    name: Build App (${{ matrix.platform }})
+    runs-on: ${{ matrix.platform == 'ios' && 'macos-latest' || 'ubuntu-latest' }}
+    steps:
+
+        # ============================
+        #        Project Setup
+        # ============================
+
+        - name: Clone Repo
+          uses: actions/checkout@v4
+
+
+        - name: Set Up PNPM
+          uses: pnpm/action-setup@v4
+          with:
+              version: 9
+
+
+        - name: Set Up Node.js 21
+          uses: actions/setup-node@v4
+          with:
+            node-version: 21
+            cache: 'pnpm'
+
+
+        - name: Install dependencies
+          run: pnpm install --frozen-lockfile
+
+        # =============================
+        #    Workflow-Specific Stuff
+        # =============================
+
+        - name: Setup EAS
+          uses: expo/expo-github-action@v8
+          with:
+            eas-version: latest
+            token: ${{ secrets.EXPO_TOKEN }}
+
+        - name: Build App for ${{ matrix.platform }}
+          run: |
+            pnpm run build-expo-NEEDS-PLATFORM --platform ${{ matrix.platform }} --profile=${{ github.event.inputs.profile }} --output=build/${{ matrix.platform }}
+
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: "native-${{ matrix.platform }}"
+            path: build/${{ matrix.platform }}

@@ -1,8 +1,8 @@
 'use client';
 
 import { View, Text } from 'dripsy'
-import { createParam } from '../../../forks/solito/src'
-import { TextLink } from '../../../forks/solito/src/link'
+import { createParam } from 'solito'
+import { TextLink } from 'solito/link'
 
 const { useParam } = createParam<{ id: string }>()
 

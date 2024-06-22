@@ -2,11 +2,11 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Dev Server - Web",
-			"detail": "Runs `yarn web`",
+			"label": "Dev Server - Next.js",
+			"detail": "Runs `pnpm deb-next`",
 			"type": "shell",
-			"command": "yarn",
-			"args": ["web"],
+			"command": "pnpm",
+			"args": ["run", "dev-next"],
 			"group": {
 				"kind": "build",
 			},
@@ -37,11 +37,11 @@
 			],
 		},
 		{
-			"label": "Dev Server - Mobile App",
-			"detail": "Runs `yarn native`",
+			"label": "Dev Server - Expo",
+			"detail": "Runs `pnpm edv-expo`",
 			"type": "shell",
-			"command": "yarn",
-			"args": ["native"],
+			"command": "pnpm",
+			"args": ["run", "dev-expo"],
 			"group": {
 				"kind": "build",
 			},
@@ -75,7 +75,7 @@
 		{
 			"label": "Dev Server - All",
 			"detail": "Runs all dev server tasks",
-			"dependsOn": ["Dev Server - Web", "Dev Server - Mobile App"],
+			"dependsOn": ["Dev Server - Next.js", "Dev Server - Expo"],
 			"group": {
 				"kind": "test",
 				"isDefault": true

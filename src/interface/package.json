@@ -7,7 +7,8 @@
     "dripsy": "^4.3.5",
     "expo-font": "^12.0.7",
     "moti": "latest",
-    "solito": "link:../solito/src"
+    "solito": "link:../forks/solito/src",
+    "lib": "link:../lib"
   },
   "sideEffects": false
 }

@@ -1,0 +1,65 @@
+{
+    "type": "object",
+    "properties": {
+        "canonicalRoot": {
+            "type": "string",
+            "description": "The root URI of the application. This is used to generate URLs for the application.\nAny requests made to the server from a non-root URI will be redirected to the root.\n\nThis should NOT be used as a security measure.\nIf your application is only accessible from your home network, do not forward ports to the application.\nThe best attack surface is no attack surface."
+        },
+        "trustLocalNetwork": {
+            "type": "boolean",
+            "description": "Whether to trust local network users to select their own account\nUseful when you have a local setup without a public IP address\n\nThis will disable the existing public-key cryptography logins and allow anyone on your local network to select their own account.\n⚠ This effectively disables all security! ⚠\n⚠ Use at your own risk! ⚠"
+        },
+        "singleHousehold": {
+            "type": "boolean",
+            "description": "If you're using a local setup, you may desire to use a single household for all users\nThat way, you don't have to worry about the hassle that might cause."
+        },
+        "trustProxy": {
+            "type": "boolean",
+            "description": "If true, extract the user's IP address from the X-Forwarded-For header.\n\nThis should only be enabled if you trust the proxy to set the header correctly. Example proxies include Nginx and Cloudflare."
+        },
+        "primaryEndpoints": {
+            "anyOf": [
+                {
+                    "type": "boolean"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "auth": {
+                            "anyOf": [
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "getKeyRegistrationParameters": {
+                                            "type": "boolean"
+                                        },
+                                        "registerKey": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "additionalProperties": false
+                                }
+                            ]
+                        },
+                        "": {
+                            "type": "boolean"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ],
+            "description": "Determines what endpoints are handled by this server when in Primary mode. (see https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers)\n\nIMPORTANT: Servers in Supplementary mode will handle all endpoints not handled by the Primary server, regardless of this configuration."
+        }
+    },
+    "required": [
+        "canonicalRoot",
+        "trustLocalNetwork",
+        "singleHousehold",
+        "trustProxy"
+    ],
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -53,3 +53,8 @@
     * Rating
     * Allergies & Dietary Restrictions (default to household's restrictions)
       * Allow users to save restriction presets
+
+
+## Before Release
+* [ ] Make route configs not optional
+* [ ] Recreate config templates

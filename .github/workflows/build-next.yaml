@@ -1,28 +1,9 @@
 on:
   workflow_dispatch:
-  push:
-      paths:
-          - package.json
-          - pnpm-lock.yaml
-          - codegen.js
-          - tsconfig.json
-          - turbo.json
-          - utilityTypes.ts
-          - schema.prisma
-          - src/forks/**
-          - src/interface/**
-          - src/lib/**
-          - src/platforms/next/**
-          - config/**
-          - assets/**
-          - .github/workflows/build-app.yaml
-
-
-
-
+  workflow_call:
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
 
@@ -37,7 +18,7 @@ jobs:
         - name: Set Up PNPM
           uses: pnpm/action-setup@v4
           with:
-              version: 9
+            version: 9
 
 
         - name: Set Up Node.js ${{ matrix.node-version }}
@@ -54,5 +35,12 @@ jobs:
         #    Workflow-Specific Stuff
         # =============================
 
-        - name: Run Tests
-          run: pnpm test
+        - name: Build Next.js Site
+          working-directory: src/platforms/next
+          run: pnpm build
+
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v4
+          with:
+            name: site
+            path: src/platforms/next/out

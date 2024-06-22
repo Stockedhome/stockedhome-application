@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=./_schema.json
+
 # The root URI of the application. This is used to generate URLs for the application.
 # Any requests made to the server from a non-root URI will be redirected to the root.
 #

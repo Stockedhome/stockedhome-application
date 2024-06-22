@@ -26,20 +26,20 @@ export const metadata: Metadata = {
         android: {
             package: 'app.stockedhome',
             app_name: 'Stockedhome',
-            url: resolveMetaUrl('https://play.google.com/store/apps/details?id=app.stockedhome'),
+            url: 'https://play.google.com/store/apps/details?id=app.stockedhome',
         },
         ios: {
-            url: resolveMetaUrl('https://apps.apple.com/us/app/stockedhome/id1234567890'), // TODO: Get real apple app ID
+            url: 'https://apps.apple.com/us/app/stockedhome/id1234567890', // TODO: Get real apple app ID
             app_name: 'Stockedhome',
             app_store_id: '1234567890',
         },
         ipad: {
-            url: resolveMetaUrl('https://apps.apple.com/us/app/stockedhome/id1234567890'), // TODO: Get real apple app ID
+            url: 'https://apps.apple.com/us/app/stockedhome/id1234567890', // TODO: Get real apple app ID
             app_name: 'Stockedhome',
             app_store_id: '1234567890',
         },
         iphone: {
-            url: resolveMetaUrl('https://apps.apple.com/us/app/stockedhome/id1234567890'), // TODO: Get real apple app ID
+            url: 'https://apps.apple.com/us/app/stockedhome/id1234567890', // TODO: Get real apple app ID
             app_name: 'Stockedhome',
             app_store_id: '1234567890',
         },
@@ -87,7 +87,7 @@ export const metadata: Metadata = {
         determiner: "",
         images: [
             { // only one image or Discord freaks out and puts the image at the bottom of the embed
-                url: resolveMetaUrl('logo-background.256.png'),
+                url: resolveMetaUrl('assets/logo-background.256.png'),
                 width: 256, height: 256,
                 type: 'image/png',
             }
@@ -97,53 +97,53 @@ export const metadata: Metadata = {
     icons: {
         icon: [
             {
-                url: resolveMetaUrl('logo.1024.png'),
+                url: resolveMetaUrl('assets/logo.1024.png'),
                 sizes: '1024x1024',
                 type: 'image/png',
                 fetchPriority: 'high',
             },
             {
-                url: resolveMetaUrl('logo-background.32.png'),
+                url: resolveMetaUrl('assets/logo-background.32.png'),
                 sizes: '32x32',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-background.48.png'),
+                url: resolveMetaUrl('assets/logo-background.48.png'),
                 sizes: '48x48',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-background.64.png'),
+                url: resolveMetaUrl('assets/logo-background.64.png'),
                 sizes: '64x64',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-background.128.png'),
+                url: resolveMetaUrl('assets/logo-background.128.png'),
                 sizes: '96x96',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-background.256.png'),
+                url: resolveMetaUrl('assets/logo-background.256.png'),
                 sizes: '256x256',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-background.512.png'),
+                url: resolveMetaUrl('assets/logo-background.512.png'),
                 sizes: '512x512',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-background.1024.png'),
+                url: resolveMetaUrl('assets/logo-background.1024.png'),
                 sizes: '1024x1024',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-background.2048.png'),
+                url: resolveMetaUrl('assets/logo-background.2048.png'),
                 sizes: '2048x2048',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('logo-notification.96.png'),
+                url: resolveMetaUrl('assets/logo-notification.96.png'),
                 sizes: '96x96',
                 type: 'image/png',
                 color: '#00000000',
@@ -152,27 +152,27 @@ export const metadata: Metadata = {
         ] satisfies Array<IconDescriptor>,
         shortcut: [
             {
-                url: resolveMetaUrl('favicon.32.png'),
+                url: resolveMetaUrl('assets/favicon.32.png'),
                 sizes: '32x32',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('favicon.48.png'),
+                url: resolveMetaUrl('assets/favicon.48.png'),
                 sizes: '48x48',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('favicon.64.png'),
+                url: resolveMetaUrl('assets/favicon.64.png'),
                 sizes: '64x64',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('favicon.128.png'),
+                url: resolveMetaUrl('assets/favicon.128.png'),
                 sizes: '128x128',
                 type: 'image/png',
             },
             {
-                url: resolveMetaUrl('favicon.ico'),
+                url: resolveMetaUrl('assets/favicon.ico'),
                 sizes: '32x32, 48x48, 64x64, 128x128',
             },
         ] satisfies Array<IconDescriptor>,
@@ -183,12 +183,16 @@ export const metadata: Metadata = {
     }
 };
 
-export const viewport: Viewport = {
+const viewport: Viewport = {
     colorScheme: 'dark',
     themeColor: '#146fc7',
-}
+};
 
-function MyApp({ children }: { children: React.ReactNode }) {
+// For some reason, unless we do this, Next's TS plugin throws:
+//    "viewport" is not a valid Next.js entry export value.
+export { viewport };
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
     return <html>
         <body>
             <Provider>
@@ -197,5 +201,3 @@ function MyApp({ children }: { children: React.ReactNode }) {
         </body>
     </html>
 }
-
-export default MyApp

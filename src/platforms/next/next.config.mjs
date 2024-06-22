@@ -1,6 +1,10 @@
-const { withExpo } = require("@expo/next-adapter");
-const withFonts = require("next-fonts");
-const webpack = require('webpack');
+import { withExpo } from "@expo/next-adapter";
+import withFonts from "next-fonts";
+import fs from 'fs';
+
+if (fs.existsSync('../../../.env')) {
+    if (!fs.existsSync('./.env')) fs.symlinkSync('../../../.env', './.env', 'file');
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withExpo(withFonts(
@@ -14,22 +18,22 @@ const nextConfig = withExpo(withFonts(
 
         experimental: {
             forceSwcTransforms: true,
-    //        turbo: {
-    //            resolveAlias: {
-    //                // Alias direct react-native imports to react-native-web
-    //                "react-native$": "react-native-web",
-    //
-    //                // Alias internal react-native modules to react-native-web
-    //                "react-native/Libraries/EventEmitter/RCTDeviceEventEmitter$": "react-native-web/dist/vendor/react-native/NativeEventEmitter/RCTDeviceEventEmitter",
-    //
-    //                "react-native/Libraries/vendor/emitter/EventEmitter$": "react-native-web/dist/vendor/react-native/emitter/EventEmitter",
-    //
-    //                "react-native/Libraries/EventEmitter/NativeEventEmitter$": "react-native-web/dist/vendor/react-native/NativeEventEmitter",
-    //
-    //                '@react-native/assets-registry/registry': 'react-native-web/dist/exports/AssetsRegistry',
-    //            },
-    //            resolveExtensions: [".web.tsx", ".web.ts", ".web.jsx", ".web.js", ".web.mjs", ".web.json", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".json", ".web.tsx", ".web.ts", ".web.jsx", ".web.js", ".web.mjs", ".web.json"],
-    //        },
+            instrumentationHook: true,
+//            turbo: {
+//                resolveAlias: {
+//                    // Alias direct react-native imports to react-native-web
+//                    "react-native$": "react-native-web",
+//
+//                    // Alias internal react-native modules to react-native-web
+//                    "react-native/Libraries/EventEmitter/RCTDeviceEventEmitter$": "react-native-web/dist/vendor/react-native/NativeEventEmitter/RCTDeviceEventEmitter",
+//
+//                    "react-native/Libraries/vendor/emitter/EventEmitter$": "react-native-web/dist/vendor/react-native/emitter/EventEmitter",
+//                    "react-native/Libraries/EventEmitter/NativeEventEmitter$": "react-native-web/dist/vendor/react-native/NativeEventEmitter",
+//
+//                    '@react-native/assets-registry/registry': 'react-native-web/dist/exports/AssetsRegistry',
+//                },
+//                resolveExtensions: [".web.tsx", ".web.ts", ".web.jsx", ".web.js", ".web.mjs", ".web.json", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".json", ".web.tsx", ".web.ts", ".web.jsx", ".web.js", ".web.mjs", ".web.json"],
+//            },
         },
 
 //        webpack(config, options) {
@@ -67,4 +71,4 @@ const nextConfig = withExpo(withFonts(
     }
 ));
 
-module.exports = nextConfig;
+export default nextConfig;

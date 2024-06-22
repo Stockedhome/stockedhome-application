@@ -4,12 +4,27 @@
     "slug": "stockedhome",
     "version": "1.0.0",
     "scheme": "stockedhome",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "ios": {
       "bundleIdentifier": "app.stockedhome.mobile"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "android": {
+      "package": "app.stockedhome.mobile"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "412cfc9a-3f35-413c-9082-3bd3661ff4b2"
+      }
+    },
+    "owner": "bellcube"
   }
 }

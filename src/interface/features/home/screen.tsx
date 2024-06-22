@@ -1,8 +1,8 @@
 'use client';
 
 import { Text, useSx, View, H1, P, Row, A, Container } from 'dripsy';
-import { TextLink } from '../../../forks/solito/src/link';
-import { MotiLink } from '../../../forks/solito/src/moti';
+import { TextLink } from 'solito/link';
+import { MotiLink } from 'solito/moti';
 
 export function HomeScreen() {
     const sx = useSx();
