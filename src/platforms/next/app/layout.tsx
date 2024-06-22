@@ -187,13 +187,22 @@ const viewport: Viewport = {
     colorScheme: 'dark',
     themeColor: '#146fc7',
 };
-
 // For some reason, unless we do this, Next's TS plugin throws:
 //    "viewport" is not a valid Next.js entry export value.
 export { viewport };
 
+
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    let sheet: any;
+    if ('getSheet' in StyleSheet && StyleSheet.getSheet && typeof StyleSheet.getSheet === 'function') {
+        sheet = StyleSheet.getSheet();
+    }
+
     return <html>
+        <head>
+            {sheet && <style dangerouslySetInnerHTML={{ __html: sheet.textContent }} id={sheet.id} />}
+        </head>
         <body>
             <Provider>
                 {children}

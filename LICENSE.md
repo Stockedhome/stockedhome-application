@@ -1,4 +1,4 @@
-**Bell's Strictly Non-Commercial MPL-2.0 v1.0**
+**Bell's Strictly Non-Commercial MPL-2.0 v1.1**
 ==================================
 
 A **MODIFIED** version of the  Mozilla Public License Version 2.0:
@@ -87,7 +87,8 @@ A **MODIFIED** version of the  Mozilla Public License Version 2.0:
 
 * **(a)** Covered Software in its entirety, or
 * **(b)** any subset or combination of subsets of the Covered Software that
-    contains at least 10% of the total lines of code in Covered Software, or
+    together contains at least 10% of the total lines of code in the version
+    of Covered Software with the greatest number of lines of non-data code,
 * **(c)** a system unique to the Covered Software with ideas or concepts that
     are unique to the Covered Software or otherwise uncommon where prior access
     to the Covered Software or its ideas can be proven, or
@@ -376,8 +377,8 @@ notice described in Exhibit B of this License must be attached.
 ## Exhibit A - Source Code Form License Notice
 
     This Source Code Form is subject to the terms of Bell's Strictly
-    Non-Commercial MPL-2.0 v1.0. If a copy of the MPL was not distributed
-    with this file, You can obtain one at
+    Non-Commercial MPL-2.0 v1.1. If a copy of the BSNC-MPL-2.0-v1.1
+    was not distributed with this file, you can obtain one at
     https://gist.github.com/BellCubeDev/7dd2a8c572cc9e245930fdbbcd5f9a8f
 
 If it is not possible or desirable to put the notice in a particular
