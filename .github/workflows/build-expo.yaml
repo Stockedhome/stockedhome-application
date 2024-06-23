@@ -28,6 +28,8 @@ jobs:
 
         - name: Clone Repo
           uses: actions/checkout@v4
+          with:
+            submodules: 'recursive'
 
 
         - name: Set Up PNPM

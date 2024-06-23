@@ -22,6 +22,8 @@ function getIp(req: NextRequest, config: ConfigForTRPCContext) {
 
     const ip = req.headers.get('x-forwarded-for')
     if (!ip) throw new Error("You trusted your proxy, but it did not provide an IP address! This means your proxy is either misconfigured or you aren't actually behind a proxy. [https://docs.stockedhome.app/hosting/configuration/ip-address#proxies]");
+
+    return ip;
 }
 
 interface DeviceIdentifier {
@@ -235,4 +237,60 @@ export const authRouter = createRouter({
             }
         })
     ,
+
+    signUp: publicProcedure
+        .input(z.object({
+            username: z.string(),
+            password: z.string(),
+            email: z.string(),
+            clientGeneratedRandom: z.string(),
+        }))
+        .output(z.union([
+            z.object({
+                success: z.literal(true),
+                userId: z.bigint(),
+                error: z.undefined(),
+            }),
+            z.object({
+                success: z.literal(false),
+                userId: z.undefined(),
+                error: z.string(),
+            }),
+        ]))
+        .query(async ({ctx, input}) => {
+            try {
+                const passwordSalt = crypto.getRandomValues(new Uint8Array(16));
+                const passwordHash = await crypto.subtle.digest('SHA-256',  new Uint8Array([...(new TextEncoder().encode(input.password)), ...passwordSalt, ...Buffer.from(base64.toArrayBuffer(process.env.PASSWORD_PEPPER!))]));
+
+                const user = await db.user.create({
+                    data: {
+                        username: input.username,
+                        email: input.email,
+                        passwordSalt: Buffer.from(passwordSalt),
+                        passwordHash: Buffer.from(passwordHash),
+
+                        newKeypairRequests: {
+                            create: {
+                                sendingIP: getIp(ctx.req, ctx.config),
+                                identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
+                            }
+                        }
+                    },
+                    select: {
+                        id: true,
+                    }
+                });
+
+                return {
+                    success: true,
+                    userId: user.id,
+                }
+            } catch (e) {
+                return {
+                    success: false,
+                    userId: undefined,
+                    error: e.message,
+                }
+            }
+        })
 })

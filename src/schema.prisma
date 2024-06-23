@@ -36,8 +36,8 @@ model User {
     newKeypairRequests    NewKeypairRequest[]
 
     // Password is only used when requesting a new keypair (prevent auth spam)
-    passHash  String
-    passSalt  String
+    passwordHash  Bytes
+    passwordSalt  Bytes
 }
 
 /// NOTE: NewKeypairRequest records are cleared 30 minutes after creation and are deleted after an approved/denied request

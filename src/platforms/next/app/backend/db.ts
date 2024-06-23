@@ -2,9 +2,13 @@ import { PrismaClient } from "@prisma/client";
 
 
 function generateDatabaseInstance() {
-    return new PrismaClient({
+    const client = new PrismaClient({
         log: ['info', 'warn', 'error'],
     });
+
+    client.$connect(); // since our service is server-based, we don't need to lazily connect
+
+    return client;
 }
 
 // add __db__ to the global object

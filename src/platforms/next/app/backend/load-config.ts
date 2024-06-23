@@ -3,12 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import type { Config, ComputedConfigProps } from 'lib/config-schema';
 import { apiRouter } from 'lib/trpc/primaryRouter';
-
-export enum HostingConfiguration {
-    Development = 'dev',
-    Local = 'local',
-    SoftwareAsAService = 'saas',
-}
+import { HostingConfiguration } from 'lib/env-schema';
 
 export function getHostingConfiguration(): HostingConfiguration {
     if (!process.env.HOSTING_CONFIGURATION) {

@@ -13,15 +13,17 @@ jobs:
 
         - name: Clone Repo
           uses: actions/checkout@v4
+          with:
+            submodules: 'recursive'
 
 
         - name: Set Up PNPM
           uses: pnpm/action-setup@v4
           with:
-            version: 9
+              version: 9
 
 
-        - name: Set Up Node.js ${{ matrix.node-version }}
+        - name: Set Up Node.js 21
           uses: actions/setup-node@v4
           with:
             node-version: 21
