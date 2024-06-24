@@ -13,6 +13,8 @@ import { db } from "../../platforms/next/app/backend/db";
 import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import type { AuthPublicKey, User } from "@prisma/client";
 import base64_ from '@hexagon/base64';
+import { getServerSideReasonForInvalidPassword, passwordRouter } from "./passwords";
+import { getStockedhomeErrorClassForCode } from "../errors";
 const base64 = base64_.base64;
 
 function getIp(req: NextRequest, config: ConfigForTRPCContext) {
@@ -259,6 +261,10 @@ export const authRouter = createRouter({
         ]))
         .query(async ({ctx, input}) => {
             try {
+                // Input validation is important guys!
+                const reasonForInvalidPassword = getServerSideReasonForInvalidPassword(input.password);
+                if (reasonForInvalidPassword) throw new (getStockedhomeErrorClassForCode(reasonForInvalidPassword))();
+
                 const passwordSalt = crypto.getRandomValues(new Uint8Array(16));
                 const passwordHash = await crypto.subtle.digest('SHA-256',  new Uint8Array([...(new TextEncoder().encode(input.password)), ...passwordSalt, ...Buffer.from(base64.toArrayBuffer(process.env.PASSWORD_PEPPER!))]));
 

@@ -1,9 +1,11 @@
 import { createRouter, publicProcedure } from './_trpc';
 import { authRouter } from './auth';
+import { passwordRouter } from './passwords';
 
 export type APIRouter = typeof apiRouter;
 export const apiRouter = createRouter({
     auth: authRouter,
+    password: passwordRouter,
     ['']: publicProcedure.query(() => {
         return {
             project: 'Stockedhome',

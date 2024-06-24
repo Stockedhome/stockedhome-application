@@ -84,3 +84,7 @@ build/**
 !.yarn/versions
 
 src/apis/
+
+src/lib/trpc/passwords/common-passwords/
+
+config/_schema.json

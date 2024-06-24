@@ -6,7 +6,7 @@ import fs from 'fs/promises';
 import url from 'url';
 
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
-const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/passwords/common');
+const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/passwords/common-passwords');
 
 const desiredPasswordLists = new Set([
     '2023-200_most_used_passwords.txt',

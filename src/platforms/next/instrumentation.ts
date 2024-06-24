@@ -1,5 +1,6 @@
 //import { envSchema } from 'lib/env-schema';
 import * as nextStyleLogging from 'next/dist/build/output/log'
+import { db } from './app/backend/db';
 
 async function registerForReal() {
 
@@ -28,8 +29,11 @@ async function registerForReal() {
     //        RUNTIME-SPECIFIC STUFF
     // =====================================
 
-    // Node.js runtime
+
     if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // begin Node.js runtime
+
+
         nextStyleLogging.wait('Loading configuration...')
         let configLoadSuccessful = false;
         try {
@@ -42,14 +46,25 @@ async function registerForReal() {
             }
         }
         nextStyleLogging.event('Configuration loaded!');
+
+
+        // since our service is not serverless, we don't need to lazily connect
+        // not awaited so the server can start taking in requests and work on ones that don't need DB right away
+        nextStyleLogging.wait('Establishing database connection...')
+        db.$connect().then(() => {
+            nextStyleLogging.event('Connected to database!');
+        })
+
+    // end Node.js runtime
     }
+
 
     // Edge runtime (not planned to be used but here for completeness)
     if (process.env.NEXT_RUNTIME === 'edge') {
-        for (let i = 0; i < 25; i++) console.log('If we use it, we need to come up with some solution for loading config into the edge runtime!');
+        for (let i = 0; i < 25; i++) console.log('If we use it, we need to come up with some solution for loading config and Prisma into the edge runtime!');
     }
 
-    console.log(' [96m❀[0m Launching server!');
+
 }
 
 export async function register() {

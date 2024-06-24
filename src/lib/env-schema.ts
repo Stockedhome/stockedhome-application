@@ -1,7 +1,5 @@
 import z from "zod";
 
-console.log('hi')
-
 export enum HostingConfiguration {
     Development = 'dev',
     Local = 'local',
@@ -11,7 +9,6 @@ export enum HostingConfiguration {
 // TODO: Add this all to the docs
 // TODO: Integrate this validator into instrumentation.ts
 // TODO: [IDEA] Extend the docker-compose.yml to give the ENV vars section a schema
-console.log('hi2')
 
 // Important note: z.object() allows for extra properties
 export const envSchema = z.object({
@@ -98,8 +95,6 @@ For information on how Stockedhome loads configuration, see https://docs.stocked
 `.trim()),
 }).merge(z.object({}))
 
-console.log('hi3')
-
 type EnvBase = z.infer<typeof envSchema>;
 
 export interface ComputedEnvProps {
@@ -110,8 +105,4 @@ type EnvWithComputedPropsAndProcessEnv<T extends EnvBase> = T & ComputedEnvProps
 
 export type Env = EnvWithComputedPropsAndProcessEnv<EnvBase>;
 
-console.log('hi4')
-
 export const env = envSchema.parse(process.env) as Env & typeof process.env;
-
-console.log('hi5')

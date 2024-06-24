@@ -6,7 +6,7 @@ function generateDatabaseInstance() {
         log: ['info', 'warn', 'error'],
     });
 
-    client.$connect(); // since our service is server-based, we don't need to lazily connect
+    //client.$connect(); // since our service is not serverless, we don't need to lazily connect -- this is now done in instrumentation.ts
 
     return client;
 }
