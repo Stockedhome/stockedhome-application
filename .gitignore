@@ -1,4 +1,30 @@
+# Local Config
 .env
+
+# Codegen
+src/apis/
+src/lib/trpc/passwords/common-passwords/
+config/_schema.json
+
+# "Don't Pull The File Unless There's A New Supabase Release" Caching
+.docker-compose-supabase-release.txt
+
+# Supabase
+.DS_Store
+node_modules
+.next
+out
+.docz
+tmp
+*.swp
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ==============
+#    Preset
+# ==============
 
 # OSX
 #
@@ -82,9 +108,3 @@ build/**
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-
-src/apis/
-
-src/lib/trpc/passwords/common-passwords/
-
-config/_schema.json
