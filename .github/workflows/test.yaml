@@ -43,6 +43,10 @@ jobs:
         - name: Install dependencies
           run: pnpm install --frozen-lockfile
 
+
+        - name: Run Codegen
+          run: pnpm run codegen
+
         # =============================
         #    Workflow-Specific Stuff
         # =============================

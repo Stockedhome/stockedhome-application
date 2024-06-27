@@ -5,6 +5,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';
 
+// Dependencies?!!
+import './prisma.mjs'
+
 const generatedSchema = zodToJsonSchema(configSchema);
 
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
