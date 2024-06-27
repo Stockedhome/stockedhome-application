@@ -1,21 +1,12 @@
 on:
   workflow_dispatch:
   push:
-      paths:
-          - package.json
-          - pnpm-lock.yaml
-          - codegen.js
-          - tsconfig.json
-          - turbo.json
-          - utilityTypes.ts
-          - schema.prisma
-          - src/forks/**
-          - src/interface/**
-          - src/lib/**
-          - src/platforms/next/**
-          - config/**
-          - assets/**
-          - .github/workflows/build-app.yaml
+    paths-ignore:
+      - .gitignore
+      - LICENSE.md
+      - readme.md
+      - todo.md
+      - .vscode
 
 
 

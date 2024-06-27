@@ -6,8 +6,8 @@ src/apis/
 src/lib/trpc/passwords/common-passwords/
 config/_schema.json
 
-# "Don't Pull The File Unless There's A New Supabase Release" Caching
-.docker-compose-supabase-release.txt
+# Test Caching! (caching resources used in tests, not caching test results)
+tests/cache
 
 # Supabase
 .DS_Store
