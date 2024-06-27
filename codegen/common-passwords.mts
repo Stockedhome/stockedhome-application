@@ -1,9 +1,9 @@
-// @ts-check
-
 import { Octokit } from "octokit";
 import path from 'path';
 import fs from 'fs/promises';
 import url from 'url';
+
+console.log('Downloading and assembling list of common passwords.')
 
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
 const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/passwords/common-passwords');

@@ -3,6 +3,8 @@ import path from 'path';
 import fs from 'fs/promises';
 import url from 'url';
 
+console.log('Generating API clients from OpenAPI schemas.')
+
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
 const schemasDir = path.join(projectCommonDir, '.schemas');
 const apiClientOutDir = path.join(projectCommonDir, 'src/apis');

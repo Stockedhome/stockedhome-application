@@ -1,14 +1,5 @@
-// more like schemagen but alright
-import { zodToJsonSchema } from "zod-to-json-schema";
-import { configSchema } from "../src/lib/config-schema";
-import fs from 'fs/promises';
-import path from 'path';
-import url from 'url';
+// dependencies first!
+import './common-passwords.mjs';
 
-// Dependencies?!!
-import './prisma.mjs'
-
-const generatedSchema = zodToJsonSchema(configSchema);
-
-const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
-await fs.writeFile(path.join(projectCommonDir, 'config/_schema.json'), JSON.stringify(generatedSchema, null, 4));
+// ok now for the real thing
+await import('./config-json-schema-for-real.mjs');

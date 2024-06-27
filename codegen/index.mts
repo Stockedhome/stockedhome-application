@@ -1,7 +1,6 @@
-// @ts-check
-
 import path from 'path';
 import url from 'url';
+import util from 'node:util';
 
 process.on('uncaughtExceptionMonitor', (e, origin) => {
     console.error(origin, e);
@@ -14,11 +13,14 @@ process.chdir(projectCommonDir);
 
 console.log('[34mStarting codegen...[0m', process.cwd());
 
-await Promise.allSettled([
-    import('./common_passwords.mjs'),
-    import('./prisma.mjs'),
+const results = await Promise.allSettled([
     import('./api_clients.mjs'),
     import('./config-json-schema.mjs'),
+    import('./common-passwords.mjs'),
 ])
 
 console.log('[32mCodegen complete![0m')
+
+if (results.filter(r => r.status === 'rejected').length) {
+    console.error(util.inspect(results, true, 8, true))
+}

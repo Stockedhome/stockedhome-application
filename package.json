@@ -15,7 +15,7 @@
   "scripts": {
     "dev-expo": "cd src/platforms/expo && pnpm run start",
     "dev-next": "next dev src/platforms/next",
-    "codegen": "tsx codegen/index.mjs",
+    "codegen": "pnpm exec prisma generate && tsx codegen/index.mjs",
     "prebuild-next": "pnpm run codegen",
     "build-next": "next build src/platforms/next",
     "prebuild-build-expo-NEEDS-PLATFORM": "pnpm run codegen",
