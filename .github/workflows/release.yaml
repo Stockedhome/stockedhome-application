@@ -1,0 +1,19 @@
+on:
+  workflow_dispatch:
+  release:
+    types: "created" # NOT 'released' or 'published'
+
+jobs:
+  build-expo:
+    uses: Stockedhome/stockedhome-application/.github/workflows/build-expo.yaml@main
+  build-next:
+    uses: Stockedhome/stockedhome-application/.github/workflows/build-next.yaml@main
+  add-to-release:
+    needs: [build-expo, build-next]
+    runs-on: ubuntu-latest
+    if: github.event.release != null
+    steps:
+      - uses: AButler/upload-release-assets@v3.0
+        with:
+          files: "artifacts/*;packages/*.nupkg"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
