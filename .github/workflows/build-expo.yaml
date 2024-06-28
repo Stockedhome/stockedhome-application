@@ -76,9 +76,15 @@ jobs:
             token: ${{ secrets.EXPO_TOKEN }}
             packager: pnpm
 
+        - name: Run `git init` Because Expo Is Silly
+          run: git init
+          working-directory: src/platforms/expo
+
+        - name: "DEBUG: `eas whoami`"
+          run: eas whoami
+
         - name: Build App for ${{ matrix.platform }}
-          run: |
-            pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ inputs.profile }} --output=build/${{ matrix.platform }}
+          run: pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ inputs.profile }} --output=build/${{ matrix.platform }}
 
         - name: Upload Artifact
           uses: actions/upload-artifact@v4
