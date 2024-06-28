@@ -5,9 +5,12 @@ on:
 
 jobs:
   build-expo:
-    uses: Stockedhome/stockedhome-application/.github/workflows/build-expo.yaml@main
+    uses: ./.github/workflows/build-expo.yaml
+    with:
+      platform: '["ios","android"]'
+      profile: production
   build-next:
-    uses: Stockedhome/stockedhome-application/.github/workflows/build-next.yaml@main
+    uses: ./.github/workflows/build-next.yaml
   add-to-release:
     needs: [build-expo, build-next]
     runs-on: ubuntu-latest

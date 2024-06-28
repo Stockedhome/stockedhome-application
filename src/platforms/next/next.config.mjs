@@ -61,6 +61,7 @@ const nextConfig = withExpo(withFonts(
             "@expo/html-elements",
             "react-native-gesture-handler",
             'expo',
+            '@react-native/assets-registry',
         ],
 
         //resolveAlias: {

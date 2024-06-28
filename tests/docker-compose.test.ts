@@ -21,7 +21,7 @@ const octokit = new Octokit({
 });
 
 let downloadDockerCompose = false;
-let latestReleaseCommitHash = '________[  ]_____  NOT  BASE64  ____[  ]___________';
+let latestReleaseTag = '________[  ]_____  NOT  BASE64  ____[  ]___________';
 if (await fs.access('tests/cache/docker-compose/.supabase-release-id.txt', fs.constants.O_RDWR).catch(e => e.code === 'ENOENT')) {
     downloadDockerCompose = true;
 } else {
@@ -30,32 +30,34 @@ if (await fs.access('tests/cache/docker-compose/.supabase-release-id.txt', fs.co
         repo: 'supabase',
     })
 
-    latestReleaseCommitHash = latestReleaseData.data.target_commitish;
+    latestReleaseTag = latestReleaseData.data.tag_name;
 
-    const downloadedCommitish = await fs.readFile('tests/cache/docker-compose/.supabase-release-id.txt', 'utf-8').catch(e => {
+    const downloadedTag = await fs.readFile('tests/cache/docker-compose/.supabase-release-id.txt', 'utf-8').catch(e => {
         if (e.code === 'ENOENT') return '________[  ]_____  NOT  BASE64  ____[  ]___________';
         throw e;
     });
 
-    if (latestReleaseCommitHash !== downloadedCommitish) {
+    if (latestReleaseTag !== downloadedTag) {
         downloadDockerCompose = true;
     }
 }
 
 if (downloadDockerCompose) {
-    let latestReleasePromise: Promise<unknown> = Promise.resolve();
-    if (latestReleaseCommitHash === '________[  ]_____  NOT  BASE64  ____[  ]___________') {
-        latestReleasePromise = octokit.rest.repos.getLatestRelease({
+    let latestReleaseTagPromise: Promise<unknown> = Promise.resolve();
+    if (latestReleaseTag === '________[  ]_____  NOT  BASE64  ____[  ]___________') {
+        latestReleaseTagPromise = octokit.rest.repos.getLatestRelease({
             owner: 'supabase',
             repo: 'supabase',
-        }).then(data => (latestReleaseCommitHash = data.data.target_commitish));
+        }).then(data => (latestReleaseTag = data.data.tag_name));
     }
+
+    console.log('Latest release commitish: latestReleaseCommitHash')
 
     const supabaseDockerComposeRes = await octokit.rest.repos.getContent({
         owner: 'supabase',
         repo: 'supabase',
         path: 'docker/docker-compose.yml',
-        ref: latestReleaseCommitHash,
+        ref: latestReleaseTag,
     });
 
     if (Array.isArray(supabaseDockerComposeRes)) throw new Error('Expected Supabase\'s docker-compose.yaml to be a file! What did you do?!!')
@@ -69,7 +71,7 @@ if (downloadDockerCompose) {
 
     await mkDirPromise;
     await fs.writeFile('tests/cache/docker-compose/docker-compose.json', JSON.stringify(supabaseDockerCompose))
-    await fs.writeFile('tests/cache/docker-compose/.supabase-release-id.txt', latestReleaseCommitHash.toString()); // one after the other for safety reasons
+    await fs.writeFile('tests/cache/docker-compose/.supabase-release-id.txt', latestReleaseTag.toString()); // one after the other for safety reasons
 } else {
     supabaseDockerCompose = await fs.readFile('tests/cache/docker-compose/docker-compose.json', 'utf8').then(text => JSON.parse(text))
 }

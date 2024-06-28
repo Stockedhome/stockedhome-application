@@ -1,12 +1,23 @@
 on:
     workflow_dispatch:
+      inputs:
+        platformm:
+          type: string
+          description: 'Platforms to build for'
+          required: false
+          default: '{platform: ["ios", "android"]}'
+        profile:
+          type: string
+          description: 'Build profile'
+          required: false
+          default: 'production'
     workflow_call:
       inputs:
         platform:
           type: string
-          description: 'Platforms to build for'
+          description: 'Platforms to build for, defined as {platform: ["ios", "android", "futurePhone(TM)"]} because Actions forgot what an array is'
           required: true
-          default: '["ios","android"]'
+          default: '{platform: ["ios", "android"]}'
         profile:
           type: string
           description: 'Build profile'
@@ -16,8 +27,7 @@ on:
 jobs:
   build:
     strategy:
-      matrix:
-        platform: ${{ fromJson( github.event.inputs.platform ) }}
+      matrix: ${{ fromJson( inputs.platform ) }}
     name: Build App (${{ matrix.platform }})
     runs-on: ${{ matrix.platform == 'ios' && 'macos-latest' || 'ubuntu-latest' }}
     steps:
@@ -48,9 +58,14 @@ jobs:
         - name: Install dependencies
           run: pnpm install --frozen-lockfile
 
+
+        - name: Run Codegen
+          run: pnpm run codegen
+
         # =============================
         #    Workflow-Specific Stuff
         # =============================
+
 
         - name: Setup EAS
           uses: expo/expo-github-action@v8
