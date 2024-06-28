@@ -231,11 +231,19 @@ export const authRouter = createRouter({
                     publicKeyId: dbResponse.id,
                 }
             } catch (e) {
-                return {
+                if (!e) throw e;
+                if (typeof e === 'string') return {
+                    success: false,
+                    publicKeyId: undefined,
+                    error: e,
+                };
+                if (typeof e !== 'object') throw e;
+                if ('message' in e && typeof e.message === 'string') return {
                     success: false,
                     publicKeyId: undefined,
                     error: e.message,
-                }
+                };
+                throw e;
             }
         })
     ,
@@ -292,11 +300,19 @@ export const authRouter = createRouter({
                     userId: user.id,
                 }
             } catch (e) {
-                return {
+                if (!e) throw e;
+                if (typeof e === 'string') return {
+                    success: false,
+                    userId: undefined,
+                    error: e,
+                };
+                if (typeof e !== 'object') throw e;
+                if ('message' in e && typeof e.message === 'string') return {
                     success: false,
                     userId: undefined,
                     error: e.message,
-                }
+                };
+                throw e;
             }
         })
 })

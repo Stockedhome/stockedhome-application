@@ -7,7 +7,7 @@ import { Platform } from 'react-native'
 import { useNavigation } from '../router/use-navigation'
 import Router from './router'
 import { useRoute } from './use-route'
-import { useRouter } from 'next/navigation'
+import { useRouter } from './use-router'
 
 function useStable<T>(value: T) {
   const ref = useRef(value)

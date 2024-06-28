@@ -5,7 +5,7 @@
     "build": "expo-module build",
     "clean": "expo-module clean",
     "test": "expo-module test",
-    "prepare__": "expo-module prepare",
+    "prepare": "expo-module prepare",
     "upgrade-expo": "bun ./scripts/upgrade-examples-expo.ts"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-export * from './use-next-router'
+export * from './use-router'
 export * from './use-params'
 export * from './use-search-params'
 export * from './use-pathname'

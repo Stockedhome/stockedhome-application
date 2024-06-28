@@ -1,1 +1,1 @@
-export { useRouter as useNextRouter } from 'next/navigation'
+export { useRouter as useNextRouter } from 'next/router'

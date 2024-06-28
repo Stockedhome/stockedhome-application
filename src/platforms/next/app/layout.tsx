@@ -195,7 +195,7 @@ export { viewport };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     let sheet: any;
-    if ('getSheet' in StyleSheet && StyleSheet.getSheet && typeof StyleSheet.getSheet === 'function') {
+    if (typeof StyleSheet !== 'undefined' && 'getSheet' in StyleSheet && StyleSheet.getSheet && typeof StyleSheet.getSheet === 'function') {
         sheet = StyleSheet.getSheet();
     }
 

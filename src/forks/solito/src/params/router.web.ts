@@ -1,1 +1,1 @@
-export { default } from 'next/navigation'
+export { default } from 'next/router'

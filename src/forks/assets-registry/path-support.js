@@ -10,8 +10,6 @@
 
 'use strict';
 
-import type {PackagerAsset} from './registry.js';
-
 const androidScaleSuffix = {
   '0.75': 'ldpi',
   '1': 'mdpi',
@@ -27,7 +25,7 @@ const ANDROID_BASE_DENSITY = 160;
  * FIXME: using number to represent discrete scale numbers is fragile in essence because of
  * floating point numbers imprecision.
  */
-function getAndroidAssetSuffix(scale: number): string {
+function getAndroidAssetSuffix(scale) {
   if (scale.toString() in androidScaleSuffix) {
     return androidScaleSuffix[scale.toString()];
   }
@@ -52,9 +50,9 @@ const drawableFileTypes = new Set([
 ]);
 
 function getAndroidResourceFolderName(
-  asset: PackagerAsset,
-  scale: number,
-): string | $TEMPORARY$string<'raw'> {
+  asset,
+  scale,
+) {
   if (!drawableFileTypes.has(asset.type)) {
     return 'raw';
   }
@@ -72,7 +70,7 @@ function getAndroidResourceFolderName(
   return 'drawable-' + suffix;
 }
 
-function getAndroidResourceIdentifier(asset: PackagerAsset): string {
+function getAndroidResourceIdentifier(asset) {
   return (getBasePath(asset) + '/' + asset.name)
     .toLowerCase()
     .replace(/\//g, '_') // Encode folder structure in file name
@@ -80,9 +78,9 @@ function getAndroidResourceIdentifier(asset: PackagerAsset): string {
     .replace(/^assets_/, ''); // Remove "assets_" prefix
 }
 
-function getBasePath(asset: PackagerAsset): string {
+function getBasePath(asset) {
   const basePath = asset.httpServerLocation;
-  return basePath.startsWith('/') ? basePath.substr(1) : basePath;
+  return basePath.startsWith('/') ? basePath.slice(1) : basePath;
 }
 
 module.exports = {

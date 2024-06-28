@@ -72,10 +72,11 @@ jobs:
           with:
             eas-version: latest
             token: ${{ secrets.EXPO_TOKEN }}
+            packager: pnpm
 
         - name: Build App for ${{ matrix.platform }}
           run: |
-            pnpm run build-expo-NEEDS-PLATFORM --platform ${{ matrix.platform }} --profile=${{ github.event.inputs.profile }} --output=build/${{ matrix.platform }}
+            pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ github.event.inputs.profile }} --output=build/${{ matrix.platform }}
 
         - name: Upload Artifact
           uses: actions/upload-artifact@v4

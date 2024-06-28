@@ -1,10 +1,11 @@
 import { GestureResponderEvent, Platform } from 'react-native'
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from './use-router'
 
 export function useLink({
   href,
   replace,
+  experimental,
 }: {
   href: string
   replace?: boolean
@@ -39,7 +40,7 @@ export function useLink({
         return
       }
       if (replace) {
-        router.replace(href)
+        router.replace(href, { experimental })
       } else {
         router.push(href)
       }

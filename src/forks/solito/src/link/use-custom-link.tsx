@@ -1,6 +1,6 @@
 import { GestureResponderEvent, Platform } from 'react-native'
 
-import { useRouter } from '../app/navigation/use-router'
+import { useRouter } from '../router'
 import { LinkCoreProps } from './LinkCoreProps'
 
 export type UseLinkProps = Pick<
@@ -46,9 +46,9 @@ export function useLink({
         return
       }
       if (replace) {
-        router.replace(href, { shallow, scroll, experimental })
+        router.replace(href, as, { shallow, scroll, experimental })
       } else {
-        router.push(href, {
+        router.push(href, as, {
           shallow,
           scroll,
         })

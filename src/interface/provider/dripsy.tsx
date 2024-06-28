@@ -5,7 +5,7 @@ import { DripsyProvider, makeTheme } from 'dripsy';
 import { useFonts } from 'expo-font';
 import { Rubik_500Medium, Rubik_500Medium_Italic, Rubik_700Bold, Rubik_700Bold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
 
-export function Fonts({ children }) {
+export function Fonts({ children }: React.PropsWithChildren<{}>) {
   const [loaded] = useFonts({
     Rubik_500Medium,
     Rubik_500Medium_Italic,

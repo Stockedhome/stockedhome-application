@@ -1,2 +1,2 @@
-platform='{platform: ["ios", "android"]}'
+platform='{platform: ["android"]}'
 profile="production"

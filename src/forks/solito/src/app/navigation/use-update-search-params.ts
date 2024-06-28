@@ -1,7 +1,10 @@
 import { useCallback } from 'react'
+import { useRouter } from './use-router'
+import { useNavigation } from '../../router/use-navigation'
+import { Platform } from 'react-native'
 import { UseUpdateSearchParamsReturns } from './use-update-search-params.types'
 import { usePathname } from './use-pathname'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 
 export default function <
   Type extends Record<string, string> = Record<string, string>

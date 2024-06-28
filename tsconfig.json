@@ -5,6 +5,7 @@
     "target": "ES2018",
     "module": "ESNext",
     "allowJs": true,
+    "strict": true,
   },
   "extends": "./node_modules/expo/tsconfig.base.json"
 }
