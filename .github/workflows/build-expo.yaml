@@ -1,11 +1,11 @@
 on:
     workflow_dispatch:
       inputs:
-        platformm:
+        platform:
           type: string
-          description: 'Platforms to build for'
+          description: 'Platforms to build for, defined as {platform: ["ios", "android", "futurePhone(TM)"]} because Actions forgot what an array is'
           required: false
-          default: '{platform: ["ios", "android"]}'
+          default: '{"platform": ["ios", "android"]}'
         profile:
           type: string
           description: 'Build profile'
@@ -17,7 +17,7 @@ on:
           type: string
           description: 'Platforms to build for, defined as {platform: ["ios", "android", "futurePhone(TM)"]} because Actions forgot what an array is'
           required: true
-          default: '{platform: ["ios", "android"]}'
+          default: '{"platform": ["ios", "android"]}'
         profile:
           type: string
           description: 'Build profile'
@@ -31,6 +31,8 @@ jobs:
     name: Build App (${{ matrix.platform }})
     runs-on: ${{ matrix.platform == 'ios' && 'macos-latest' || 'ubuntu-latest' }}
     steps:
+
+        - run: echo ${{inputs.platform}}
 
         # ============================
         #        Project Setup
@@ -76,7 +78,7 @@ jobs:
 
         - name: Build App for ${{ matrix.platform }}
           run: |
-            pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ github.event.inputs.profile }} --output=build/${{ matrix.platform }}
+            pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ inputs.profile }} --output=build/${{ matrix.platform }}
 
         - name: Upload Artifact
           uses: actions/upload-artifact@v4
