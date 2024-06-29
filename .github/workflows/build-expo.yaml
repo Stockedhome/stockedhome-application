@@ -76,12 +76,9 @@ jobs:
             token: ${{ secrets.EXPO_TOKEN }}
             packager: pnpm
 
-        - name: "DEBUG: `eas whoami`"
+        - name: "DEBUG: `eas whoami`" # Yes, the above does supposedly work. See https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context
+          if: runner.debug == '1'
           run: eas whoami
-
-        - name: Run `git init` Because Expo Is Silly
-          run: git init
-          working-directory: ${{ github.workspace }}
 
         - name: Build App for ${{ matrix.platform }}
           run: pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ inputs.profile }} --output=build/${{ matrix.platform }}
