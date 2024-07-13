@@ -1,9 +1,16 @@
 import { withExpo } from "@expo/next-adapter";
 import withFonts from "next-fonts";
 import fs from 'fs';
+import url from 'url';
+import path from 'path';
 
-if (fs.existsSync('../../../.env')) {
-    if (!fs.existsSync('./.env')) fs.symlinkSync('../../../.env', './.env', 'file');
+console.log('Entering Next.js config 🎇');
+
+const nextRoot = path.dirname(url.fileURLToPath(import.meta.url));
+const projectRoot = path.join(nextRoot, '../../../');
+
+if (!fs.existsSync(path.join(nextRoot, './.env'))) {
+    if (fs.existsSync(path.join(projectRoot, './.env'))) fs.symlinkSync(path.join(projectRoot, './.env'), path.join(nextRoot, './.env'), 'file');
 }
 
 /** @type {import('next').NextConfig} */

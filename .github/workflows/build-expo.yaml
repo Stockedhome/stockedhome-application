@@ -1,3 +1,5 @@
+# Some direction & snippets taken from https://github.com/thomasread99/expo-workflows/
+
 on:
     workflow_dispatch:
       inputs:
@@ -80,8 +82,30 @@ jobs:
           if: runner.debug == '1'
           run: eas whoami
 
+
+
+        # ==== [ANDROID] Set up JDK & Android Studio ====
+
+        - name: Set up JDK 17
+          if: matrix.platform == 'android'
+          uses: actions/setup-java@v4
+          with:
+            java-version: '17'
+            distribution: 'temurin'
+            cache: 'gradle'
+
+        - name: Setup Android SDK
+          if: matrix.platform == 'android'
+          uses: android-actions/setup-android@v3
+
+
+        # ==== Build App ====
+
         - name: Build App for ${{ matrix.platform }}
           run: pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ inputs.profile }} --output=build/${{ matrix.platform }}
+
+
+        # ==== Upload Artifact ====
 
         - name: Upload Artifact
           uses: actions/upload-artifact@v4
