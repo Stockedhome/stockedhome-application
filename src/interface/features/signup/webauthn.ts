@@ -6,5 +6,3 @@ export async function signUpWithWebAuthn(trpc: APIRouter) {
     });
 
 }
-
-type A = Extract<'a',' b'>

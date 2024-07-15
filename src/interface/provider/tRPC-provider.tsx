@@ -8,8 +8,9 @@ import { useConfig } from './config-profile';
 import { ssrPrepass } from '@trpc/next/ssrPrepass';
 import type { BuiltRouter, RouterRecord } from '@trpc/server/unstable-core-do-not-import';
 
+export type TRPCClient = ReturnType<typeof createTRPCClient>;
 
-const trpcContext = React.createContext<ReturnType<typeof createTRPCClient>>(new Proxy({} as any, {
+const trpcContext = React.createContext<TRPCClient>(new Proxy({} as any, {
     get(target, prop) {
         throw new Error(`TRPCProvider not mounted. Tried to access ${String(prop)}`);
     }
@@ -55,19 +56,35 @@ function BasicTRPCProvider({ children }: React.PropsWithChildren<{}>) {
     return <trpcContext.Provider value={value}>{children}</trpcContext.Provider>
 }
 
-type RecordOfBooleansOrObjectsLevel<TIndexObj extends Record<any, any> = Record<any, any>> = boolean | Partial<RecordOfBooleansOrObjects<TIndexObj>> | undefined
+type RecordOfBooleansOrObjectsLevel<TIndexObj extends Record<any, any> = Record<any, unknown>> = boolean | Partial<RecordOfBooleansOrObjects<TIndexObj>> | undefined
 
 type RecordOfBooleansOrObjects<TIndexObj extends Record<any, any> = Record<any, any>> = {
-    [Tkey in keyof TIndexObj]: RecordOfBooleansOrObjectsLevel<any>
+    [Tkey in keyof TIndexObj as Tkey extends `use${string}` ? never : Tkey]: RecordOfBooleansOrObjectsLevel<any>
+}
+
+function createHookedModifier<TRouter extends Pick<TRPCClient, TModifier>, TModifier extends Extract<keyof TRPCClient, `use${string}`>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter, modifier: TModifier) {
+    const primaryModifier = primaryClientLevel[modifier];
+    const supplementaryModifier = supplementaryClientLevel[modifier];
+
+    const hookedModifier = (...args: Parameters<TRouter[TModifier]>) => {
+        if (typeof currentConfigLevel === 'boolean') return currentConfigLevel ? primaryModifier(...args) : supplementaryModifier(...args);
+        if (typeof currentConfigLevel === 'undefined') return primaryModifier(...args);
+        if (!(modifier in currentConfigLevel) || currentConfigLevel[modifier] === undefined) return primaryModifier(...args);
+
+        if (typeof currentConfigLevel[modifier] === 'boolean') return currentConfigLevel[modifier] ? primaryModifier(...args) : supplementaryModifier(...args);
+        else return createHookedModifier(currentConfigLevel[modifier], primaryClientLevel[modifier], supplementaryClientLevel[modifier], modifier);
+    }
 }
 
 // TODO: Test this. Most likely going to need some way to modify config in tests 🤔
 // Need to test ALL code paths here. Give this Proxy 100% coverage. This is a matter of privacy, security, and core program functionality.
-function createConfigBasedProxy<TRouter extends BuiltRouter<{ ctx: any; meta: any; errorShape: any; transformer: any; }, RouterRecord>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter): TRouter {
+function createConfigBasedProxy<TRouter extends TRPCClient | BuiltRouter<{ ctx: any; meta: any; errorShape: any; transformer: any; }, RouterRecord>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter): TRouter {
     // Note: both router levels are equal since they're initialized from the same schema.
     return new Proxy(supplementaryClientLevel, {
         get(_, prop) {
             if ((!(prop in primaryClientLevel))) return Reflect.get(primaryClientLevel, prop);
+            if (prop === 'useUtils' || prop === 'useSuspenseQueries' || prop === 'useQueries' || prop === 'useContext') {
+            }
 
             if (typeof currentConfigLevel === 'boolean') return currentConfigLevel ? Reflect.get(primaryClientLevel, prop) : Reflect.get(supplementaryClientLevel, prop);
 
@@ -79,6 +96,7 @@ function createConfigBasedProxy<TRouter extends BuiltRouter<{ ctx: any; meta: an
             else return createConfigBasedProxy(currentConfigLevel[prop as any], primaryClientLevel[prop as any] as any, supplementaryClientLevel[prop as any]); // Weirdly, the first param errors but the second doesn't
         }
     });
+
 }
 
 function MixedTRPCProvider({ children }: React.PropsWithChildren<{}>) {
@@ -88,7 +106,7 @@ function MixedTRPCProvider({ children }: React.PropsWithChildren<{}>) {
     const supplementaryClient = React.useMemo(() => createTRPCClient(config.supplementary.canonicalRoot), [config.supplementary.canonicalRoot.href])
 
     const value = React.useMemo(() => {
-        return createConfigBasedProxy(config.primary.primaryEndpoints, primaryClient as any, supplementaryClient); // Same weird error as the recursive call in createConfigBasedProxy
+        return createConfigBasedProxy(config.primary.primaryEndpoints, primaryClient, supplementaryClient); // Same weird error as the recursive call in createConfigBasedProxy
     }, [config.primary.primaryEndpoints, primaryClient, supplementaryClient]);
 
     return <trpcContext.Provider value={value}>{children}</trpcContext.Provider>
