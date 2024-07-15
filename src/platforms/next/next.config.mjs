@@ -76,6 +76,7 @@ const nextConfig = withExpo(withFonts(
         //},
 
         basePath: "/web",
+        assetPrefix: "/web/",
     }
 ));
 

@@ -6,16 +6,27 @@ import { useFonts } from 'expo-font';
 import { Rubik_500Medium, Rubik_500Medium_Italic, Rubik_700Bold, Rubik_700Bold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
 
 export function Fonts({ children }: React.PropsWithChildren<{}>) {
-  const [loaded] = useFonts({
-    Rubik_500Medium,
-    Rubik_500Medium_Italic,
-    Rubik_700Bold,
-    Rubik_700Bold_Italic,
-    Rubik_900Black,
-    Rubik_900Black_Italic,
-  });
 
-  return <>{loaded && children}</>;
+    const [loaded, error] = useFonts({
+        Rubik_500Medium,
+        Rubik_500Medium_Italic,
+        Rubik_700Bold,
+        Rubik_700Bold_Italic,
+        Rubik_900Black,
+        Rubik_900Black_Italic,
+    });
+
+    React.useEffect(()=> {
+        if (error) {
+            console.error('Error loading fonts:', error);
+        } else if (!loaded) {
+            console.log('Loading fonts...');
+        } else {
+            console.log('Fonts loaded');
+        }
+    }, [loaded, error]);
+
+    return <>{children}</>;
 }
 
 const theme = makeTheme({
@@ -44,6 +55,10 @@ const theme = makeTheme({
             color: '$text',
         },
         div: {
+            fontSize: 16,
+            color: '$text',
+        },
+        Text: {
             fontSize: 16,
             color: '$text',
         },
@@ -80,13 +95,9 @@ const theme = makeTheme({
 });
 
 export function Dripsy({ children }: { children: React.ReactNode; }) {
-    return (
-        <DripsyProvider
-            theme={theme}
-            // this disables SSR, since react-native-web doesn't have support for it (yet)
-            ssr
-        >
+    return <DripsyProvider theme={theme} ssr={true} >
+        <Fonts>
             {children}
-        </DripsyProvider>
-    );
+        </Fonts>
+    </DripsyProvider>
 }
