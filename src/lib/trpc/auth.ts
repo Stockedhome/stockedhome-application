@@ -12,9 +12,9 @@ import type { ConfigForTRPCContext } from "../config-schema";
 import { db } from "../../platforms/next/app/backend/db";
 import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import type { AuthPublicKey, User } from "@prisma/client";
-import base64_ from '@hexagon/base64';
 import { getServerSideReasonForInvalidPassword, passwordRouter } from "./passwords";
 import { getStockedhomeErrorClassForCode } from "../errors";
+import base64_ from '@hexagon/base64';
 const base64 = base64_.base64;
 
 function getIp(req: NextRequest, config: ConfigForTRPCContext) {
@@ -128,10 +128,10 @@ export const authRouter = createRouter({
             clientGeneratedRandom: z.string(),
             userId: z.bigint(),
             response: z.object({
-            /** This is base64!!! */
-            id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64' }),
-            /** This is base64!!! */
-            rawId: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64' }),
+                /** This is base64!!! */
+                id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64' }),
+                /** This is base64!!! */
+                rawId: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64' }),
                 response: z.object({
                     /** This is base64!!! */
                     clientDataJSON: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64' }),
@@ -258,12 +258,14 @@ export const authRouter = createRouter({
         .output(z.union([
             z.object({
                 success: z.literal(true),
-                userId: z.bigint(),
+                userId: z.string(),
+                keypairRequestId: z.string(),
                 error: z.undefined(),
             }),
             z.object({
                 success: z.literal(false),
-                userId: z.undefined(),
+                userId: z.undefined().optional(),
+                keypairRequestId: z.undefined(),
                 error: z.string(),
             }),
         ]))
@@ -287,29 +289,36 @@ export const authRouter = createRouter({
                             create: {
                                 sendingIP: getIp(ctx.req, ctx.config),
                                 identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
-                            }
+                            },
                         }
                     },
                     select: {
                         id: true,
+                        newKeypairRequests: {select: {id: true}}
                     }
                 });
 
+                const keypairRequest = user.newKeypairRequests[0];
+                if (!keypairRequest) throw new Error('Impossible condition! In /api/auth.signUp, keypairRequest is null!')
+
                 return {
                     success: true,
-                    userId: user.id,
+                    userId: user.id.toString(),
+                    keypairRequestId: keypairRequest.id,
                 }
             } catch (e) {
                 if (!e) throw e;
                 if (typeof e === 'string') return {
                     success: false,
                     userId: undefined,
+                    keypairRequestId: undefined,
                     error: e,
                 };
                 if (typeof e !== 'object') throw e;
                 if ('message' in e && typeof e.message === 'string') return {
                     success: false,
                     userId: undefined,
+                    keypairRequestId: undefined,
                     error: e.message,
                 };
                 throw e;

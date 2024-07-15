@@ -59,20 +59,18 @@ function BasicTRPCProvider({ children }: React.PropsWithChildren<{}>) {
 type RecordOfBooleansOrObjectsLevel<TIndexObj extends Record<any, any> = Record<any, unknown>> = boolean | Partial<RecordOfBooleansOrObjects<TIndexObj>> | undefined
 
 type RecordOfBooleansOrObjects<TIndexObj extends Record<any, any> = Record<any, any>> = {
-    [Tkey in keyof TIndexObj as Tkey extends `use${string}` ? never : Tkey]: RecordOfBooleansOrObjectsLevel<any>
+    [Tkey in Exclude<keyof TIndexObj, `use${string}`>]: RecordOfBooleansOrObjectsLevel<any>
 }
 
-function createHookedModifier<TRouter extends Pick<TRPCClient, TModifier>, TModifier extends Extract<keyof TRPCClient, `use${string}`>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter, modifier: TModifier) {
-    const primaryModifier = primaryClientLevel[modifier];
-    const supplementaryModifier = supplementaryClientLevel[modifier];
+function createHookedUseUtils<TRouter extends Pick<TRPCClient, 'useUtils'>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter) {
+    const primaryModifier = primaryClientLevel['useUtils'] as (...args: Parameters<TRouter['useUtils']>) => ReturnType<TRouter['useUtils']>;
+    const supplementaryModifier = supplementaryClientLevel['useUtils'] as (...args: Parameters<TRouter['useUtils']>) => ReturnType<TRouter['useUtils']>;
 
-    const hookedModifier = (...args: Parameters<TRouter[TModifier]>) => {
-        if (typeof currentConfigLevel === 'boolean') return currentConfigLevel ? primaryModifier(...args) : supplementaryModifier(...args);
-        if (typeof currentConfigLevel === 'undefined') return primaryModifier(...args);
-        if (!(modifier in currentConfigLevel) || currentConfigLevel[modifier] === undefined) return primaryModifier(...args);
+    return (...args: Parameters<TRouter['useUtils']>) => {
+        const modifiedPrimary = primaryModifier(...args);
+        const modifiedSupplementary = supplementaryModifier(...args);
 
-        if (typeof currentConfigLevel[modifier] === 'boolean') return currentConfigLevel[modifier] ? primaryModifier(...args) : supplementaryModifier(...args);
-        else return createHookedModifier(currentConfigLevel[modifier], primaryClientLevel[modifier], supplementaryClientLevel[modifier], modifier);
+        return createConfigBasedProxy(currentConfigLevel, modifiedPrimary as any, modifiedSupplementary as any);
     }
 }
 
@@ -80,22 +78,26 @@ function createHookedModifier<TRouter extends Pick<TRPCClient, TModifier>, TModi
 // Need to test ALL code paths here. Give this Proxy 100% coverage. This is a matter of privacy, security, and core program functionality.
 function createConfigBasedProxy<TRouter extends TRPCClient | BuiltRouter<{ ctx: any; meta: any; errorShape: any; transformer: any; }, RouterRecord>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter): TRouter {
     // Note: both router levels are equal since they're initialized from the same schema.
+    const hookedUseUtils = 'useUtils' in primaryClientLevel ? createHookedUseUtils(currentConfigLevel, primaryClientLevel as any, supplementaryClientLevel) : undefined;
     return new Proxy(supplementaryClientLevel, {
-        get(_, prop) {
+        get(_: unknown, prop: keyof TRouter & keyof Partial<RecordOfBooleansOrObjects<TRouter>>) {
             if ((!(prop in primaryClientLevel))) return Reflect.get(primaryClientLevel, prop);
-            if (prop === 'useUtils' || prop === 'useSuspenseQueries' || prop === 'useQueries' || prop === 'useContext') {
+
+            if (prop === 'useSuspenseQueries' || prop === 'useQueries' || prop === 'useContext') {
+                throw new TypeError('Stockedhome does not support the useQueries, useSuspenseQueries, or useContext hooks in the root tRPC client!');
             }
+            if (prop === 'useUtils') return hookedUseUtils;
 
             if (typeof currentConfigLevel === 'boolean') return currentConfigLevel ? Reflect.get(primaryClientLevel, prop) : Reflect.get(supplementaryClientLevel, prop);
 
             // hit primary router by default (though, once we hit production, it shouldn't be possible to have an undefined prop)
             if (typeof currentConfigLevel === 'undefined') return Reflect.get(primaryClientLevel, prop);
-            if (!(prop in currentConfigLevel) || currentConfigLevel[prop as any] === undefined) return Reflect.get(primaryClientLevel, prop);
+            if (!(prop in currentConfigLevel) || currentConfigLevel[prop] === undefined) return Reflect.get(primaryClientLevel, prop);
 
-            if (typeof currentConfigLevel[prop as any] === 'boolean') return currentConfigLevel[prop as any] ? Reflect.get(primaryClientLevel, prop) : Reflect.get(supplementaryClientLevel, prop);
-            else return createConfigBasedProxy(currentConfigLevel[prop as any], primaryClientLevel[prop as any] as any, supplementaryClientLevel[prop as any]); // Weirdly, the first param errors but the second doesn't
+            if (typeof currentConfigLevel[prop] === 'boolean') return currentConfigLevel[prop] ? Reflect.get(primaryClientLevel, prop) : Reflect.get(supplementaryClientLevel, prop);
+            else return createConfigBasedProxy(currentConfigLevel[prop], primaryClientLevel[prop], supplementaryClientLevel[prop]); // Weirdly, the first param errors but the second doesn't
         }
-    });
+    } as any);
 
 }
 

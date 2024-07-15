@@ -26,6 +26,7 @@
       }
     },
     "githubUrl": "https://github.com/Stockedhome/stockedhome",
-    "owner": "stockedhome"
+    "owner": "stockedhome",
+    "jsEngine": "hermes"
   }
 }

@@ -1,8 +1,8 @@
 // import { ConfigProvider } from './config';
 import { Dripsy } from './dripsy'
 
-export function Provider({ children }: { children: React.ReactNode }) {
+export function Provider({ children }: { children: React.ReactNode}) {
     return <Dripsy>
-        {children}
+        {children as any}
     </Dripsy>
 }

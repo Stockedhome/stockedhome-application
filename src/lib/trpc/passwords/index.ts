@@ -7,24 +7,24 @@ import { StockedhomeErrorType } from "../../errors";
 
 // TODO: Test to see if Next.js' tree shaking can remove `commonPasswords` from the client bundle when only importing this function
 /** Checks suitable to be run client-side on the user's password */
-export function getClientSideReasonForInvalidPassword(password: string): StockedhomeErrorType.Password_TooShort | StockedhomeErrorType.Password_TooLong | null {
+export function getClientSideReasonForInvalidPassword(password: string): StockedhomeErrorType.Authentication_Registration_Password_TooShort | StockedhomeErrorType.Authentication_Registration_Password_TooLong | null {
     if (password.length < 4)
-        return StockedhomeErrorType.Password_TooShort;
+        return StockedhomeErrorType.Authentication_Registration_Password_TooShort;
 
     if (password.length > 1024)
-        return StockedhomeErrorType.Password_TooLong;
+        return StockedhomeErrorType.Authentication_Registration_Password_TooLong;
 
     return null;
 }
 
-export function getServerSideReasonForInvalidPassword(password: string): ReturnType<typeof getClientSideReasonForInvalidPassword> | StockedhomeErrorType.Password_TooCommon | null {
+export function getServerSideReasonForInvalidPassword(password: string): ReturnType<typeof getClientSideReasonForInvalidPassword> | StockedhomeErrorType.Authentication_Registration_Password_TooCommon | null {
     const clientSideReason = getClientSideReasonForInvalidPassword(password);
 
     if (clientSideReason)
         return clientSideReason;
 
     if (commonPasswords.has(password))
-        return StockedhomeErrorType.Password_TooCommon;
+        return StockedhomeErrorType.Authentication_Registration_Password_TooCommon;
 
     return null;
 }
@@ -37,9 +37,9 @@ export const passwordRouter = createRouter({
         }))
         .output(z.object({
             error: z.union([
-                z.literal(StockedhomeErrorType.Password_TooShort),
-                z.literal(StockedhomeErrorType.Password_TooLong),
-                z.literal(StockedhomeErrorType.Password_TooCommon),
+                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooShort),
+                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooLong),
+                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooCommon),
             ]).nullable(),
         }))
         .query(function({ input: {password} }): {error: ReturnType<typeof getServerSideReasonForInvalidPassword>} {
