@@ -61,7 +61,7 @@ async function registerForReal() {
 
     // Edge runtime (not planned to be used but here for completeness)
     if (process.env.NEXT_RUNTIME === 'edge') {
-        for (let i = 0; i < 25; i++) console.log('If we use it, we need to come up with some solution for loading config and Prisma into the edge runtime!');
+        nextStyleLogging.warnOnce("Edge runtime is ONLY supported in middleware. Nearly all routes are impractical to render in the edge runtime due to the necessity of configuration loading.")
     }
 
 
