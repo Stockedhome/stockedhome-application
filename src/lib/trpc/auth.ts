@@ -13,7 +13,7 @@ import { db } from "../../platforms/next/app/backend/db";
 import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import type { AuthPublicKey, User } from "@prisma/client";
 import { getServerSideReasonForInvalidPassword, passwordRouter } from "./passwords";
-import { getStockedhomeErrorClassForCode } from "../errors";
+import { StockedhomeErrorType, getStockedhomeErrorClassForCode } from "../errors";
 import base64_ from '@hexagon/base64';
 const base64 = base64_.base64;
 
@@ -56,9 +56,9 @@ function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, ch
         userDisplayName: user.username,
         userID: Buffer.from(user.id.toString()),
         authenticatorSelection: {
-            residentKey: 'required',
-            userVerification: 'required',
-            authenticatorAttachment: 'cross-platform',
+            //residentKey: 'required', -- this shows a different prompt on mobile and, personally, I prefer the non-resident prompt
+            userVerification: 'discouraged', // If an attacker has physical access to your device, them accessing your grocery list is the least of your concerns
+            //authenticatorAttachment: 'cross-platform', -- nobody told me I could just, like, not define this and it doesn't filter
         },
         attestationType: 'none', // TODO: Test what this does and determine whether we want it for security purposes
         excludeCredentials: publicKeys.map(key => ({
@@ -169,6 +169,8 @@ export const authRouter = createRouter({
             }),
         ]))
         .query(async ({ctx, input}) => {
+            // FIXME: got error "Unexpected registration response type "webauthn.create", expected "public-key""
+            // TODO: Account for every error thrown in the simplewebauthn validator
             try {
                 const userId = BigInt(input.userId);
                 const dbData = await db.newKeypairRequest.findUnique({
@@ -204,7 +206,7 @@ export const authRouter = createRouter({
                     expectedChallenge: base64.fromArrayBuffer(dbData.challenge!),
                     expectedOrigin: ctx.config.canonicalRoot.href,
                     expectedRPID: ctx.config.canonicalRoot.hostname,
-                    expectedType: 'public-key',
+                    expectedType: ['webauthn.create', 'public-key'],
                     requireUserVerification: true,
                 });
 
@@ -233,6 +235,7 @@ export const authRouter = createRouter({
                     publicKeyId: dbResponse.id,
                 }
             } catch (e) {
+                console.error(e);
                 if (!e) throw e;
                 if (typeof e === 'string') return {
                     success: false,
@@ -309,6 +312,7 @@ export const authRouter = createRouter({
                     keypairRequestId: keypairRequest.id,
                 }
             } catch (e) {
+                console.error(e);
                 if (!e) throw e;
                 if (typeof e === 'string') return {
                     success: false,
@@ -325,5 +329,51 @@ export const authRouter = createRouter({
                 };
                 throw e;
             }
-        })
+        }),
+
+    checks: {
+        uniqueEmail: publicProcedure
+            .input(z.object({
+                email: z.string(),
+            }))
+            .output(z.boolean())
+            .query(async ({input}) => {
+                return !(await db.user.findUnique({
+                    where: { email: input.email },
+                    select: { id: true },
+                }));
+            }),
+
+        uniqueUsername: publicProcedure
+            .input(z.object({
+                username: z.string(),
+            }))
+            .output(z.boolean())
+            .query(async ({input}) => {
+                return !(await db.user.findUnique({
+                    where: { username: input.username },
+                    select: { id: true },
+                }));
+            }),
+
+        /** Returns `true` if a password is valid. Client-side checks should be run before passing off to the server.
+         *
+         * If the password is invalid, returns the error code string.
+         */
+        validPassword: publicProcedure
+            .input(z.object({
+                password: z.string(),
+            }))
+            .output(z.union([
+                z.literal(true),
+                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooShort),
+                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooLong),
+                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooCommon),
+            ]))
+            .query(async ({input}) => {
+                const reasonForInvalidPassword = getServerSideReasonForInvalidPassword(input.password);
+                if (reasonForInvalidPassword) return reasonForInvalidPassword;
+                return true;
+            }),
+    }
 })

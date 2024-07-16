@@ -1,74 +1,31 @@
 'use client';
 
-import { View, Text, TextInput } from 'dripsy'
-import type { TextInput as RNTextInput } from 'react-native'
-import React from 'react'
-import { Button } from 'react-native'
-import { signUpWithWebAuthn } from './webauthn';
-import { useTRPC } from '../../provider/tRPC-provider';
-import { useRouter } from 'solito/app/navigation';
+import base64_ from '@hexagon/base64';
+import React from 'react';
+import { SignUpNewAccountScreen } from './signup-new-account-screen';
+import { SignUpNewPasskeyScreen } from './signup-new-passkey-screen';
+import { SignUpTestNewPasskeyScreen } from './signup-test-new-passkey-screen';
+const base64 = base64_.base64;
 
 export function SignUpScreen() {
+    const clientGeneratedRandom = React.useMemo(() => {
+        const clientGeneratedRandomArr = new Uint8Array(32);
+        window.crypto.getRandomValues(clientGeneratedRandomArr);
+        return base64.fromArrayBuffer(clientGeneratedRandomArr);
+    }, []);
 
-    const [email, setEmail] = React.useState('')
-    const emailInputRef = React.useRef<RNTextInput>(null)
-    const [username, setUsername] = React.useState('')
-    const usernameInputRef = React.useRef<RNTextInput>(null)
-    const [password, setPassword] = React.useState('')
-    const passwordInputRef = React.useRef<RNTextInput>(null)
+    const [username, setUsername] = React.useState('');
+    const [userId, setUserId] = React.useState('');
+    const [keypairRequestId, setKeypairRequestId] = React.useState('');
 
-    const [submitting, setSubmitting] = React.useState(false)
-    const [error, setError] = React.useState<string | null>(null)
+    const [signupStage, setSignupStage] = React.useState<'new-account' | 'new-passkey' | 'test-passkey'>('new-account');
 
-    const trpc = useTRPC().useUtils()
-    const router = useRouter()
-
-    const submit = React.useCallback(() => {
-        if (submitting) return
-        if (!email || !username || !password) {
-            return setError('Please fill out all fields!')
-        }
-
-        setSubmitting(true)
-
-        signUpWithWebAuthn({ trpc, email, username, password }).then((res) => {
-            setSubmitting(false)
-            router.push('/signup/success')
-        }).catch((e) => {
-            console.error(e)
-            setError(e.message)
-            setSubmitting(false)
-        })
-    }, [email, username, password, submitting])
-
-    if (error) {
-        return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text sx={{ color: 'red', mb: 16 }}>{error}</Text>
-            <Button title="Try Again" onPress={()=>setError(null)} />
-        </View>
+    switch (signupStage) {
+        case 'new-account':
+            return <SignUpNewAccountScreen clientGeneratedRandom={clientGeneratedRandom} setUsername={setUsername} setUserId={setUserId} setKeypairRequestId={setKeypairRequestId} setSignupStage={setSignupStage} />;
+        case 'new-passkey':
+            return <SignUpNewPasskeyScreen userId={userId} keypairRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStage={setSignupStage} />;
+        case 'test-passkey':
+            return <SignUpTestNewPasskeyScreen userId={userId} />; // auth code generates its own random
     }
-
-    if (submitting) {
-        return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text sx={{ mb: 16 }}>Signing up...</Text>
-        </View>
-    }
-
-    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
-            Sign Up for Stockedhome
-        </Text>
-
-        <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 1, borderColor: 'gray' }} ref={emailInputRef as any}
-            placeholder="Email" value={email} onChangeText={setEmail} returnKeyType='next' inputMode='email' onSubmitEditing={()=>usernameInputRef.current?.focus()} blurOnSubmit={false} />
-
-        <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 1, borderColor: 'gray' }} ref={usernameInputRef as any}
-            placeholder="Username" value={username} onChangeText={setUsername} returnKeyType='next' inputMode='text' onSubmitEditing={()=>passwordInputRef.current?.focus()} blurOnSubmit={false} />
-
-        <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 1, borderColor: 'gray' }} ref={passwordInputRef as any}
-            placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry returnKeyType='go' enablesReturnKeyAutomatically inputMode='text' blurOnSubmit={false} onSubmitEditing={submit} />
-
-
-        <Button title="Sign Up" onPress={submit} />
-    </View>
 }
