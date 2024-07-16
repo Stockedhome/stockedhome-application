@@ -1,6 +1,6 @@
 'use client';
 
-import { View, Text } from 'dripsy'
+import { View, P } from 'dripsy'
 import React from 'react'
 import { Button } from 'react-native'
 import { createNewWebAuthnCredential } from 'lib/webauthn';
@@ -46,25 +46,25 @@ export function SignUpNewPasskeyScreen({
     }, [creatingPasskey])
 
     return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
+        <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             Welcome, {username}! 🎉
-        </Text>
+        </P>
 
-        <Text sx={{ textAlign: 'center', mb: 16 }}>
+        <P sx={{ textAlign: 'center', mb: 16 }}>
             Now, to log in, Stockedhome uses Passkeys. Passkeys are simpler to use than passwords&mdash;and more secure, too!
-        </Text>
+        </P>
 
-        <Text sx={{ textAlign: 'center', mb: 16 }}>
+        <P sx={{ textAlign: 'center', mb: 16 }}>
             You'll use your password when you want to ask for a new passkey on a new device. You'll have to approve that request from a device that's already logged in.
-        </Text>
+        </P>
 
-        <Text sx={{ textAlign: 'center', mb: 16 }}>
+        <P sx={{ textAlign: 'center', mb: 16 }}>
             Since you don't have any logged-in devices yet, click the button below to create your first passkey.
-        </Text>
+        </P>
 
         { error
-            ? <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text sx={{ color: 'red', mb: 16 }}>{error}</Text>
+            ? <View sx={{marginTop: 8}}>
+                <P sx={{ color: 'red', mb: 16 }}>{error}</P>
                 <Button title="Try Again" onPress={createPasskey} />
             </View>
             : creatingPasskey

@@ -1,16 +1,16 @@
 'use client';
 
-import { View, Text } from 'dripsy'
+import { View, P } from 'dripsy'
 import { useParams } from 'solito/app/navigation';
 import { TextLink } from 'solito/link'
 
 export function UserDetailScreen() {
-  const {id} = useParams()
+    const {id} = useParams()
 
-    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
+    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center', p: 16 }}>
+        <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             {`User ID: ${id}`}
-        </Text>
+        </P>
 
         <TextLink href="/">👈 Go Home</TextLink>
     </View>

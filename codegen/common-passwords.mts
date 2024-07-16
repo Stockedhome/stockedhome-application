@@ -1,4 +1,5 @@
 import { Octokit } from "octokit";
+import type { Octokit as OctokitCore } from "@octokit/core";
 import path from 'path';
 import fs from 'fs/promises';
 import url from 'url';
@@ -24,7 +25,16 @@ const octokit = new Octokit({
         error: console.error,
     },
     userAgent: 'Stockedhome Codegen',
-});
+}) as
+// octokit doesn't export their types correctly (giving Octokit type `any` because of a bad import in 'octokit.d.ts')
+// so we have to manually fix the error here
+InstanceType<typeof OctokitCore & import("@octokit/core/dist-types/types").Constructor<{
+    paginate: import("@octokit/plugin-paginate-rest").PaginateInterface;
+} & import("@octokit/plugin-paginate-graphql").paginateGraphQLInterface & import("@octokit/plugin-rest-endpoint-methods").Api & {
+    retry: {
+        retryRequest: (error: import("@octokit/request-error").RequestError, retries: number, retryAfter: number) => import("@octokit/request-error").RequestError;
+    };
+}>>;
 
 let downloadPasswordLists = false;
 let latestReleaseID = -1;

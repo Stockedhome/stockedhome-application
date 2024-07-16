@@ -1,6 +1,6 @@
 'use client';
 
-import { View, Text } from 'dripsy'
+import { View, P } from 'dripsy'
 import React from 'react'
 import { Button } from 'react-native'
 import { createNewWebAuthnCredential } from 'lib/webauthn';
@@ -31,21 +31,21 @@ export function SignUpTestNewPasskeyScreen({
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text sx={{ color: 'red', mb: 16 }}>{error}</Text>
+            <P sx={{ color: 'red', mb: 16 }}>{error}</P>
             <Button title="Try Again" onPress={()=>setError(null)} />
         </View>
     }
 
     if (submitting) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text sx={{ mb: 16 }}>Signing up...</Text>
+            <P sx={{ mb: 16 }}>Signing up...</P>
         </View>
     }
 
     return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text sx={{ textAlign: 'center', mb: 16}}>
+        <P sx={{ textAlign: 'center', mb: 16}}>
             You're all set up! You can now sign in with your new account!
-        </Text>
+        </P>
 
         <Button title="Get Started" onPress={testPasskey} />
     </View>

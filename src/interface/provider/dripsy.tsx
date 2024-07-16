@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { DripsyProvider, Text, View, makeTheme } from 'dripsy';
 import { useFonts } from 'expo-font';
-import { Rubik_500Medium, Rubik_500Medium_Italic, Rubik_700Bold, Rubik_700Bold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
+import { Rubik_500Medium, Rubik_500Medium_Italic, Rubik_600SemiBold, Rubik_600SemiBold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
 import { TRPCProvider } from './tRPC-provider';
 
 export function Fonts({ children }: React.PropsWithChildren<{}>) {
@@ -11,8 +11,8 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
     const [loaded, error] = useFonts({
         Rubik_500Medium,
         Rubik_500Medium_Italic,
-        Rubik_700Bold,
-        Rubik_700Bold_Italic,
+        Rubik_600SemiBold,
+        Rubik_600SemiBold_Italic,
         Rubik_900Black,
         Rubik_900Black_Italic,
     });
@@ -30,23 +30,33 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
     return <>{children}</>;
 }
 
-const theme = makeTheme(Object.assign({
-    "colors": {
-        "text": "hsl(210, 50%, 96%)",
-        "background": "hsl(230, 25%, 18%)",
-        "primary": "hsl(260, 100%, 80%)",
-        "secondary": "hsl(290, 100%, 80%)",
-        "highlight": "hsl(260, 20%, 40%)",
-        "purple": "hsl(290, 100%, 80%)",
-        "muted": "hsla(230, 20%, 0%, 20%)",
-        "gray": "hsl(210, 50%, 60%)"
+const theme = makeTheme({
+    types: {
+        reactNativeTypesOnly: true,
     },
-    "fonts": {
-        "body": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", sans-serif",
-        "heading": "inherit",
-        "monospace": "Menlo, monospace"
+    colors: {
+        purple: "hsl(290, 100%, 80%)",
+        gray: "hsl(210, 50%, 60%)",
+
+        primary: '#1d6cb8',
+        highlight: '#5db0ff',
+        accent: '#184c7d',
+
+        background: '#222222',
+
+        text: '#cccccc',
+        textBright: '#dddddd',
+        textSecondary: '#aaaaaa',
+        secondary: '#aaaaaa',
+        textMuted: '#666666',
+        muted: '#666666',
     },
-    "fontSizes": [
+    fonts: {
+        heading: "inherit",
+        monospace: "Menlo, monospace",
+        root: 'rubik, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", sans-serif',
+    },
+    fontSizes: [
         12,
         14,
         16,
@@ -57,30 +67,53 @@ const theme = makeTheme(Object.assign({
         64,
         72
     ],
-    "fontWeights": {
-        "body": 400,
-        "heading": 700,
-        "display": 900
+    fontWeights: {
+        body: '400',
+        heading: '700',
+        display: '900'
     },
-    "lineHeights": {
-        "body": 1.5,
-        "heading": 1.25
+    lineHeights: {
+        body: 1.5,
+        heading: 1.25
     },
-    "text": {
-        "heading": {
-            "fontFamily": "heading",
-            "fontWeight": "heading",
-            "lineHeight": "heading"
+    text: {
+        heading: {
+            fontFamily: "heading",
+            fontWeight: "heading",
+            lineHeight: "heading"
         },
-        "display": {
-            "variant": "text.heading",
-            "fontSize": [
+        display: {
+            variant: 'text.heading',
+            fontSize: [
                 5,
                 6
             ],
-            "fontWeight": "display",
-            "letterSpacing": "-0.03em",
-            "mt": 3
+            fontWeight: "display",
+            letterSpacing: "-0.03em",
+            mt: 3
+        },
+        p: {
+            fontSize: 16,
+            color: 'text',
+        },
+        div: {
+            fontSize: 16,
+            color: 'text',
+        },
+        Text: {
+            fontSize: 16,
+            color: 'text',
+        },
+        bold: {
+            fontWeight: 'bold',
+        },
+        h1: {
+            fontSize: 32,
+            fontWeight: 'bold',
+            color: 'textBright',
+        },
+        A: {
+            color: 'primary',
         }
     },
     "styles": {
@@ -191,71 +224,23 @@ const theme = makeTheme(Object.assign({
         ".selector,.attr-name,.string,.char,.builtin,.inserted": {
             "color": "secondary"
         }
-    }
-} as any, {
+    },
+
     customFonts: {
         ['rubik']: {
             400: 'Rubik_500Medium',
             default: 'Rubik_500Medium',
             normal: 'Rubik_500Medium',
             500: 'Rubik_500Medium',
-            600: 'Rubik_700Bold',
-            bold: 'Rubik_700Bold',
-            700: 'Rubik_700Bold',
+            600: 'Rubik_600SemiBold',
+            bold: 'Rubik_600SemiBold',
+            700: 'Rubik_600SemiBold',
             800: 'Rubik_900Black',
             900: 'Rubik_900Black',
         },
     },
-    fonts: {
-        root: 'rubik',
-    },
-
     // https://www.dripsy.xyz/usage/theming/create
-
-    text: {
-        p: {
-            fontSize: 16,
-            color: '$text',
-        },
-        div: {
-            fontSize: 16,
-            color: '$text',
-        },
-        Text: {
-            fontSize: 16,
-            color: '$text',
-        },
-        bold: {
-            fontWeight: 'bold',
-        },
-        h1: {
-            fontSize: 32,
-            fontWeight: 'bold',
-            color: '$textBright',
-        },
-        A: {
-            color: '$colorPrimary',
-        }
-    },
-    colors: {
-        $colorPrimary: '#1d6cb8',
-        primary: '#1d6cb8',
-        $colorHighlight: '#5db0ff',
-        highlight: '#5db0ff',
-        $colorAccent: '#184c7d',
-        accent: '#184c7d',
-
-        background: '#222',
-
-        $text: '#ccc',
-        text: '#ccc',
-        $textBright: '#ddd',
-        $textSecondary: '#aaa',
-        secondary: '#aaa',
-        $textMuted: '#666',
-        muted: '#666',
-    },
-}));
+});
 
 export function Dripsy({ children }: { children: React.ReactNode; }) {
     return <Fonts><TRPCProvider>

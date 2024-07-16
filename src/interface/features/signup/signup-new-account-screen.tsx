@@ -1,11 +1,12 @@
 'use client';
 
-import { View, Text, TextInput } from 'dripsy'
+import { View, P, TextInput } from 'dripsy'
 import type { TextInput as RNTextInput } from 'react-native'
 import React from 'react'
 import { Button } from 'react-native'
 import { useTRPC } from '../../provider/tRPC-provider';
 import { useRouter } from 'solito/app/navigation';
+import type { AnyAuthenticationRegistrationEmailStockedhomeError, AnyAuthenticationRegistrationPasswordStockedhomeError, AnyAuthenticationRegistrationUsernameStockedhomeError, StockedhomeError_Authentication_Registration_Password_TooCommon } from 'lib/errors';
 
 export function SignUpNewAccountScreen({
     clientGeneratedRandom,
@@ -22,10 +23,13 @@ export function SignUpNewAccountScreen({
 }) {
 
     const [email, setEmail] = React.useState('')
+    const [emailProblem, setEmailProblem] = React.useState<AnyAuthenticationRegistrationEmailStockedhomeError | null>(null)
     const emailInputRef = React.useRef<RNTextInput>(null)
     const [username, setUsername] = React.useState('')
+    const [usernameProblem, setUsernameProblem] = React.useState<AnyAuthenticationRegistrationUsernameStockedhomeError | null>(null)
     const usernameInputRef = React.useRef<RNTextInput>(null)
     const [password, setPassword] = React.useState('')
+    const [passwordProblem, setPasswordProblem] = React.useState<AnyAuthenticationRegistrationPasswordStockedhomeError | null>(null)
     const passwordInputRef = React.useRef<RNTextInput>(null)
 
     const [submitting, setSubmitting] = React.useState(false)
@@ -62,21 +66,21 @@ export function SignUpNewAccountScreen({
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text sx={{ color: 'red', mb: 16 }}>{error}</Text>
+            <P sx={{ color: 'red', mb: 16 }}>{error}</P>
             <Button title="Try Again" onPress={()=>setError(null)} />
         </View>
     }
 
     if (submitting) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text sx={{ mb: 16 }}>Signing up...</Text>
+            <P sx={{ mb: 16 }}>Signing up...</P>
         </View>
     }
 
     return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
+        <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             Sign Up for Stockedhome
-        </Text>
+        </P>
 
         <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 1, borderColor: 'gray' }} ref={emailInputRef as any}
             placeholder="Email" value={email} onChangeText={setEmail} returnKeyType='next' inputMode='email' onSubmitEditing={()=>usernameInputRef.current?.focus()} blurOnSubmit={false} />
