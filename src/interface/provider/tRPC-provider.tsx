@@ -2,63 +2,68 @@
 
 import type { APIRouter } from '../../lib/trpc/primaryRouter';
 import { httpBatchLink } from '@trpc/client';
-import { createTRPCNext } from '@trpc/next';
 import React from 'react';
 import { useConfig } from './config-profile';
-import { ssrPrepass } from '@trpc/next/ssrPrepass';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { BuiltRouter, RouterRecord } from '@trpc/server/unstable-core-do-not-import';
+import { createTRPCReact } from '@trpc/react-query';
+import type { Config, ConfigForTRPCContext } from 'lib/config-schema';
 
-export type TRPCClient = ReturnType<typeof createTRPCClient>;
+export type TRPCClient = Omit<typeof trpc, 'Provider' | 'useContext' | ''>;
 
 const trpcContext = React.createContext<TRPCClient>(new Proxy({} as any, {
     get(target, prop) {
         throw new Error(`TRPCProvider not mounted. Tried to access ${String(prop)}`);
     }
-}))
+}));
 
-function createTRPCClient(canonicalRoot: string | URL) {
-    return createTRPCNext<APIRouter>({
-        config(opts) {
-            return {
-                links: [
-                    httpBatchLink({
-                        url: `${canonicalRoot}/api/`,
-                        // We store our authentication token in a HTTP-only cookie
-                        //async headers() {
-                        //    return {
-                        //
-                        //    };
-                        //},
-                    }),
-                ],
-            };
-        },
-        /**
-         * @link https://trpc.io/docs/v11/ssr
-         **/
-        ssr: true,
-        ssrPrepass,
-    });
+const trpc = createTRPCReact<APIRouter>({
+
+});
+
+const queryClient = new QueryClient({
+    defaultOptions: { queries: { staleTime: 5 * 1000 } },
+});
+
+function createTRPCClient(primaryConfig: Config, supplementaryConfig: Config) {
+
+
+    // Dumb server if there's only one API server
+    if (primaryConfig.canonicalRoot === supplementaryConfig.canonicalRoot) {
+        return trpc.createClient({
+            links: [
+                httpBatchLink({ url: `${primaryConfig.canonicalRoot}/api/` }),
+            ],
+        });
+
+    } else { // Witchcraft if we have multiple servers
+        return trpc.createClient({
+            links: [
+                (runtime) => {
+                    const servers = {
+                        primary: httpBatchLink({ url: new URL('api', primaryConfig.canonicalRoot) })(runtime),
+                        supplementary: httpBatchLink({ url: new URL('api', supplementaryConfig.canonicalRoot) })(runtime),
+                    } as const;
+
+                    return (ctx) => {
+                        const { op } = ctx;
+
+                        if (primaryConfig.canonicalRoot === supplementaryConfig.canonicalRoot) {
+                            return servers.primary(ctx);
+                        }
+
+                        const pathParts = op.path.split('.');
+
+                        const server = getServerForPath(primaryConfig.primaryEndpoints, pathParts);
+                        return servers[server](ctx);
+                    };
+                },
+            ],
+        });
+    }
+
 }
 
-export function TRPCProvider({ children }: React.PropsWithChildren) {
-    const config = useConfig();
-
-    if (config.isSame) return BasicTRPCProvider({ children });
-    else return MixedTRPCProvider({ children });
-}
-
-export function useTRPC() {
-    return React.useContext(trpcContext);
-}
-
-function BasicTRPCProvider({ children }: React.PropsWithChildren<{}>) {
-    const config = useConfig()
-
-    const value = React.useMemo(() => createTRPCClient(config.primary.canonicalRoot), [config.primary.canonicalRoot.href])
-
-    return <trpcContext.Provider value={value}>{children}</trpcContext.Provider>
-}
 
 type RecordOfBooleansOrObjectsLevel<TIndexObj extends Record<any, any> = Record<any, unknown>> = boolean | Partial<RecordOfBooleansOrObjects<TIndexObj>> | undefined
 
@@ -66,54 +71,40 @@ type RecordOfBooleansOrObjects<TIndexObj extends Record<any, any> = Record<any, 
     [Tkey in Exclude<keyof TIndexObj, `use${string}`>]: RecordOfBooleansOrObjectsLevel<any>
 }
 
-function createHookedUseUtils<TRouter extends Pick<TRPCClient, 'useUtils'>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter) {
-    const primaryModifier = primaryClientLevel['useUtils'] as (...args: Parameters<TRouter['useUtils']>) => ReturnType<TRouter['useUtils']>;
-    const supplementaryModifier = supplementaryClientLevel['useUtils'] as (...args: Parameters<TRouter['useUtils']>) => ReturnType<TRouter['useUtils']>;
-
-    return (...args: Parameters<TRouter['useUtils']>) => {
-        const modifiedPrimary = primaryModifier(...args);
-        const modifiedSupplementary = supplementaryModifier(...args);
-
-        return createConfigBasedProxy(currentConfigLevel, modifiedPrimary as any, modifiedSupplementary as any);
+function getServerForPath<TRouter extends TRPCClient | BuiltRouter<{ ctx: any; meta: any; errorShape: any; transformer: any; }, RouterRecord>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, remainingPath: string[]): 'primary' | 'supplementary' {
+    if (currentConfigLevel === undefined) {
+        return 'primary';
     }
+
+    if (typeof currentConfigLevel === 'boolean') {
+        return currentConfigLevel ? 'supplementary' : 'primary';
+    }
+
+    if (remainingPath.length === 0) {
+        return 'primary';
+    }
+
+    const [nextKey, ...rest] = remainingPath as [string, ...string[]];
+
+    const nextLevel = currentConfigLevel[nextKey as keyof Partial<RecordOfBooleansOrObjects<TRouter>>];
+    return getServerForPath(nextLevel, rest);
 }
 
-// TODO: Test this. Most likely going to need some way to modify config in tests 🤔
-// Need to test ALL code paths here. Give this Proxy 100% coverage. This is a matter of privacy, security, and core program functionality.
-function createConfigBasedProxy<TRouter extends TRPCClient | BuiltRouter<{ ctx: any; meta: any; errorShape: any; transformer: any; }, RouterRecord>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, primaryClientLevel: TRouter, supplementaryClientLevel: TRouter): TRouter {
-    // Note: both router levels are equal since they're initialized from the same schema.
-    const hookedUseUtils = 'useUtils' in primaryClientLevel ? createHookedUseUtils(currentConfigLevel, primaryClientLevel as any, supplementaryClientLevel) : undefined;
-    return new Proxy(supplementaryClientLevel, {
-        get(_: unknown, prop: keyof TRouter & keyof Partial<RecordOfBooleansOrObjects<TRouter>>) {
-            if ((!(prop in primaryClientLevel))) return Reflect.get(primaryClientLevel, prop);
 
-            if (prop === 'useSuspenseQueries' || prop === 'useQueries' || prop === 'useContext') {
-                throw new TypeError('Stockedhome does not support the useQueries, useSuspenseQueries, or useContext hooks in the root tRPC client!');
-            }
-            if (prop === 'useUtils') return hookedUseUtils;
+export function TRPCProvider({ children }: React.PropsWithChildren) {
+    const config = useConfig();
 
-            if (typeof currentConfigLevel === 'boolean') return currentConfigLevel ? Reflect.get(primaryClientLevel, prop) : Reflect.get(supplementaryClientLevel, prop);
+    const client = React.useMemo(() => createTRPCClient(config.primary, config.supplementary), [config.primary.canonicalRoot.href, config.supplementary.canonicalRoot.href]);
 
-            // hit primary router by default (though, once we hit production, it shouldn't be possible to have an undefined prop)
-            if (typeof currentConfigLevel === 'undefined') return Reflect.get(primaryClientLevel, prop);
-            if (!(prop in currentConfigLevel) || currentConfigLevel[prop] === undefined) return Reflect.get(primaryClientLevel, prop);
-
-            if (typeof currentConfigLevel[prop] === 'boolean') return currentConfigLevel[prop] ? Reflect.get(primaryClientLevel, prop) : Reflect.get(supplementaryClientLevel, prop);
-            else return createConfigBasedProxy(currentConfigLevel[prop], primaryClientLevel[prop], supplementaryClientLevel[prop]); // Weirdly, the first param errors but the second doesn't
-        }
-    } as any);
-
+    return <trpcContext.Provider value={trpc}>
+        <trpc.Provider client={client} queryClient={queryClient}>
+            <QueryClientProvider client={queryClient}>
+                {children}
+            </QueryClientProvider>
+        </trpc.Provider>
+    </trpcContext.Provider>;
 }
 
-function MixedTRPCProvider({ children }: React.PropsWithChildren<{}>) {
-    const config = useConfig()
-
-    const primaryClient = React.useMemo(() => createTRPCClient(config.primary.canonicalRoot), [config.primary.canonicalRoot.href])
-    const supplementaryClient = React.useMemo(() => createTRPCClient(config.supplementary.canonicalRoot), [config.supplementary.canonicalRoot.href])
-
-    const value = React.useMemo(() => {
-        return createConfigBasedProxy(config.primary.primaryEndpoints, primaryClient, supplementaryClient); // Same weird error as the recursive call in createConfigBasedProxy
-    }, [config.primary.primaryEndpoints, primaryClient, supplementaryClient]);
-
-    return <trpcContext.Provider value={value}>{children}</trpcContext.Provider>
+export function useTRPC() {
+    return React.useContext(trpcContext);
 }

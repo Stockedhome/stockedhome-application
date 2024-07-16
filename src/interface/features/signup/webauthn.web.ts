@@ -21,12 +21,10 @@ export async function signUpWithWebAuthn({trpc, email, password, username}: {trp
         throw new Error(signupData.error);
     }
 
-    const userId = BigInt(signupData.userId)
+    const { userId, keypairRequestId } = signupData;
 
     const credentialCreationOptions = await trpc.auth.getKeyRegistrationParameters.fetch({
-        clientGeneratedRandom,
-        userId,
-        keypairRequestId: signupData.keypairRequestId,
+        clientGeneratedRandom, userId, keypairRequestId,
     });
 
     const newCredential = await startRegistration(credentialCreationOptions);
@@ -36,9 +34,7 @@ export async function signUpWithWebAuthn({trpc, email, password, username}: {trp
     }
 
     const registeredKey = await trpc.auth.registerKey.fetch({
-        userId,
-        keypairRequestId: signupData.keypairRequestId,
-        clientGeneratedRandom,
+        userId, keypairRequestId, clientGeneratedRandom,
         response: newCredential as typeof newCredential & {response: {publicKey: string}},
     })
 

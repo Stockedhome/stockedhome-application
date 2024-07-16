@@ -74,14 +74,15 @@ export const authRouter = createRouter({
         .input(z.object({
             keypairRequestId: z.string(),
             clientGeneratedRandom: z.string(),
-            userId: z.bigint(),
+            userId: z.string(),
         }))
         // TODO: .output(z.union([z.object({ success: z.literal(true), options: z.any() }), z.object({ success: z.literal(false), error: z.string() })]))
         .query(async ({ctx, input}) => {
+            const userId = BigInt(input.userId);
             const dbData = await db.newKeypairRequest.findUnique({
                 where: {
                     id: input.keypairRequestId,
-                    userId: input.userId,
+                    userId,
                     OR: [
                         { signedWithKeyId: { not: null } },
                         { user: { publicKeys: {none: {}} } },
@@ -126,7 +127,7 @@ export const authRouter = createRouter({
         .input(z.object({
             keypairRequestId: z.string(),
             clientGeneratedRandom: z.string(),
-            userId: z.bigint(),
+            userId: z.string(),
             response: z.object({
                 /** This is base64!!! */
                 id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64' }),
@@ -169,10 +170,11 @@ export const authRouter = createRouter({
         ]))
         .query(async ({ctx, input}) => {
             try {
+                const userId = BigInt(input.userId);
                 const dbData = await db.newKeypairRequest.findUnique({
                     where: {
                         id: input.keypairRequestId,
-                        userId: input.userId,
+                        userId,
                         OR: [
                             { signedWithKeyId: { not: null } },
                             { user: { publicKeys: {none: {}} } },
@@ -212,7 +214,7 @@ export const authRouter = createRouter({
                     data: {
                         id: input.response.id,
                         clientTransports: input.response.response.transports,
-                        userId: input.userId,
+                        userId,
                         publicKey: Buffer.from(base64.toArrayBuffer(input.response.response.publicKey)),
                         authorizedByKeyId: dbData.signedWithKeyId,
                         sessionCounter: verification.registrationInfo?.counter,
