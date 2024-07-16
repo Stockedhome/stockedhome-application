@@ -6,11 +6,9 @@ import { Provider } from 'interface/provider'
 import React from 'react'
 import type { Metadata, Viewport } from 'next';
 import type { Icon, IconDescriptor, Icons } from 'next/dist/lib/metadata/types/metadata-types';
-
-const metadataBase = new URL('https://self.bellcube.dev/web/');
-function resolveMetaUrl(url: string | URL): URL {
-    return new URL(url, metadataBase);
-}
+import { metadataBase, resolveMetaUrl } from './metadataUtils';
+import { ConfigProvider } from 'interface/provider/config-profile';
+import { loadConfig } from './backend/load-config';
 
 export const metadata: Metadata = {
     title: {
@@ -21,6 +19,8 @@ export const metadata: Metadata = {
     applicationName: 'Stockedhome',
     category: 'Software',
     classification: 'Software',
+
+    manifest: resolveMetaUrl('manifest.webmanifest'),
 
     appLinks: {
         android: {
@@ -191,7 +191,7 @@ const viewport: Viewport = {
 //    "viewport" is not a valid Next.js entry export value.
 export { viewport };
 
-
+const configPromise = loadConfig();
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     let sheet: any;
@@ -203,10 +203,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <head>
             {sheet && <style dangerouslySetInnerHTML={{ __html: sheet.textContent }} id={sheet.id} />}
         </head>
-        <body>
+        <body><ConfigProvider primaryConfig={await configPromise}>
             <Provider>
                 {children}
             </Provider>
-        </body>
+        </ConfigProvider></body>
     </html>
 }

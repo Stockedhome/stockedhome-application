@@ -2,17 +2,15 @@ import { startRegistration } from '@simplewebauthn/browser';
 import type { TRPCClient } from '../../provider/tRPC-provider';
 
 import base64_ from '@hexagon/base64';
-import { StockedhomeError } from 'lib/errors';
+import { StockedhomeError, StockedhomeError_Authentication_Registration_NewKeypair_CreationNoPublicKey } from 'lib/errors';
 const base64 = base64_.base64;
 
-export async function signUpWithWebAuthn({trpc, email, password, username}: {trpc: TRPCClient, email: string, password: string, username: string, }) {
+export async function signUpWithWebAuthn({trpc, email, password, username}: {trpc: ReturnType<TRPCClient['useUtils']>, email: string, password: string, username: string, }) {
     const clientGeneratedRandomArr = new Uint8Array(32);
     window.crypto.getRandomValues(clientGeneratedRandomArr);
     const clientGeneratedRandom = base64.fromArrayBuffer(clientGeneratedRandomArr);
 
-    const utils = trpc.useUtils()
-
-    const signupData = await utils.auth.signUp.fetch({
+    const signupData = await trpc.auth.signUp.fetch({
         clientGeneratedRandom,
         email,
         password,
@@ -25,7 +23,7 @@ export async function signUpWithWebAuthn({trpc, email, password, username}: {trp
 
     const userId = BigInt(signupData.userId)
 
-    const credentialCreationOptions = await utils.auth.getKeyRegistrationParameters.fetch({
+    const credentialCreationOptions = await trpc.auth.getKeyRegistrationParameters.fetch({
         clientGeneratedRandom,
         userId,
         keypairRequestId: signupData.keypairRequestId,
@@ -34,14 +32,17 @@ export async function signUpWithWebAuthn({trpc, email, password, username}: {trp
     const newCredential = await startRegistration(credentialCreationOptions);
 
     if (!newCredential.response.publicKey) {
-        throw new Error('No public key in response from authenticator');
+        throw new StockedhomeError_Authentication_Registration_NewKeypair_CreationNoPublicKey(newCredential)
     }
 
-    await utils.auth.registerKey.fetch({
+    const registeredKey = await trpc.auth.registerKey.fetch({
         userId,
         keypairRequestId: signupData.keypairRequestId,
         clientGeneratedRandom,
         response: newCredential as typeof newCredential & {response: {publicKey: string}},
     })
 
+    if (!registeredKey.success) {
+        throw new Error(registeredKey.error);
+    }
 }

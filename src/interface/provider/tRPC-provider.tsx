@@ -48,6 +48,10 @@ export function TRPCProvider({ children }: React.PropsWithChildren) {
     else return MixedTRPCProvider({ children });
 }
 
+export function useTRPC() {
+    return React.useContext(trpcContext);
+}
+
 function BasicTRPCProvider({ children }: React.PropsWithChildren<{}>) {
     const config = useConfig()
 
