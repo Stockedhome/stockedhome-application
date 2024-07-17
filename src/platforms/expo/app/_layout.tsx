@@ -1,9 +1,11 @@
 import { Provider } from 'interface/provider/index'
 import { Stack } from 'expo-router'
-import { View, Text } from 'dripsy'
+import { ConfigProviderMobileWrapper } from './mobile-config';
 
 export default function Root() {
-    return <Provider>
-        <Stack />
-    </Provider>
+    return <ConfigProviderMobileWrapper>
+        <Provider>
+            <Stack />
+        </Provider>
+    </ConfigProviderMobileWrapper>
 }

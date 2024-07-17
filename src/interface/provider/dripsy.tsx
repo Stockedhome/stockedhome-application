@@ -5,6 +5,7 @@ import { DripsyProvider, Text, View, makeTheme } from 'dripsy';
 import { useFonts } from 'expo-font';
 import { Rubik_500Medium, Rubik_500Medium_Italic, Rubik_600SemiBold, Rubik_600SemiBold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
 import { TRPCProvider } from './tRPC-provider';
+import { Platform } from 'react-native';
 
 export function Fonts({ children }: React.PropsWithChildren<{}>) {
 
@@ -27,7 +28,14 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
         }
     }, [loaded, error]);
 
-    return <>{children}</>;
+    if (loaded) return <>{children}</>;
+
+
+    if (Platform.OS === 'android' || Platform.OS === 'ios') {
+        return <Text>Loading fonts...</Text>;
+    } else {
+        return <>{children}</>;
+    }
 }
 
 const theme = makeTheme({
@@ -54,7 +62,7 @@ const theme = makeTheme({
     fonts: {
         heading: "inherit",
         monospace: "Menlo, monospace",
-        root: 'rubik, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", sans-serif',
+        root: 'rubik',
     },
     fontSizes: [
         12,
@@ -227,7 +235,7 @@ const theme = makeTheme({
     },
 
     customFonts: {
-        ['rubik']: {
+        rubik: {
             400: 'Rubik_500Medium',
             default: 'Rubik_500Medium',
             normal: 'Rubik_500Medium',
@@ -243,9 +251,7 @@ const theme = makeTheme({
 });
 
 export function Dripsy({ children }: { children: React.ReactNode; }) {
-    return <Fonts><TRPCProvider>
-        <DripsyProvider theme={theme} ssr={true}>
+    return <DripsyProvider theme={theme} ssr={true}><Fonts><TRPCProvider>
             {children}
-        </DripsyProvider>
-    </TRPCProvider></Fonts>;
+    </TRPCProvider></Fonts></DripsyProvider>;
 }

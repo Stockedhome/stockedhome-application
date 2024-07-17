@@ -4,8 +4,8 @@ import type { Config } from "lib/config-schema";
 import React from "react";
 
 export interface ConfigProfile {
-    primary: Config;
-    supplementary: Config;
+    primary: Config | null;
+    supplementary: Config | null;
     setSupplementary?: (config: Config) => void;
     isSame: boolean;
 }
@@ -16,14 +16,14 @@ const configContext = React.createContext<ConfigProfile>(new Proxy({} as any, {
     }
 }))
 
-export function ConfigProvider({ primaryConfig, children }: React.PropsWithChildren<{ primaryConfig: Config }>) {
-    const [supplementary, setSupplementary] = React.useState<Config>(primaryConfig);
+export function ConfigProvider({ primaryConfig, children }: React.PropsWithChildren<{ primaryConfig: Config | null }>) {
+    const [supplementary, setSupplementary] = React.useState<Config | null>(primaryConfig);
 
-    const value = React.useMemo(() => ({
+    const value: ConfigProfile = React.useMemo(() => ({
         primary: primaryConfig,
         supplementary,
         setSupplementary,
-        isSame: !supplementary || primaryConfig.canonicalRoot.href === supplementary?.canonicalRoot.href
+        isSame: !primaryConfig || !supplementary || primaryConfig.canonicalRoot.href === supplementary?.canonicalRoot.href
     }), [primaryConfig, supplementary]);
 
     return <configContext.Provider value={value}>{children}</configContext.Provider>

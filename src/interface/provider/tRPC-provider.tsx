@@ -3,7 +3,7 @@
 import type { APIRouter } from '../../lib/trpc/primaryRouter';
 import { httpBatchLink } from '@trpc/client';
 import React from 'react';
-import { useConfig } from './config-profile';
+import { useConfig } from './config-provider';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { BuiltRouter, RouterRecord } from '@trpc/server/unstable-core-do-not-import';
 import { createTRPCReact } from '@trpc/react-query';
@@ -94,7 +94,9 @@ function getServerForPath<TRouter extends TRPCClient | BuiltRouter<{ ctx: any; m
 export function TRPCProvider({ children }: React.PropsWithChildren) {
     const config = useConfig();
 
-    const client = React.useMemo(() => createTRPCClient(config.primary, config.supplementary), [config.primary.canonicalRoot.href, config.supplementary.canonicalRoot.href]);
+    if (!config.primary || !config.supplementary) return <>{children}</>;
+
+    const client = React.useMemo(() => createTRPCClient(config.primary!, config.supplementary!), [config.primary.canonicalRoot.href, config.supplementary.canonicalRoot.href]);
 
     return <trpcContext.Provider value={trpc}>
         <trpc.Provider client={client} queryClient={queryClient}>
