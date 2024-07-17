@@ -88,6 +88,11 @@ const theme = makeTheme({
         monospace: "Menlo, monospace",
         root: 'Rubik_500Medium',
     },
+    borders: {
+        default: {
+            backgroundColor: 'accent',
+        }
+    },
     fontSizes: [
         12,
         14,

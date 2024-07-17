@@ -1,7 +1,8 @@
 import yaml from 'js-yaml';
 import fs from 'fs/promises';
 import path from 'path';
-import type { Config, ComputedConfigProps } from 'lib/config-schema';
+import type { Config } from 'lib/config-schema';
+import type { ComputedConfigProps } from 'lib/config-schema-base';
 import { apiRouter } from 'lib/trpc/primaryRouter';
 import { HostingConfiguration } from 'lib/env-schema';
 

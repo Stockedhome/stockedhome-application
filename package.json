@@ -33,6 +33,10 @@
   ],
   "dependencies": {
     "@babel/preset-flow": "^7.24.6",
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-regular-svg-icons": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@prisma/client": "5.15.1",
     "@tanstack/react-query": "^5.45.1",
     "@trpc/client": "11.0.0-rc.413",
@@ -51,6 +55,7 @@
     "octokit": "^4.0.2",
     "openapi-typescript-codegen": "^0.29.0",
     "prisma": "^5.15.1",
+    "react-native-svg": "^15.4.0",
     "tsx": "^4.15.7",
     "vitest": "^1.6.0",
     "zod": "^3.23.8",
