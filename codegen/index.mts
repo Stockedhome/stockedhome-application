@@ -8,6 +8,8 @@ process.on('uncaughtExceptionMonitor', (e, origin) => {
     console.log('\n\n\n');
 });
 
+process.env.IN_CODEGEN = 'true';
+
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
 process.chdir(projectCommonDir);
 

@@ -105,4 +105,4 @@ type EnvWithComputedPropsAndProcessEnv<T extends EnvBase> = T & ComputedEnvProps
 
 export type Env = EnvWithComputedPropsAndProcessEnv<EnvBase>;
 
-export const env = envSchema.parse(process.env) as Env & typeof process.env;
+export const env = (process.env.IN_CODEGEN === 'true' ? process.env : envSchema.parse(process.env)) as Env & typeof process.env;

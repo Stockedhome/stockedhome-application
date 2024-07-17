@@ -12,7 +12,7 @@ import type { ConfigForTRPCContext } from "../config-schema";
 import { db } from "../../platforms/next/app/backend/db";
 import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import type { AuthPublicKey, User } from "@prisma/client";
-import { getServerSideReasonForInvalidPassword, passwordRouter } from "./passwords";
+import { getServerSideReasonForInvalidPassword } from "./passwords/server";
 import { StockedhomeErrorType, getStockedhomeErrorClassForCode } from "../errors";
 import base64_ from '@hexagon/base64';
 const base64 = base64_.base64;

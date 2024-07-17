@@ -3,6 +3,7 @@ import type { Octokit as OctokitCore } from "@octokit/core";
 import path from 'path';
 import fs from 'fs/promises';
 import url from 'url';
+import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "../src/lib/trpc/passwords/client";
 
 console.log('Downloading and assembling list of common passwords.')
 
@@ -98,7 +99,7 @@ if (downloadPasswordLists) {
     }).filter(Boolean);
 
     const [, ...passwordLists] = await Promise.all([mkDirPromise, ...downloadPromises]);
-    const bigPasswordList = passwordLists.flat();
+    const bigPasswordList = Array.from(new Set(passwordLists.flat().filter(p => p && p.length >= MIN_PASSWORD_LENGTH && p.length <= MAX_PASSWORD_LENGTH)));
 
     await fs.writeFile(path.join(commonPasswordsOutDir, 'index.ts'), `export const commonPasswords=new Set(${JSON.stringify(bigPasswordList)});`);
 
