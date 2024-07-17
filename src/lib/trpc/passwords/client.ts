@@ -8,10 +8,10 @@ export const MIN_PASSWORD_LENGTH = 6;
 
 /** Checks suitable to be run client-side on the user's password */
 export function getClientSideReasonForInvalidPassword(password: string): StockedhomeErrorType.Authentication_Registration_Password_TooShort | StockedhomeErrorType.Authentication_Registration_Password_TooLong | null {
-    if (password.length < 4)
+    if (password.length < MIN_PASSWORD_LENGTH)
         return StockedhomeErrorType.Authentication_Registration_Password_TooShort;
 
-    if (password.length > 1024)
+    if (password.length > MAX_PASSWORD_LENGTH)
         return StockedhomeErrorType.Authentication_Registration_Password_TooLong;
 
     return null;

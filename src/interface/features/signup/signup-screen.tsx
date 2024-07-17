@@ -7,6 +7,9 @@ import { SignUpNewPasskeyScreen } from './signup-new-passkey-screen';
 import { SignUpTestNewPasskeyScreen } from './signup-test-new-passkey-screen';
 const base64 = base64_.base64;
 
+import * as Crypto from 'expo-crypto';
+if (!window.crypto) window.crypto = Crypto as any;
+
 export function SignUpScreen() {
     const clientGeneratedRandom = React.useMemo(() => {
         const clientGeneratedRandomArr = new Uint8Array(32);

@@ -4,7 +4,7 @@ import { View, H1, P, Row, Text } from 'dripsy';
 import { TextLink } from 'solito/link';
 
 export function HomeScreen() {
-    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center', p: 16 }}>
+    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center', p: 16, backgroundColor: 'background' }}>
         <H1>Stockedhome <Text sx={{fontWeight: 'normal'}}>(Authentication)</Text></H1>
 
         <View sx={{ maxWidth: 600 }}>

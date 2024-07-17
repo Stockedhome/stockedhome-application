@@ -1,5 +1,6 @@
 import type { RegistrationResponseJSON } from "@simplewebauthn/server/script/deps";
-import { StockedhomeErrorType, StockedhomeError } from "../..";
+import { StockedhomeError } from "../../_errorClass";
+import { StockedhomeErrorType } from "../../_errorTypeEnum";
 
 export class StockedhomeError_Authentication_Passkeys_New_NoPublicKey extends StockedhomeError<StockedhomeErrorType.Authentication_Passkeys_New_NoPublicKey> {
     constructor(newCredential?: RegistrationResponseJSON) {

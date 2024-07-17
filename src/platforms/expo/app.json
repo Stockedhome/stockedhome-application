@@ -11,12 +11,25 @@
     "ios": {
       "bundleIdentifier": "app.stockedhome.mobile"
     },
+    "android": {
+      "package": "app.stockedhome.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#146fc7",
+        "foregroundImage": "./assets/favicon.128.png",
+        "monochromeImage": "./assets/logo-notification.96.png"
+      }
+    },
+    "backgroundColor": "#222",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/favicon.128.png",
+    "splash": {
+      "backgroundColor": "#146fc7",
+      "image": "./assets/logo.1024.png",
+      "resizeMode": "contain"
+    },
     "plugins": [
       "expo-router"
     ],
-    "android": {
-      "package": "app.stockedhome.mobile"
-    },
     "extra": {
       "router": {
         "origin": false

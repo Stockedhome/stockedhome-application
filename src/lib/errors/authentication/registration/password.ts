@@ -1,4 +1,6 @@
-import { StockedhomeErrorType, StockedhomeError } from "../..";
+import { StockedhomeError } from "../../_errorClass";
+import { StockedhomeErrorType } from "../../_errorTypeEnum";
+
 
 export class StockedhomeError_Authentication_Registration_Password_TooShort extends StockedhomeError<StockedhomeErrorType.Authentication_Registration_Password_TooShort> {
     constructor() {

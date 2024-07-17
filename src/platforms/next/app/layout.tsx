@@ -7,7 +7,7 @@ import React from 'react'
 import type { Metadata, Viewport } from 'next';
 import type { Icon, IconDescriptor, Icons } from 'next/dist/lib/metadata/types/metadata-types';
 import { metadataBase, resolveMetaUrl } from './metadataUtils';
-import { ConfigProvider } from 'interface/provider/config-profile';
+import { ConfigProvider } from 'interface/provider/config-provider';
 import { loadConfig } from './backend/load-config';
 import { withTRPC } from '@trpc/next';
 
