@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P } from 'dripsy'
+import { View, P, SafeAreaView } from 'dripsy'
 import React from 'react'
 import { Button } from 'react-native'
 import { createNewWebAuthnCredential } from 'lib/webauthn';
@@ -30,23 +30,23 @@ export function SignUpTestNewPasskeyScreen({
     }, [submitting])
 
     if (error) {
-        return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ color: 'red', mb: 16 }}>{error}</P>
             <Button title="Try Again" onPress={()=>setError(null)} />
-        </View>
+        </SafeAreaView>
     }
 
     if (submitting) {
-        return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ mb: 16 }}>Signing up...</P>
-        </View>
+        </SafeAreaView>
     }
 
-    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <P sx={{ textAlign: 'center', mb: 16}}>
             You're all set up! You can now sign in with your new account!
         </P>
 
         <Button title="Get Started" onPress={testPasskey} />
-    </View>
+    </SafeAreaView>
 }

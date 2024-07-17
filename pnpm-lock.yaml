@@ -217,6 +217,9 @@ importers:
       babel-preset-es2018:
         specifier: ^1.0.0
         version: 1.0.0
+      dripsy:
+        specifier: '*'
+        version: 4.3.5
       expo:
         specifier: ^51.0.9
         version: 51.0.14(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))

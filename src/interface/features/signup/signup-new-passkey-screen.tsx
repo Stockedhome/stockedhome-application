@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P } from 'dripsy'
+import { View, P, SafeAreaView } from 'dripsy'
 import React from 'react'
 import { Button } from 'react-native'
 import { createNewWebAuthnCredential } from 'lib/webauthn';
@@ -45,7 +45,7 @@ export function SignUpNewPasskeyScreen({
         })
     }, [creatingPasskey])
 
-    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             Welcome, {username}! 🎉
         </P>
@@ -72,5 +72,5 @@ export function SignUpNewPasskeyScreen({
                 : <Button title="Create Your First Passkey" onPress={createPasskey} />
         }
 
-    </View>
+    </SafeAreaView>
 }

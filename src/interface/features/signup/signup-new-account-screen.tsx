@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P, TextInput, ActivityIndicator } from 'dripsy'
+import { View, P, TextInput, ActivityIndicator, SafeAreaView } from 'dripsy'
 import type { TextInput as RNTextInput } from 'react-native'
 import React from 'react'
 import { Button } from 'react-native'
@@ -116,14 +116,14 @@ export function SignUpNewAccountScreen({
         </View>
     }
 
-    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             Sign Up for Stockedhome
         </P>
 
         <View sx={{ height: 35 + 16 }}>
             <View sx={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 1, borderColor: 'gray' }} ref={emailInputRef as any}
+            <TextInput sx={{ borderColor: passwordProblem ? 'red' : 'gray' }} ref={emailInputRef as any}
                     placeholder="Email" value={email} onChangeText={setEmail} returnKeyType='next' inputMode='email' onSubmitEditing={()=>usernameInputRef.current?.focus()} blurOnSubmit={false} />
                 {emailProblemFetching ? <ActivityIndicator /> : null}
             </View>
@@ -131,11 +131,11 @@ export function SignUpNewAccountScreen({
         </View>
 
 
-        <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 1, borderColor: 'gray' }} ref={usernameInputRef as any}
+        <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 2, borderColor: passwordProblem ? 'red' : 'gray' }} ref={usernameInputRef as any}
             placeholder="Username" value={username} onChangeText={setUsername} returnKeyType='next' inputMode='text' onSubmitEditing={()=>passwordInputRef.current?.focus()} blurOnSubmit={false} />
 
 
-        <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 1, borderColor: 'gray', borderInlineColor: passwordProblem ? 'red' : undefined, borderBlockColor: passwordProblem ? 'red' : undefined }} ref={passwordInputRef as any}
+        <TextInput sx={{ mb: 16, width: '80%', padding: 8, borderRadius: 4, borderWidth: 2, borderColor: passwordProblem ? 'red' : 'gray' }} ref={passwordInputRef as any}
             placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry returnKeyType='go' enablesReturnKeyAutomatically inputMode='text' blurOnSubmit={false} onSubmitEditing={submit} />
         {!passwordProblem ? <View sx={{ height: 16 }} /> : <P sx={{ color: 'red', mb: 16 }}>{(()=>{
             switch (passwordProblem) {
@@ -149,5 +149,5 @@ export function SignUpNewAccountScreen({
         })()}</P>}
 
         <Button title="Sign Up" onPress={submit} />
-    </View>
+    </SafeAreaView>
 }

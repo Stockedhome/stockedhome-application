@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "babel-preset-es2018": "^1.0.0",
+    "dripsy": "*",
     "expo": "^51.0.9",
     "expo-crypto": "~13.0.2",
     "expo-linear-gradient": "~13.0.2",

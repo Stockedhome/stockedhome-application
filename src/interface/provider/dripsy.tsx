@@ -132,7 +132,7 @@ const theme = makeTheme({
             fontSize: 16,
             color: 'text',
         },
-        Text: {
+        text: {
             fontSize: 16,
             color: 'text',
         },
@@ -144,9 +144,25 @@ const theme = makeTheme({
             fontWeight: 'bold',
             color: 'textBright',
         },
-        A: {
+        h2: {
+            fontSize: 32,
+            fontWeight: 'bold',
+            color: 'textBright',
+        },
+        a: {
             color: 'primary',
-        }
+        },
+    },
+    forms: {
+        input: {
+            mb: 16,
+            width: '80%',
+            padding: 8,
+            borderRadius: 4,
+            borderWidth: 2,
+            borderColor: 'gray',
+            color: 'text',
+        },
     },
     "styles": {
         "Container": {

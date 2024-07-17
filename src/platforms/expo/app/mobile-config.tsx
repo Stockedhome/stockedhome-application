@@ -25,6 +25,6 @@ export function ConfigProviderMobileWrapper({ children }: { children: React.Reac
     </Provider>
 }
 
-export function useConfig() {
+export function useMobileConfigContext() {
     return React.useContext(configContextMobileWrapper);
 }
