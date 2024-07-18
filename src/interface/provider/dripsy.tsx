@@ -82,6 +82,9 @@ const theme = makeTheme({
         secondary: '#aaaaaa',
         textMuted: '#666666',
         muted: '#666666',
+
+        errorRed: '#ff6666',
+        successGreen: '#66ff66',
     },
     fonts: {
         heading: "inherit",

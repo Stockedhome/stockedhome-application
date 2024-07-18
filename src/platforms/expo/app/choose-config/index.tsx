@@ -4,14 +4,11 @@ import React from 'react';
 import { TextLink } from 'solito/link';
 import { type TextInput as RNTextInput } from 'react-native'
 import { TopLevelScreenView } from 'interface/TopLevelScreenView';
-import { configSchemaBase, configSchemaComputations } from 'lib/config-schema-base';
 import type { Config } from 'lib/config-schema';
-
-enum ConfigInvalidityReason {
-    InvalidURL = 'InvalidURL',
-    InvalidConfig = 'InvalidConfig',
-    NoConfigReturned = 'NoConfigReturned',
-}
+import { useFetchConfig } from './fetch-config';
+import { faCheck, faX, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { stringifyConfigInvalidityReason, type ConfigInvalidityReason } from './config-invalidity-reason';
+import { FontAwesomeIcon } from 'interface/components/fontawesome';
 
 export default function ChooseConfig() {
     const nav = useNavigation()
@@ -23,66 +20,29 @@ export default function ChooseConfig() {
     }, [nav]);
 
     const [primaryConfigInvalidReason, setPrimaryConfigInvalidReason] = React.useState<ConfigInvalidityReason | null>(null)
-    const [primaryConfigFetching, setPrimaryConfigFetching] = React.useState(false)
-    const [primaryConfigLocation, setPrimaryConfigLocation] = React.useState('https://stockedhome.app/web')
+    const [isPrimaryConfigFetching, setIsPrimaryConfigFetching] = React.useState(false)
+    const [primaryConfigLocation, setPrimaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/web')
     const storedPrimaryConfig = React.useRef<Config | null>(null)
     const primaryConfigLocationRef = React.useRef<RNTextInput>(null)
-    React.useEffect(() => {
-        let url: URL;
-        try {
-            url = new URL('./api/config', primaryConfigLocation)
-        } catch (e) {
-            setPrimaryConfigInvalidReason(ConfigInvalidityReason.InvalidURL)
-            return
-        }
+    useFetchConfig({
+        configLocation: primaryConfigLocation,
+        setIsConfigFetching: setIsPrimaryConfigFetching,
+        setConfigInvalidReason: setPrimaryConfigInvalidReason,
+        storedConfigRef: storedPrimaryConfig,
+    })
 
-        setPrimaryConfigFetching(true)
 
-        fetch(url).then(async (res) => {
-            if (!res.ok) {
-                setPrimaryConfigInvalidReason(ConfigInvalidityReason.NoConfigReturned)
-                return
-            }
-
-            const configResData = await res.json()
-            if (!configResData) {
-                setPrimaryConfigInvalidReason(ConfigInvalidityReason.NoConfigReturned)
-                return
-            }
-
-            if (typeof configResData !== 'object') {
-                setPrimaryConfigInvalidReason(ConfigInvalidityReason.NoConfigReturned)
-                return
-            }
-
-            if (!('result' in configResData) || !configResData.result || typeof configResData.result !== 'object' || !('data' in configResData.result) || !configResData.result.data || typeof configResData.result.data !== 'object') {
-                setPrimaryConfigInvalidReason(ConfigInvalidityReason.NoConfigReturned)
-                return
-            }
-
-            const config = configResData.result.data
-
-            let parsedConfig: Config;
-            try {
-                parsedConfig = configSchemaBase.merge(configSchemaComputations).parse(config) // works since primaryEndpoints isn't strictly required
-            } catch (e) {
-                console.log('Received config was considered invalid because of the following error:', e)
-                setPrimaryConfigInvalidReason(ConfigInvalidityReason.InvalidConfig)
-                return
-            }
-
-            setPrimaryConfigInvalidReason(null)
-            storedPrimaryConfig.current = parsedConfig
-        }).catch(() => {
-            setPrimaryConfigInvalidReason(ConfigInvalidityReason.NoConfigReturned)
-        }).finally(() => {
-            setPrimaryConfigFetching(false)
-        })
-    }, [primaryConfigLocation])
-
-    const [supplementaryConfigInvalidReason, setSupplementaryConfigInvalidReason] = React.useState(null)
-    const [supplementaryConfigLocation, setSupplementaryConfigLocation] = React.useState('https://stockedhome.app/web')
+    const [supplementaryConfigInvalidReason, setSupplementaryConfigInvalidReason] = React.useState<ConfigInvalidityReason | null>(null)
+    const [isSupplementaryConfigFetching, setIsSupplementaryConfigFetching] = React.useState(false)
+    const [supplementaryConfigLocation, setSupplementaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/web')
     const supplementaryConfigLocationRef = React.useRef<RNTextInput>(null)
+    const storedSupplementaryConfig = React.useRef<Config | null>(null)
+    useFetchConfig({
+        configLocation: supplementaryConfigLocation,
+        setIsConfigFetching: setIsSupplementaryConfigFetching,
+        setConfigInvalidReason: setSupplementaryConfigInvalidReason,
+        storedConfigRef: storedSupplementaryConfig,
+    })
 
     return <TopLevelScreenView><ScrollView maximumZoomScale={5}
         contentContainerSx={{ justifyContent: 'center', alignItems: ['left', 'center'], p: 16, backgroundColor: 'background' }}
@@ -102,10 +62,11 @@ export default function ChooseConfig() {
                 <TextInput value={primaryConfigLocation} onChangeText={setPrimaryConfigLocation} ref={primaryConfigLocationRef}
                     blurOnSubmit={false} onSubmitEditing={() => supplementaryConfigLocationRef.current?.focus()} />
                 {
-                    primaryConfigFetching
+                    isPrimaryConfigFetching
                         ? <ActivityIndicator />
-                        : <P>{primaryConfigInvalidReason ?? ''}</P>
-
+                        : primaryConfigInvalidReason
+                            ? <FontAwesomeIcon icon={faXmark} color='errorRed' />
+                            : <FontAwesomeIcon icon={faCheck} color='successGreen' />
                 }
             </Row>
             <P sx={{color: 'textSecondary'}}>
@@ -113,6 +74,11 @@ export default function ChooseConfig() {
                 If the primary server doesn't support that kind of data, though, the app will try the supplementary server.
                 See <TextLink href='https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers'>the docs</TextLink> for more information.
             </P>
+            {
+                !primaryConfigInvalidReason
+                    ? <View sx={{ height: 16 }} />
+                    : <P sx={{color: 'errorRed' }}>{stringifyConfigInvalidityReason(primaryConfigInvalidReason)}</P>
+            }
         </View>
 
         <View sx={{ height: 16 }} />
