@@ -6,9 +6,44 @@ import { type TextInput as RNTextInput } from 'react-native'
 import { TopLevelScreenView } from 'interface/TopLevelScreenView';
 import type { Config } from 'lib/config-schema';
 import { useFetchConfig } from './fetch-config';
-import { faCheck, faX, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { stringifyConfigInvalidityReason, type ConfigInvalidityReason } from './config-invalidity-reason';
+import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
+//import { stringifyConfigInvalidityReason, type ConfigInvalidityReason } from './config-invalidity-reason';
 import { FontAwesomeIcon } from 'interface/components/fontawesome';
+import { ValidatedInput } from 'interface/components/ValidatedInput';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+export enum ConfigInvalidityReason {
+    InvalidURL = 'InvalidURL',
+    InvalidConfig = 'InvalidConfig',
+    NoConfigReturned = 'NoConfigReturned',
+    CouldNotConnect = 'CouldNotConnect',
+    UnknownError = 'UnknownError',
+}
+
+export function stringifyConfigInvalidityReason(reason: ConfigInvalidityReason): Exclude<React.ReactNode, undefined> {
+    switch (reason) {
+        case ConfigInvalidityReason.InvalidURL:
+            return 'The URL you entered is invalid. Double-check you typed the right thing!'
+        case ConfigInvalidityReason.InvalidConfig:
+            return 'We got something from the server, but we didn\'t get a valid config. Make sure the server is set up correctly.'
+        case ConfigInvalidityReason.NoConfigReturned:
+            return 'We connected to a server but couldn\'t get a config from it. Make sure you typed the correct URL in and that the server is set up correctly.'
+        case ConfigInvalidityReason.CouldNotConnect:
+            return 'We couldn\'t connect to the server. Make sure you typed the correct URL in and that the server is up and running.'
+        case ConfigInvalidityReason.UnknownError:
+            return 'An unknown error occurred. Check the logs for more information.'
+    }
+}
+
+function getConfigAPIUrl(baseUrl: string): URL | null {
+    let url: URL;
+    try {
+        return new URL('./api/config', baseUrl)
+    } catch (e) {
+        return null
+    }
+}
+
 
 export default function ChooseConfig() {
     const nav = useNavigation()
@@ -58,6 +93,7 @@ export default function ChooseConfig() {
 
         <View sx={{ height: 48 }} />
 
+{/*
         <View sx={{ width: '100%' }}>
             <H2>Primary Server</H2>
             <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center' }}>
@@ -86,6 +122,26 @@ export default function ChooseConfig() {
                     : <P sx={{color: 'errorRed' }}>{stringifyConfigInvalidityReason(primaryConfigInvalidReason)}</P>
             }
         </View>
+*/}
+
+        <ValidatedInput
+            title={<H2>Primary Server</H2>}
+            description={<>
+                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                    The Primary Server is the first server Stockedhome will grab data from.
+                    If the primary server doesn't support that kind of data, though, the app will try the supplementary server.
+                </P>
+                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                    See <TextLink href='https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers'>the docs</TextLink> for more information.
+                </P>
+            </>}
+            InputComponent={TextInput}
+            defaultValue={primaryConfigLocation}
+            syncValidator={(value) => value ? getConfigAPIUrl(value) ? null : ConfigInvalidityReason.InvalidURL : ConfigInvalidityReason.InvalidURL}
+            invalidityReasonEnum={ConfigInvalidityReason}
+            onChangeProp={'onChangeText'}
+            renderInvalidityReason={stringifyConfigInvalidityReason}
+        />
 
         <View sx={{ height: 16 }} />
 

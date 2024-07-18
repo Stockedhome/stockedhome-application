@@ -1,5 +1,5 @@
 import type { Config } from "lib/config-schema";
-import { ConfigInvalidityReason } from "./config-invalidity-reason";
+import { ConfigInvalidityReason } from "./index";
 import React from 'react';
 import { configSchemaBaseWithComputations } from "lib/config-schema-base";
 
@@ -27,7 +27,7 @@ export function useFetchConfig({
             return
         }
 
-        setIsConfigFetching(true)@react-native-async-storage/async-storage
+        setIsConfigFetching(true)
 
         fetch(url, {
             cache: 'force-cache',
