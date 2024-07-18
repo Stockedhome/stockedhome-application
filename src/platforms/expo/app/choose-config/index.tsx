@@ -11,7 +11,7 @@ import { Button } from 'interface/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useConfig } from 'interface/provider/config-provider';
 import { useMobileConfigContext } from '../mobile-config';
-import { loadConfigClient, ConfigInvalidityReason, getConfigAPIUrl, stringifyConfigInvalidityReason } from 'lib/config/client-loader';
+import { loadConfigClient, ConfigInvalidityReason, getConfigAPIUrl, stringifyConfigInvalidityReason } from 'lib/config/loader-client';
 
 
 export default function ChooseConfig() {
@@ -40,7 +40,7 @@ export default function ChooseConfig() {
     const supplementaryConfigAsyncValidator = React.useCallback((value: string) => configUrlAsyncValidator(storedSupplementaryConfig, value), [storedSupplementaryConfig])
     const [isSupplementaryConfigValid, setIsSupplementaryConfigValid] = React.useState(false)
 
-    return <TopLevelScreenView scrollable>
+    return <TopLevelScreenView scrollable><View sx={{alignItems: 'left'}}>
 
         <View sx={{ height: 8 }} />
 
@@ -54,11 +54,11 @@ export default function ChooseConfig() {
         <ValidatedInput
             title={<H2>Primary Server</H2>}
             description={<>
-                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                <P sx={{color: 'textSecondary'}}>
                     The Primary Server is the first server Stockedhome will grab data from.
                     If the primary server doesn't support that kind of data, though, the app will try the supplementary server.
                 </P>
-                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                <P sx={{color: 'textSecondary'}}>
                     See <TextLink href='https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers'>the docs</TextLink> for more information.
                 </P>
             </>}
@@ -84,16 +84,16 @@ export default function ChooseConfig() {
             onValidationStateChanged={setIsPrimaryConfigValid}
         />
 
-        <View sx={{ height: 16 }} />
+        <View sx={{ height: 24 }} />
 
         <ValidatedInput
             title={<H2>Supplementary Server</H2>}
             description={<>
-                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                <P sx={{color: 'textSecondary'}}>
                     The Supplementary Server is the server Stockedhome will hit if the Primary Server doesn't support the data it needs.
                     In "partial" self-hosting setups (you host some data, Stockedhome hosts other data), this is Stockedhome's server.
                 </P>
-                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                <P sx={{color: 'textSecondary'}}>
                     See <TextLink href='https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers'>the docs</TextLink> for more information.
                 </P>
             </>}
@@ -132,7 +132,7 @@ export default function ChooseConfig() {
 
         <View sx={{ height: 32 }} />
 
-    </TopLevelScreenView>
+    </View></TopLevelScreenView>
 }
 
 

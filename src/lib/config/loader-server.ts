@@ -1,10 +1,10 @@
 import yaml from 'js-yaml';
 import fs from 'fs/promises';
 import path from 'path';
-import type { Config } from 'lib/config/schema';
-import type { ComputedConfigProps } from 'lib/config/schema-base';
-import { apiRouter } from 'lib/trpc/primaryRouter';
-import { HostingConfiguration } from 'lib/env-schema';
+import type { Config } from './schema';
+import type { ComputedConfigProps } from './schema-base';
+import { apiRouter } from '../trpc/primaryRouter';
+import { HostingConfiguration } from '../env-schema';
 
 export function getHostingConfiguration(): HostingConfiguration {
     if (!process.env.HOSTING_CONFIGURATION) {
@@ -77,7 +77,7 @@ export async function loadConfigServer(): Promise<Config> {
     let validatedConfig: Config;
     try {
         console.log('Validating config file...')
-        const { configSchema } = await import('lib/config/schema');
+        const { configSchema } = await import('./schema');
         validatedConfig = Object.assign(configSchema.parse(configYamlParsed), {
             devMode: thisHostingConfig === HostingConfiguration.Development,
         } satisfies ComputedConfigProps);
@@ -92,7 +92,7 @@ export async function loadConfigServer(): Promise<Config> {
     globalThis.___config___ = validatedConfig
 
     // =========== CONFIG LOAD HOOKS ==============
-    apiRouter._def._config.isDev = true;
+    apiRouter._def._config.isDev = true; // gives us stack traces; can be used in prod since we're open-source anyway
     // ============================================
 
     return validatedConfig;

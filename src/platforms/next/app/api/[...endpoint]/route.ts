@@ -1,7 +1,7 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { apiRouter } from "lib/trpc/primaryRouter";
 import { NextResponse, type NextRequest } from "next/server";
-import { loadConfigServer } from "../../backend/load-config";
+import { loadConfigServer } from "lib/config/loader-server";
 
 async function tRPCRequestHandler(req: NextRequest) {
     const config = await loadConfigServer();

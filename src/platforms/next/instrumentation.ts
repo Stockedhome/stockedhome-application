@@ -1,6 +1,6 @@
 //import { envSchema } from 'lib/env-schema';
 import * as nextStyleLogging from 'next/dist/build/output/log'
-import { db } from './app/backend/db';
+import { db } from 'lib/db';
 
 async function registerForReal() {
 
@@ -37,7 +37,7 @@ async function registerForReal() {
         nextStyleLogging.wait('Loading configuration...')
         let configLoadSuccessful = false;
         try {
-            const { loadConfigServer } = await import('./app/backend/load-config');
+            const { loadConfigServer } = await import('lib/config/loader-server');
             await loadConfigServer(); // TODO: Better error logging when using `instrumentation.ts` (errors on front and on back are UGLY)
             configLoadSuccessful = true;
         } finally {

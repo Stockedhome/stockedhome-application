@@ -1,30 +1,43 @@
-import SMTPAddressParser_ from 'smtp-address-parser';
+import { db } from '../../../../db';
 import { getClientSideReasonForInvalidEmail, EmailInvalidityReason } from './client';
+import validateEmail from 'deep-email-validator'
 
-const SMTPAddressParser = SMTPAddressParser_ as typeof SMTPAddressParser_ & {
-    parse(email: string): any
-}
-
-// MUST BE KEPT IN SYNC WITH RETURN TYPE OF `getServerSideReasonForInvalidPassword`
-export function getServerSideReasonForInvalidPassword(email: string): EmailInvalidityReason | null {
+export async function getServerSideReasonForInvalidEmail(email: string): Promise<EmailInvalidityReason | null> {
     const clientSideReason = getClientSideReasonForInvalidEmail(email);
 
     if (clientSideReason)
         return clientSideReason;
 
-//    try {
-//        if (SMTPAddressParser.parse(email))
-//    } catch (e) {
-//        if (!(e instanceof Error))
-//            throw e;
-//
-//        switch(e.message) {
-//            case "address too long":
-//                return EmailInvalidityReason.TooLong;
-//            case "address parsing failed: ambiguous grammar":
-//                throw new Error("Unexpected error parsing email: " + e.message);
-//        }
-//    }
+    const validationResult = await validateEmail({
+        email: email,
+
+        validateRegex: false, // we already validated the email against
+        validateDisposable: false, // we don't care if someone uses a disposable email
+
+        validateMx: true, // make sure the email server exists
+        validateTypo: true, // make sure a user doesn't accidentally typo a domain
+        validateSMTP: true, // make sure the user has a mailbox
+    })
+
+    console.log('Email validation result:', validationResult)
+
+    if (!validationResult.validators.typo?.valid) {
+        return EmailInvalidityReason.LikelyTypo
+    } else if (!validationResult.validators.mx?.valid) {
+        return EmailInvalidityReason.DoesNotExist
+    } else if (!validationResult.validators.smtp?.valid) {
+        if (validationResult.validators.smtp?.reason !== 'Timeout') // happened in testing; don't want to shove users out because Google is slow
+            return EmailInvalidityReason.DoesNotExist
+    } else if (/** for some other reason */ !validationResult.valid)
+        return EmailInvalidityReason.DoesNotExist // best error we can give in this catch-all
+
+    const isUnique = !(await db.user.findUnique({
+        where: { email: email },
+        select: { id: true },
+    }));
+
+    if (!isUnique)
+        return EmailInvalidityReason.AlreadyInUse;
 
     return null;
 }

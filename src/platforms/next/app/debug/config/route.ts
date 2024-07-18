@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loadConfigServer } from "../../backend/load-config";
+import { loadConfigServer } from "lib/config/loader-server";
 import { middleware } from "../../../middleware";
 
 export const dynamic = 'force-dynamic';

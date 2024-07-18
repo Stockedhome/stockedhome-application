@@ -139,6 +139,7 @@ const theme = makeTheme({
         p: {
             fontSize: 16,
             color: 'text',
+            marginTop: 0,
         },
         div: {
             fontSize: 16,
@@ -157,7 +158,12 @@ const theme = makeTheme({
             color: 'textBright',
         },
         h2: {
-            fontSize: 32,
+            fontSize: 26,
+            fontWeight: 'bold',
+            color: 'textBright',
+        },
+        h3: {
+            fontSize: 20,
             fontWeight: 'bold',
             color: 'textBright',
         },
@@ -174,6 +180,7 @@ const theme = makeTheme({
             borderWidth: 2,
             borderColor: 'gray',
             color: 'text',
+            height: 40,
         },
     },
     "styles": {
@@ -302,7 +309,7 @@ const theme = makeTheme({
     // https://www.dripsy.xyz/usage/theming/create
 });
 
-export function DripsyThemeProviderThemeProvider({ children }: { children: React.ReactNode; }) {
+export function ThemeProvider({ children }: { children: React.ReactNode; }) {
     return <Fonts><DripsyProvider theme={theme} ssr={true}>
             {children}
     </DripsyProvider></Fonts>;

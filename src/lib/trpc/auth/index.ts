@@ -8,16 +8,21 @@ import {
     type GenerateRegistrationOptionsOpts,
   } from '@simplewebauthn/server';
 
-import type { ConfigSchemaBaseWithBaseWithComputations } from "../../config/schema-base";
-import { db } from "../../../platforms/next/app/backend/db";
+import type { ConfigSchemaBaseWithComputations } from "../../config/schema-base";
+import { db } from "../../db";
 import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import type { AuthPublicKey, User } from "@prisma/client";
 import { getServerSideReasonForInvalidPassword } from "./checks/passwords/server";
 import { StockedhomeErrorType, getStockedhomeErrorClassForCode } from "../../errors";
 import base64_ from '@hexagon/base64';
+import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from "./checks/emails/client";
+import { PasswordInvalidityReason } from "./checks/passwords/client";
+import { getServerSideReasonForInvalidEmail } from "./checks/emails/server";
+import { getServerSideReasonForInvalidUsername } from "./checks/usernames/server";
+import { UsernameInvalidityReason } from "./checks/usernames/client";
 const base64 = base64_.base64;
 
-function getIp(req: NextRequest, config: ConfigSchemaBaseWithBaseWithComputations) {
+function getIp(req: NextRequest, config: ConfigSchemaBaseWithComputations) {
     if (req.ip) return req.ip;
 
     if (!config.trustProxy) return 'PROXY_NOT_TRUSTED';
@@ -43,7 +48,7 @@ function getDeviceIdentifier(req: NextRequest, clientGeneratedRandom: string): D
 }
 
 function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, challenge }: {
-    config: ConfigSchemaBaseWithBaseWithComputations,
+    config: ConfigSchemaBaseWithComputations,
     user: Pick<User, 'id'|'username'>,
     publicKeys: Pick<AuthPublicKey, 'id'|'clientTransports'>[],
     challenge: string,
@@ -168,7 +173,7 @@ export const authRouter = createRouter({
                 error: z.string(),
             }),
         ]))
-        .query(async ({ctx, input}) => {
+        .mutation(async ({ctx, input}) => {
             // FIXME: got error "Unexpected registration response type "webauthn.create", expected "public-key""
             // TODO: Account for every error thrown in the simplewebauthn validator
             try {
@@ -274,11 +279,16 @@ export const authRouter = createRouter({
                 error: z.string(),
             }),
         ]))
-        .query(async ({ctx, input}) => {
+        .mutation(async ({ctx, input}) => {
             try {
-                // Input validation is important guys!
+                const reasonForInvalidUsername = await getServerSideReasonForInvalidUsername(input.username);
+                if (reasonForInvalidUsername) throw new Error(`Invalid username (${reasonForInvalidUsername}); please use the auth.checks.validUsername route to check usernames before trying to sign up!`);
+
+                const reasonForInvalidEmail = await getServerSideReasonForInvalidEmail(input.email);
+                if (reasonForInvalidEmail) throw new Error(`Invalid email (${reasonForInvalidEmail}); please use the auth.checks.validEmail route to check emails before trying to sign up!`);
+
                 const reasonForInvalidPassword = getServerSideReasonForInvalidPassword(input.password);
-                if (reasonForInvalidPassword) throw new (getStockedhomeErrorClassForCode(reasonForInvalidPassword))();
+                if (reasonForInvalidPassword) throw new Error(`Invalid password (${reasonForInvalidPassword}); please use the auth.checks.validPassword route to check passwords before trying to sign up!`);
 
                 const passwordSalt = crypto.getRandomValues(new Uint8Array(16));
                 const passwordHash = await crypto.subtle.digest('SHA-256',  new Uint8Array([...(new TextEncoder().encode(input.password)), ...passwordSalt, ...Buffer.from(base64.toArrayBuffer(process.env.PASSWORD_PEPPER!))]));
@@ -332,28 +342,32 @@ export const authRouter = createRouter({
         }),
 
     checks: {
-        uniqueEmail: publicProcedure
+        validEmail: publicProcedure
             .input(z.object({
                 email: z.string(),
             }))
-            .output(z.boolean())
-            .query(async ({input}) => {
-                return !(await db.user.findUnique({
-                    where: { email: input.email },
-                    select: { id: true },
-                }));
+            .output(z.union([
+                z.literal(true),
+                z.enum(Object.values(EmailInvalidityReason))
+            ]))
+            .query(async ({input}) => { // this all goes over HTTPS anyway
+                const reasonForInvalidEmail = await getServerSideReasonForInvalidEmail(input.email);
+                if (reasonForInvalidEmail) return reasonForInvalidEmail;
+                return true;
             }),
 
-        uniqueUsername: publicProcedure
+        validUsername: publicProcedure
             .input(z.object({
                 username: z.string(),
             }))
-            .output(z.boolean())
-            .query(async ({input}) => {
-                return !(await db.user.findUnique({
-                    where: { username: input.username },
-                    select: { id: true },
-                }));
+            .output(z.union([
+                z.literal(true),
+                z.enum(Object.values(UsernameInvalidityReason))
+            ]))
+            .query(async ({input}) => { // this all goes over HTTPS anyway
+                const reasonForInvalidUsername = await getServerSideReasonForInvalidUsername(input.username);
+                if (reasonForInvalidUsername) return reasonForInvalidUsername;
+                return true;
             }),
 
         /** Returns `true` if a password is valid. Client-side checks should be run before passing off to the server.
@@ -366,11 +380,9 @@ export const authRouter = createRouter({
             }))
             .output(z.union([
                 z.literal(true),
-                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooShort),
-                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooLong),
-                z.literal(StockedhomeErrorType.Authentication_Registration_Password_TooCommon),
+                z.enum(Object.values(PasswordInvalidityReason))
             ]))
-            .query(async ({input}) => {
+            .query(async ({input}) => { // this all goes over HTTPS anyway
                 const reasonForInvalidPassword = getServerSideReasonForInvalidPassword(input.password);
                 if (reasonForInvalidPassword) return reasonForInvalidPassword;
                 return true;

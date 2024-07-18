@@ -4,6 +4,7 @@ import { ActivityIndicator, P, Row, View, type TextInput } from "dripsy";
 import { FontAwesomeIcon } from "./FontAwesomeIcon";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import React, { type RefAttributes } from "react";
+import { authRouter } from "lib/trpc/auth";
 
 type OnChangePropRecord<TProps extends Record<any, any>, TValueType = any> = { [TKey in keyof TProps as NonNullable<TProps[TKey]> extends ((value: NonNullable<TValueType>) => void) ? TKey : never]: NonNullable<TProps[TKey]> extends ((value: infer TValueType) => void) ? TValueType : never }
 type OnChangePropKeys<TProps extends Record<any, any>, TValueType = any> = keyof OnChangePropRecord<TProps, TValueType>
@@ -18,6 +19,7 @@ type ExtraStuffForValidatedInput<TInputType extends React.ComponentType<any>, TO
     title?: React.ReactNode,
     description?: React.ReactNode,
     onValidationStateChanged?: (isValid: boolean) => void,
+    emptyValue?: TValueType,
 }
 
 function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value: any}>, TValueType extends PropsForComponent<TInputType>['value'], TInvalidityReasonEnum extends Record<string, string> & {UnknownError: any}, TOnChangeProp extends OnChangePropKeys<PropsForComponent<TInputType>, TValueType>>({
@@ -32,6 +34,7 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
     defaultValue,
     renderInvalidityReason,
     onValidationStateChanged,
+    emptyValue,
 }: {
     invalidityReasonEnum: TInvalidityReasonEnum,
     InputComponent: TInputType,
@@ -43,7 +46,7 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
 
     React.useEffect(() => {
         if (onValidationStateChanged) {
-            onValidationStateChanged(!invalidityReason && !isFetching)
+            onValidationStateChanged(!invalidityReason && !isFetching && value !== emptyValue && value !== undefined)
         }
     }, [invalidityReason, isFetching])
 
@@ -80,24 +83,31 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
     // NOTE: After making changes to this file, make sure the types are still valid by removing this `any`!
     const InputComponent_ = InputComponent as any
 
-    return <View sx={{ width: '100%' }}>
-        {title}
-        <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+    return <View sx={{ width: '100%', height: 'auto' }}>
+        <View>
+            {title}
+        </View>
+
+        <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center', height: 56, }}>
             <InputComponent_ {...(inputProps ?? {})} value={value} {...({[onChangeProp]: setValue})} ref={ref} />
 
             <View sx={{  width: '20%', height: 32, alignItems: 'center', marginTop: -16 }}>
-                {
+                { value !== emptyValue && value !== undefined && (
                     isFetching
                         ? <ActivityIndicator size={32} color='highlight' />
                         : invalidityReason
                             ? <FontAwesomeIcon icon={faXmark} color='errorRed' size={32} />
                             : <FontAwesomeIcon icon={faCheck} color='successGreen' size={32} />
-                }
+                ) }
             </View>
         </Row>
-        { description }
+
+
+        <View>
+            { description }
+        </View>
         {
-            !invalidityReason
+            value === emptyValue || value === undefined || !invalidityReason
                 ? <View sx={{ height: 32 }} />
                 : <P sx={{color: 'errorRed' }}>{renderInvalidityReason(invalidityReason)}</P>
         }

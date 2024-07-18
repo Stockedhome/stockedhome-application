@@ -8,7 +8,7 @@ import type { Metadata, Viewport } from 'next';
 import type { Icon, IconDescriptor, Icons } from 'next/dist/lib/metadata/types/metadata-types';
 import { metadataBase, resolveMetaUrl } from './metadataUtils';
 import { ConfigProvider } from 'interface/provider/config-provider';
-import { loadConfigServer } from './backend/load-config';
+import { loadConfigServer } from 'lib/config/loader-server';
 import { withTRPC } from '@trpc/next';
 
 export const metadata: Metadata = {

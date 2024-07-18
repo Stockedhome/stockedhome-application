@@ -1,4 +1,4 @@
-import { loadConfigServer } from '../../platforms/next/app/backend/load-config';
+import { loadConfigServer } from '../config/loader-server';
 import type { ConfigSchemaBaseWithComputations } from '../config/schema-base';
 import { createRouter, publicProcedure } from './_trpc';
 import { authRouter } from './auth';

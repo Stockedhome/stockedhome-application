@@ -2,7 +2,7 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ConfigProvider } from "interface/provider/config-provider";
-import { loadConfigClient } from "lib/config/client-loader";
+import { loadConfigClient } from "lib/config/loader-client";
 import type { Config } from "lib/config/schema";
 import React from "react";
 import { useRouter } from "solito/app/navigation";
