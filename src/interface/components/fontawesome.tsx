@@ -1,18 +1,14 @@
-import React, { ComponentProps, forwardRef } from 'react';
-import { createThemedComponent } from 'dripsy/build/core/css/create-themed-component';
-import { defaultFontStyle } from 'dripsy/build/core/components/defaultStyle';
-import { useDripsyTheme } from 'dripsy/build/core/use-dripsy-theme';
-import { ColorPath, StyledProps } from 'dripsy/build/core/types-v2/sx';
+import React, { ComponentProps } from 'react';
+import { createThemedComponent, useDripsyTheme, ColorPath, StyledProps } from 'dripsy';
 import { get } from 'dripsy/build/core/css/get';
 import { FontAwesomeIcon as RFontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-const DripsyInput = createThemedComponent(RFontAwesomeIcon, {
+const DripsyFontAwesomeIcon = createThemedComponent(RFontAwesomeIcon, {
     themeKey: 'images',
     defaultVariant: 'icon',
-    defaultStyle: defaultFontStyle,
 });
 
-type InputProps = React.ComponentPropsWithoutRef<typeof DripsyInput>;
+type InputProps = React.ComponentPropsWithoutRef<typeof DripsyFontAwesomeIcon>;
 type ColorKeys = keyof Pick<
     InputProps,
     'color' | 'secondaryColor'
@@ -29,15 +25,12 @@ const colorKeys: Record<ColorKeys, true> = {
     secondaryColor: true,
 };
 
-export const FontAwesomeIcon = function FontAwesomeIcon({ ...props }: Parameters<typeof DripsyInput>[0]) {
-    const dripsyTheme = useDripsyTheme();
-    const { theme } = dripsyTheme;
+export const FontAwesomeIcon = function FontAwesomeIcon({ ...props }: Parameters<typeof DripsyFontAwesomeIcon>[0]) {
+    const { theme } = useDripsyTheme();
     Object.keys(colorKeys).forEach((key) => {
         if ((props as any)[key] && theme?.colors) {
-            const color = get(theme.colors, (props as any)[key] as string) ?? (props as any)[key];
-            console.log(`Setting ${key} to ${color} (original: ${(props as any)[key]})`);
-            (props as any)[key] = color;
+            (props as any)[key] = get(theme.colors, (props as any)[key] as string) ?? (props as any)[key];
         }
     });
-    return <RFontAwesomeIcon {...props} />;
+    return <DripsyFontAwesomeIcon {...props} />;
 };

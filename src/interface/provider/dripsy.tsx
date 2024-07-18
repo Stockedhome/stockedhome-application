@@ -67,12 +67,11 @@ const theme = makeTheme({
         reactNativeTypesOnly: true,
     },
     colors: {
-        purple: "hsl(290, 100%, 80%)",
         gray: "hsl(210, 50%, 60%)",
 
-        primary: '#1d6cb8',
+        accent: '#097eed',
+        primary: '#3a8fe0',
         highlight: '#5db0ff',
-        accent: '#184c7d',
 
         background: '#222222',
 
@@ -115,6 +114,12 @@ const theme = makeTheme({
     lineHeights: {
         body: 1.5,
         heading: 1.25
+    },
+    images: {
+        icon: {
+            width: 32,
+            height: 32,
+        }
     },
     text: {
         heading: {

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "babel-preset-es2018": "^1.0.0",
     "dripsy": "*",
     "expo": "^51.0.9",

@@ -27,7 +27,7 @@ export function useFetchConfig({
             return
         }
 
-        setIsConfigFetching(true)
+        setIsConfigFetching(true)@react-native-async-storage/async-storage
 
         fetch(url, {
             cache: 'force-cache',
