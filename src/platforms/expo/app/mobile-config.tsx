@@ -2,8 +2,10 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ConfigProvider } from "interface/provider/config-provider";
-import type { Config } from "lib/config-schema";
+import { loadConfigClient } from "lib/config/client-loader";
+import type { Config } from "lib/config/schema";
 import React from "react";
+import { useRouter } from "solito/app/navigation";
 
 export interface ConfigProviderMobileWrapper {
     setPrimaryConfig: (config: Config) => void;
@@ -15,27 +17,32 @@ const configContextMobileWrapper = React.createContext<ConfigProviderMobileWrapp
     }
 }))
 
-export function ConfigProviderMobileWrapper({ children }: { children: React.ReactNode }) {
+export function ConfigAndTRPCProviderMobileEdition({ children }: { children: React.ReactNode }) {
     const [primaryConfig, setPrimaryConfig] = React.useState<Config | null>(null);
-    const Provider = configContextMobileWrapper.Provider as ((...args: Parameters<typeof configContextMobileWrapper.Provider>) => Exclude<React.ReactPortal, bigint>)
 
     React.useEffect(() => {
-        if (primaryConfig) return;
+        if (primaryConfig) return setDirectUserToChooseConfigState('has-config');
 
         const abortController = new AbortController();
         let isCanceled = false;
 
         (async()=>{
-            let primaryConfigLocation = await AsyncStorage.getItem("primaryConfigLocation_default")
-            if (!primaryConfigLocation || isCanceled) return;
+            let primaryConfigServerURL = await AsyncStorage.getItem("primaryConfigServerURL_default")
+            console.log(`Loaded primary config location <${primaryConfigServerURL}> from device storage.`)
+            if (!primaryConfigServerURL) return setDirectUserToChooseConfigState('directing');
+            if (isCanceled) return;
 
-            if (!primaryConfigLocation.endsWith('/')) primaryConfigLocation += '/'
-            const response = await fetch(new URL('./api/config', primaryConfigLocation), { signal: abortController.signal });
-
-            if (!response.ok || isCanceled) return;
-
-            // TODO: make a real config loader
-
+            const response = await loadConfigClient(primaryConfigServerURL)
+            if (typeof response === 'object') {
+                console.log(`Loaded primary config from <${primaryConfigServerURL}>.`, response)
+                setPrimaryConfig(response)
+                setDirectUserToChooseConfigState('has-config')
+            } else {
+                // TODO: Handle errors in config loading on subsequent loads
+                // Network error, invalid config, etc.
+                console.log(`Failed to load primary config from <${primaryConfigServerURL}>.`, response)
+                setDirectUserToChooseConfigState('directing');
+            }
         })();
 
         return () => {
@@ -44,6 +51,18 @@ export function ConfigProviderMobileWrapper({ children }: { children: React.Reac
         }
     }, [!primaryConfig])
 
+    const router = useRouter();
+
+    const [directUserToChooseConfigState, setDirectUserToChooseConfigState] = React.useState<'undecided' | 'directing' | 'has-directed' | 'has-config'>('undecided');
+
+    React.useEffect(() => {
+        if (directUserToChooseConfigState === 'directing') {
+            router.push('/choose-config');
+            setDirectUserToChooseConfigState('has-directed');
+        }
+    }, [directUserToChooseConfigState]);
+
+    const Provider = configContextMobileWrapper.Provider as ((...args: Parameters<typeof configContextMobileWrapper.Provider>) => Exclude<React.ReactPortal, bigint>) // thanks, TS
     return <Provider value={{ setPrimaryConfig }}>
         <ConfigProvider primaryConfig={primaryConfig}>
             {children}

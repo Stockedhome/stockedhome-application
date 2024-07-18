@@ -3,12 +3,12 @@ import type { Octokit as OctokitCore } from "@octokit/core";
 import path from 'path';
 import fs from 'fs/promises';
 import url from 'url';
-import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "../src/lib/trpc/passwords/client";
+import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "../src/lib/trpc/auth/checks/passwords/client";
 
 console.log('Downloading and assembling list of common passwords.')
 
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
-const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/passwords/common-passwords');
+const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/auth/checks/passwords/common-passwords');
 
 const desiredPasswordLists = new Set([
     '2023-200_most_used_passwords.txt',

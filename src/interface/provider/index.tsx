@@ -1,8 +1,16 @@
 // import { ConfigProvider } from './config';
-import { Dripsy } from './dripsy'
+import { ConfigProvider } from './config-provider';
+import { DripsyThemeProviderThemeProvider } from './dripsy'
+import { TRPCProvider } from './tRPC-provider';
 
-export function Provider({ children }: { children: React.ReactNode}) {
-    return <Dripsy>
+export function ProvidersBeforeConfig({ children }: { children: React.ReactNode}) {
+    return <DripsyThemeProviderThemeProvider>
         {children as any}
-    </Dripsy>
+    </DripsyThemeProviderThemeProvider>
+}
+
+export function ProvidersAfterConfig({ children }: { children: React.ReactNode }) {
+    return <TRPCProvider>
+        {children}
+    </TRPCProvider>
 }

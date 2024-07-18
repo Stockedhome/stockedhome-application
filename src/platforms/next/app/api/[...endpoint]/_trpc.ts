@@ -1,6 +1,6 @@
 import { initTRPC } from '@trpc/server';
 import { NextRequest } from 'next/server';
-import type { ConfigForTRPCContext } from 'lib/config-schema';
+import type { ConfigForTRPCContext } from 'lib/config/schema';
 
 interface TRPCGlobalContext {
     req: NextRequest,
@@ -12,7 +12,7 @@ function generateTRPCInstance(): ReturnType<ReturnType<typeof initTRPC.context<T
     return initTRPC.context<TRPCGlobalContext>().create({
         experimental: {
             iterablesAndDeferreds: true,
-            
+
         },
     });
 }

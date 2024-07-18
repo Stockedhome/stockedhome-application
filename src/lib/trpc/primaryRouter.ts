@@ -1,5 +1,5 @@
-import { loadConfig } from '../../platforms/next/app/backend/load-config';
-import type { ConfigForTRPCContext } from '../config-schema';
+import { loadConfigServer } from '../../platforms/next/app/backend/load-config';
+import type { ConfigSchemaBaseWithComputations } from '../config/schema-base';
 import { createRouter, publicProcedure } from './_trpc';
 import { authRouter } from './auth';
 
@@ -7,7 +7,7 @@ export type APIRouter = typeof apiRouter;
 export const apiRouter = createRouter({
     auth: authRouter,
     config: publicProcedure.query(async () => {
-        return await (loadConfig as ()=>Promise<ConfigForTRPCContext>)();
+        return await (loadConfigServer as ()=>Promise<ConfigSchemaBaseWithComputations>)();
     }),
     ['']: publicProcedure.query(() => {
         return {

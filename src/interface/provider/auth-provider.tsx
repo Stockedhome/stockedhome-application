@@ -1,6 +1,6 @@
 'use client';
 
-import type { Config } from "lib/config-schema";
+import type { Config } from "lib/config/schema";
 import React from "react";
 
 export interface ConfigProfile {

@@ -1,7 +1,7 @@
 import z from "zod";
-import { apiRouter } from "./trpc/primaryRouter";
+import { apiRouter } from "../trpc/primaryRouter";
 import type { AnyProcedure, RouterRecord } from "@trpc/server/unstable-core-do-not-import"; // this sign can't stop me because I can't read!
-import { configSchemaBaseWithComputations } from "./config-schema-base";
+import { configSchemaBaseWithComputations } from "./schema-base";
 
 type ZodObjectWrapperForAPIConfigSchemaForLevel<T extends z.ZodRawShape> = z.ZodOptional<z.ZodUnion<[z.ZodBoolean, z.ZodObject<T>]>>
 

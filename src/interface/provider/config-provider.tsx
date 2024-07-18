@@ -1,6 +1,6 @@
 'use client';
 
-import type { Config } from "lib/config-schema";
+import type { Config } from "lib/config/schema";
 import React from "react";
 
 export interface ConfigProfile {
@@ -17,16 +17,20 @@ const configContext = React.createContext<ConfigProfile>(new Proxy({} as any, {
 }))
 
 export function ConfigProvider({ primaryConfig, children }: React.PropsWithChildren<{ primaryConfig: Config | null }>) {
-    const [supplementary, setSupplementaryConfig] = React.useState<Config | null>(primaryConfig);
+    const [supplementaryConfig, setSupplementaryConfig] = React.useState<Config | null>(null);
 
     const value: ConfigProfile = React.useMemo(() => ({
         primary: primaryConfig,
-        supplementary,
+        supplementary: supplementaryConfig || primaryConfig,
         setSupplementaryConfig,
-        isSame: !primaryConfig || !supplementary || primaryConfig.canonicalRoot.href === supplementary?.canonicalRoot.href
-    }), [primaryConfig, supplementary]);
+        isSame: !primaryConfig || !supplementaryConfig || primaryConfig.canonicalRoot.href === supplementaryConfig?.canonicalRoot.href
+    }), [primaryConfig, primaryConfig?.canonicalRoot.href, supplementaryConfig, supplementaryConfig?.canonicalRoot.href]);
 
-    return <configContext.Provider value={value}>{children}</configContext.Provider>
+    console.log('ConfigProvider', value);
+
+    return <configContext.Provider value={value}>
+        {children}
+    </configContext.Provider>
 }
 
 export function useConfig() {

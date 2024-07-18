@@ -1,4 +1,4 @@
-import { createRouter, publicProcedure } from "./_trpc";
+import { createRouter, publicProcedure } from "../_trpc";
 import { z } from "zod";
 import { NextRequest } from "next/server";
 
@@ -8,16 +8,16 @@ import {
     type GenerateRegistrationOptionsOpts,
   } from '@simplewebauthn/server';
 
-import type { ConfigForTRPCContext } from "../config-schema";
-import { db } from "../../platforms/next/app/backend/db";
+import type { ConfigSchemaBaseWithBaseWithComputations } from "../../config/schema-base";
+import { db } from "../../../platforms/next/app/backend/db";
 import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import type { AuthPublicKey, User } from "@prisma/client";
-import { getServerSideReasonForInvalidPassword } from "./passwords/server";
-import { StockedhomeErrorType, getStockedhomeErrorClassForCode } from "../errors";
+import { getServerSideReasonForInvalidPassword } from "./checks/passwords/server";
+import { StockedhomeErrorType, getStockedhomeErrorClassForCode } from "../../errors";
 import base64_ from '@hexagon/base64';
 const base64 = base64_.base64;
 
-function getIp(req: NextRequest, config: ConfigForTRPCContext) {
+function getIp(req: NextRequest, config: ConfigSchemaBaseWithBaseWithComputations) {
     if (req.ip) return req.ip;
 
     if (!config.trustProxy) return 'PROXY_NOT_TRUSTED';
@@ -43,7 +43,7 @@ function getDeviceIdentifier(req: NextRequest, clientGeneratedRandom: string): D
 }
 
 function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, challenge }: {
-    config: ConfigForTRPCContext,
+    config: ConfigSchemaBaseWithBaseWithComputations,
     user: Pick<User, 'id'|'username'>,
     publicKeys: Pick<AuthPublicKey, 'id'|'clientTransports'>[],
     challenge: string,

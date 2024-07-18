@@ -3,7 +3,7 @@
 
 # Codegen
 src/apis/
-src/lib/trpc/passwords/common-passwords/
+src/lib/trpc/auth/checks/passwords/common-passwords/
 config/_schema.json
 
 # Test Caching! (caching resources used in tests, not caching test results)

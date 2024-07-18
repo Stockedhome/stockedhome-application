@@ -4,7 +4,6 @@ import * as React from 'react';
 import { DripsyProvider, makeTheme } from 'dripsy';
 import { useFonts } from 'expo-font';
 import { Rubik_500Medium, Rubik_500Medium_Italic, Rubik_600SemiBold, Rubik_600SemiBold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
-import { TRPCProvider } from './tRPC-provider';
 import { Platform, Text as RNText } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -303,8 +302,8 @@ const theme = makeTheme({
     // https://www.dripsy.xyz/usage/theming/create
 });
 
-export function Dripsy({ children }: { children: React.ReactNode; }) {
-    return <Fonts><DripsyProvider theme={theme} ssr={true}><TRPCProvider>
+export function DripsyThemeProviderThemeProvider({ children }: { children: React.ReactNode; }) {
+    return <Fonts><DripsyProvider theme={theme} ssr={true}>
             {children}
-    </TRPCProvider></DripsyProvider></Fonts>;
+    </DripsyProvider></Fonts>;
 }

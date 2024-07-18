@@ -91,7 +91,7 @@ Whether the application is running in development mode
 `.trim()),
 
 });
-export type ConfigSchemaComputations = ConfigWithComputedProps<ConfigBase>;
+export type ConfigSchemaBaseWithBaseWithComputations = ConfigWithComputedProps<ConfigBase>;
 
 export const configSchemaBaseWithComputations = configSchemaBase.merge(configSchemaComputations);
 

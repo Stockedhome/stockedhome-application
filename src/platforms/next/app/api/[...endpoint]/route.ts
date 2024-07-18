@@ -1,10 +1,10 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { apiRouter } from "lib/trpc/primaryRouter";
 import { NextResponse, type NextRequest } from "next/server";
-import { loadConfig } from "../../backend/load-config";
+import { loadConfigServer } from "../../backend/load-config";
 
 async function tRPCRequestHandler(req: NextRequest) {
-    const config = await loadConfig();
+    const config = await loadConfigServer();
 
     return await fetchRequestHandler({
         endpoint: "/api/",

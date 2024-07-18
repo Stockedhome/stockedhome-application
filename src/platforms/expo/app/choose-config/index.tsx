@@ -4,46 +4,14 @@ import React from 'react';
 import { TextLink } from 'solito/link';
 import { type TextInput as RNTextInput } from 'react-native'
 import { TopLevelScreenView } from 'interface/TopLevelScreenView';
-import type { Config } from 'lib/config-schema';
+import type { Config } from 'lib/config/schema';
 import { ValidatedInput } from 'interface/components/ValidatedInput';
-import { configSchemaBaseWithComputations } from "lib/config-schema-base";
+import { configSchemaBaseWithComputations } from "lib/config/schema-base";
 import { Button } from 'interface/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useConfig } from 'interface/provider/config-provider';
 import { useMobileConfigContext } from '../mobile-config';
-
-export enum ConfigInvalidityReason {
-    InvalidURL = 'InvalidURL',
-    InvalidConfig = 'InvalidConfig',
-    NoConfigReturned = 'NoConfigReturned',
-    CouldNotConnect = 'CouldNotConnect',
-    UnknownError = 'UnknownError',
-}
-
-export function stringifyConfigInvalidityReason(reason: ConfigInvalidityReason): Exclude<React.ReactNode, undefined> {
-    switch (reason) {
-        case ConfigInvalidityReason.InvalidURL:
-            return 'The URL you entered is invalid. Double-check you typed the right thing!'
-        case ConfigInvalidityReason.InvalidConfig:
-            return 'We got something from the server, but we didn\'t get a valid config. Make sure the server is set up correctly.'
-        case ConfigInvalidityReason.NoConfigReturned:
-            return 'We connected to a server but couldn\'t get a config from it. Make sure you typed the correct URL in and that the server is set up correctly.'
-        case ConfigInvalidityReason.CouldNotConnect:
-            return 'We couldn\'t connect to the server. Make sure you typed the correct URL in and that the server is up and running.'
-        case ConfigInvalidityReason.UnknownError:
-            return 'An unknown error occurred. Check the logs for more information.'
-    }
-}
-
-function getConfigAPIUrl(baseUrl: string): URL | null {
-    const baseUrlWithSlash = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'
-    let url: URL;
-    try {
-        return new URL('./api/config', baseUrlWithSlash)
-    } catch (e) {
-        return null
-    }
-}
+import { loadConfigClient, ConfigInvalidityReason, getConfigAPIUrl, stringifyConfigInvalidityReason } from 'lib/config/client-loader';
 
 
 export default function ChooseConfig() {
@@ -72,10 +40,7 @@ export default function ChooseConfig() {
     const supplementaryConfigAsyncValidator = React.useCallback((value: string) => configUrlAsyncValidator(storedSupplementaryConfig, value), [storedSupplementaryConfig])
     const [isSupplementaryConfigValid, setIsSupplementaryConfigValid] = React.useState(false)
 
-    return <TopLevelScreenView><ScrollView maximumZoomScale={5}
-        contentContainerSx={{ justifyContent: 'center', alignItems: ['left', 'center'], p: 16, backgroundColor: 'background' }}
-        indicatorStyle='white'
-    >
+    return <TopLevelScreenView scrollable>
 
         <View sx={{ height: 8 }} />
 
@@ -154,7 +119,7 @@ export default function ChooseConfig() {
 
         <Button title='OK' disabled={!isPrimaryConfigValid || !isSupplementaryConfigValid} onPress={async () => {
             await Promise.all([
-                AsyncStorage.setItem('primaryConfigLocation_default', primaryConfigLocation),
+                AsyncStorage.setItem('primaryConfigServerURL_default', primaryConfigLocation),
                 AsyncStorage.setItem('supplementaryConfigLocation_default', supplementaryConfigLocation),
             ]);
 
@@ -167,7 +132,7 @@ export default function ChooseConfig() {
 
         <View sx={{ height: 32 }} />
 
-    </ScrollView></TopLevelScreenView>
+    </TopLevelScreenView>
 }
 
 
@@ -175,54 +140,13 @@ function configUrlSyncValidator(value: string): ConfigInvalidityReason | null {
     return getConfigAPIUrl(value) ? null : ConfigInvalidityReason.InvalidURL
 }
 
-async function configUrlAsyncValidator(storedConfigRef: React.MutableRefObject<Config | null>, value: string) {
-    const url = getConfigAPIUrl(value)
+async function configUrlAsyncValidator(storedConfigRef: React.MutableRefObject<Config | null>, baseUrl: string): Promise<ConfigInvalidityReason | null> {
+    const configLoadResult = await loadConfigClient(baseUrl)
 
-    if (!url) {
-        console.log('[configUrlAsyncValidator] Invalid URL:', value)
-        return ConfigInvalidityReason.InvalidURL
+    if (typeof configLoadResult !== 'object') {
+        return configLoadResult
     }
 
-    const res = await fetch(url, {
-        cache: 'force-cache',
-    }).catch((e) => {
-        console.error('[configUrlAsyncValidator] Failed to fetch config: error connecting with server', e)
-        return null
-    })
-    if (!res) {
-        return ConfigInvalidityReason.CouldNotConnect
-    }
-
-    if (!res.ok) {
-        console.log('[configUrlAsyncValidator] Failed to fetch config: response was not OK', res)
-        return ConfigInvalidityReason.NoConfigReturned
-    }
-
-    const configResData = await res.json().catch(() => null)
-
-    if (!configResData) {
-        console.log('[configUrlAsyncValidator] Failed to fetch config: response was either empty or not JSON', res)
-        return ConfigInvalidityReason.NoConfigReturned
-    }
-
-    if (typeof configResData !== 'object') {
-        console.log('[configUrlAsyncValidator] Failed to fetch config: response was JSON but not a JSON object', res)
-        return ConfigInvalidityReason.NoConfigReturned
-    }
-
-    if (!('result' in configResData) || !configResData.result || typeof configResData.result !== 'object' || !('data' in configResData.result) || !configResData.result.data || typeof configResData.result.data !== 'object') {
-        console.log('[configUrlAsyncValidator] Failed to fetch config: response was not in the expected tRPC format', res)
-        return ConfigInvalidityReason.NoConfigReturned
-    }
-
-    const config = configResData.result.data
-
-    const validationResult = configSchemaBaseWithComputations.safeParse(config)
-    if (!validationResult.success) {
-        console.log('Received config was considered invalid: Zod schema validation failed because of', validationResult.error)
-        return ConfigInvalidityReason.InvalidConfig
-    }
-
-    storedConfigRef.current = validationResult.data
+    storedConfigRef.current = configLoadResult
     return null
 }

@@ -2,13 +2,13 @@ import 'raf/polyfill'
 import 'setimmediate'
 import './global.default.css'
 
-import { Provider } from 'interface/provider'
+import { ProvidersAfterConfig, ProvidersBeforeConfig } from 'interface/provider'
 import React from 'react'
 import type { Metadata, Viewport } from 'next';
 import type { Icon, IconDescriptor, Icons } from 'next/dist/lib/metadata/types/metadata-types';
 import { metadataBase, resolveMetaUrl } from './metadataUtils';
 import { ConfigProvider } from 'interface/provider/config-provider';
-import { loadConfig } from './backend/load-config';
+import { loadConfigServer } from './backend/load-config';
 import { withTRPC } from '@trpc/next';
 
 export const metadata: Metadata = {
@@ -192,7 +192,7 @@ const viewport: Viewport = {
 //    "viewport" is not a valid Next.js entry export value.
 export { viewport };
 
-const configPromise = loadConfig();
+const configPromise = loadConfigServer();
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     let sheet: any;
@@ -204,10 +204,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <head>
             {sheet && <style dangerouslySetInnerHTML={{ __html: sheet.textContent }} id={sheet.id} />}
         </head>
-        <body><ConfigProvider primaryConfig={await configPromise}>
-            <Provider>
-                {children}
-            </Provider>
-        </ConfigProvider></body>
+        <body>
+            <ProvidersBeforeConfig>
+                <ConfigProvider primaryConfig={await configPromise}>
+                    <ProvidersAfterConfig>
+                        {children}
+                    </ProvidersAfterConfig>
+                </ConfigProvider>
+            </ProvidersBeforeConfig>
+        </body>
     </html>
 }

@@ -1,7 +1,7 @@
 // codegen? more like schemagen but alright
 
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { configSchema } from "../src/lib/config-schema";
+import { configSchema } from "../src/lib/config/schema";
 import fs from 'fs/promises';
 import path from 'path';
 import url from 'url';

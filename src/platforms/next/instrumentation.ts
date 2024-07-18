@@ -37,8 +37,8 @@ async function registerForReal() {
         nextStyleLogging.wait('Loading configuration...')
         let configLoadSuccessful = false;
         try {
-            const { loadConfig } = await import('./app/backend/load-config');
-            await loadConfig(); // TODO: Better error logging when using `instrumentation.ts` (errors on front and on back are UGLY)
+            const { loadConfigServer } = await import('./app/backend/load-config');
+            await loadConfigServer(); // TODO: Better error logging when using `instrumentation.ts` (errors on front and on back are UGLY)
             configLoadSuccessful = true;
         } finally {
             if (!configLoadSuccessful) {

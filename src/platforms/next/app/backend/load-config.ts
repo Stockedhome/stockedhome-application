@@ -1,8 +1,8 @@
 import yaml from 'js-yaml';
 import fs from 'fs/promises';
 import path from 'path';
-import type { Config } from 'lib/config-schema';
-import type { ComputedConfigProps } from 'lib/config-schema-base';
+import type { Config } from 'lib/config/schema';
+import type { ComputedConfigProps } from 'lib/config/schema-base';
 import { apiRouter } from 'lib/trpc/primaryRouter';
 import { HostingConfiguration } from 'lib/env-schema';
 
@@ -27,7 +27,7 @@ declare global {
     var ___config___: Config;
 }
 
-export async function loadConfig(): Promise<Config> {
+export async function loadConfigServer(): Promise<Config> {
     console.log('Loading configuration...');
     if (globalThis.___config___) {
         console.log('Configuration already loaded!')
@@ -77,7 +77,7 @@ export async function loadConfig(): Promise<Config> {
     let validatedConfig: Config;
     try {
         console.log('Validating config file...')
-        const { configSchema } = await import('lib/config-schema');
+        const { configSchema } = await import('lib/config/schema');
         validatedConfig = Object.assign(configSchema.parse(configYamlParsed), {
             devMode: thisHostingConfig === HostingConfiguration.Development,
         } satisfies ComputedConfigProps);
