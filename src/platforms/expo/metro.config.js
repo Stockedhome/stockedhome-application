@@ -34,6 +34,7 @@ config.watchFolders = [projectRoot];
 // 2. Let Metro know where to resolve packages and in what order
 config.resolver.nodeModulesPaths = [
     path.resolve(expoRoot, 'node_modules'),
+    path.resolve(interface, 'node_modules'),
     path.resolve(projectRoot, 'node_modules'),
 ];
 config.resolver.extraNodeModules = {

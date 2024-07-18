@@ -1,23 +1,26 @@
 'use client';
 
-import { ActivityIndicator, P, Row, View } from "dripsy";
-import { FontAwesomeIcon } from "./fontawesome";
+import { ActivityIndicator, P, Row, View, type TextInput } from "dripsy";
+import { FontAwesomeIcon } from "./FontAwesomeIcon";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import React, { type RefAttributes } from "react";
 
-type OnChangePropRecord<TProps extends Record<any, any>, TValueType = any> = { [TKey in keyof TProps as NonNullable<TProps[TKey]> extends ((value: TValueType) => void) ? TKey : never]: NonNullable<TProps[TKey]> extends ((value: infer TValueType) => void) ? TValueType : never }
+type OnChangePropRecord<TProps extends Record<any, any>, TValueType = any> = { [TKey in keyof TProps as NonNullable<TProps[TKey]> extends ((value: NonNullable<TValueType>) => void) ? TKey : never]: NonNullable<TProps[TKey]> extends ((value: infer TValueType) => void) ? TValueType : never }
 type OnChangePropKeys<TProps extends Record<any, any>, TValueType = any> = keyof OnChangePropRecord<TProps, TValueType>
 type PropsForComponent<TComponent extends React.ComponentType<any>> = TComponent extends React.ComponentType<infer TProps> ? TProps : never
 
-type ExtraStuffBasedOnProps<TInputType extends React.ComponentType<any>, TOnChangeProp extends string | number | symbol, TValueType extends any, TInvalidityReason extends string> = {
-    defaultValue: NonNullable<PropsForComponent<TInputType>['value']>,
+type ExtraStuffForValidatedInput<TInputType extends React.ComponentType<any>, TOnChangeProp extends string | number | symbol, TValueType extends any, TInvalidityReason extends string> = {
+    defaultValue: TValueType,
     inputProps?: Omit<PropsForComponent<TInputType>, 'ref'|'value'|TOnChangeProp>,
     syncValidator?: (value: TValueType) => TInvalidityReason | null,
     asyncValidator?: (value: TValueType, abortController: AbortController) => Promise<TInvalidityReason | null>,
     renderInvalidityReason: (reason: TInvalidityReason) => React.ReactNode,
+    title?: React.ReactNode,
+    description?: React.ReactNode,
+    onValidationStateChanged?: (isValid: boolean) => void,
 }
 
-function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value: TValueType}>, TInvalidityReasonEnum extends Record<string, string> & {UnknownError: any}, TValueType extends any, TOnChangeProp extends OnChangePropKeys<PropsForComponent<TInputType>, TValueType>>({
+function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value: any}>, TValueType extends PropsForComponent<TInputType>['value'], TInvalidityReasonEnum extends Record<string, string> & {UnknownError: any}, TOnChangeProp extends OnChangePropKeys<PropsForComponent<TInputType>, TValueType>>({
     invalidityReasonEnum,
     syncValidator,
     asyncValidator,
@@ -28,16 +31,21 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
     inputProps,
     defaultValue,
     renderInvalidityReason,
+    onValidationStateChanged,
 }: {
     invalidityReasonEnum: TInvalidityReasonEnum,
     InputComponent: TInputType,
-    title?: React.ReactNode,
-    description?: React.ReactNode,
     onChangeProp: TOnChangeProp,
-} & ExtraStuffBasedOnProps<TInputType, TOnChangeProp, TValueType, TInvalidityReasonEnum[keyof TInvalidityReasonEnum]>, ref: React.Ref<TInputType>) {
+} & ExtraStuffForValidatedInput<TInputType, TOnChangeProp, TValueType, TInvalidityReasonEnum[keyof TInvalidityReasonEnum]> & (RefAttributes<PropsForComponent<typeof TextInput> extends {ref?: React.Ref<infer TRefType>} ? TRefType : PropsForComponent<typeof TextInput> extends {ref?: React.Ref<infer TRefType> | React.LegacyRef<infer TRefType>} ? TRefType : TInputType>), ref: React.Ref<TInputType>) {
     const [invalidityReason, setInvalidReason] = React.useState<TInvalidityReasonEnum[keyof TInvalidityReasonEnum] | null>(null)
     const [isFetching, setIsFetching] = React.useState(false)
     const [value, setValue] = React.useState<TValueType>(defaultValue)
+
+    React.useEffect(() => {
+        if (onValidationStateChanged) {
+            onValidationStateChanged(!invalidityReason && !isFetching)
+        }
+    }, [invalidityReason, isFetching])
 
     React.useEffect(() => {
         if (syncValidator) {

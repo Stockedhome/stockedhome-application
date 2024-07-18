@@ -260,10 +260,10 @@ importers:
         specifier: ~1.12.1
         version: 1.12.1
       interface:
-        specifier: link:../../interface
+        specifier: link:..\..\interface
         version: link:../../interface
       lib:
-        specifier: link:../../lib
+        specifier: link:..\..\lib
         version: link:../../lib
       react:
         specifier: 18.3.1

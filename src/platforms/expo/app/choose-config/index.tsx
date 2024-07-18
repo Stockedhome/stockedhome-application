@@ -1,16 +1,16 @@
-import { View, P, H1, H2, ScrollView, TextInput, ActivityIndicator, Row, A } from 'dripsy';
+import { View, P, H1, H2, ScrollView, TextInput } from 'dripsy';
 import { useNavigation } from 'expo-router';
 import React from 'react';
 import { TextLink } from 'solito/link';
 import { type TextInput as RNTextInput } from 'react-native'
 import { TopLevelScreenView } from 'interface/TopLevelScreenView';
 import type { Config } from 'lib/config-schema';
-import { useFetchConfig } from './fetch-config';
-import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
-//import { stringifyConfigInvalidityReason, type ConfigInvalidityReason } from './config-invalidity-reason';
-import { FontAwesomeIcon } from 'interface/components/fontawesome';
 import { ValidatedInput } from 'interface/components/ValidatedInput';
+import { configSchemaBaseWithComputations } from "lib/config-schema-base";
+import { Button } from 'interface/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useConfig } from 'interface/provider/config-provider';
+import { useMobileConfigContext } from '../mobile-config';
 
 export enum ConfigInvalidityReason {
     InvalidURL = 'InvalidURL',
@@ -36,9 +36,10 @@ export function stringifyConfigInvalidityReason(reason: ConfigInvalidityReason):
 }
 
 function getConfigAPIUrl(baseUrl: string): URL | null {
+    const baseUrlWithSlash = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/'
     let url: URL;
     try {
-        return new URL('./api/config', baseUrl)
+        return new URL('./api/config', baseUrlWithSlash)
     } catch (e) {
         return null
     }
@@ -48,36 +49,28 @@ function getConfigAPIUrl(baseUrl: string): URL | null {
 export default function ChooseConfig() {
     const nav = useNavigation()
 
+    const configContext = useConfig()
+    const mobileConfigContext = useMobileConfigContext()
+
+    const beforeRemoveListener = React.useCallback((e: {preventDefault(): void}) => { e.preventDefault() }, [])
+
     React.useEffect(() => {
-        nav.addListener('beforeRemove', (e) => {
-            e.preventDefault()
-        })
+        nav.addListener('beforeRemove', beforeRemoveListener);
+        return () => nav.removeListener('beforeRemove', beforeRemoveListener);
     }, [nav]);
 
-    const [primaryConfigInvalidReason, setPrimaryConfigInvalidReason] = React.useState<ConfigInvalidityReason | null>(null)
-    const [isPrimaryConfigFetching, setIsPrimaryConfigFetching] = React.useState(false)
     const [primaryConfigLocation, setPrimaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/web')
     const storedPrimaryConfig = React.useRef<Config | null>(null)
-    const primaryConfigLocationRef = React.useRef<RNTextInput>(null)
-    useFetchConfig({
-        configLocation: primaryConfigLocation,
-        setIsConfigFetching: setIsPrimaryConfigFetching,
-        setConfigInvalidReason: setPrimaryConfigInvalidReason,
-        storedConfigRef: storedPrimaryConfig,
-    })
+    const primaryConfigInputRef = React.useRef<RNTextInput>(null)
+    const primaryConfigAsyncValidator = React.useCallback((value: string) => configUrlAsyncValidator(storedPrimaryConfig, value), [storedPrimaryConfig])
+    const [isPrimaryConfigValid, setIsPrimaryConfigValid] = React.useState(false)
 
     // NOTE: This will be removed once we have households and such but, you know what? get over it
-    const [supplementaryConfigInvalidReason, setSupplementaryConfigInvalidReason] = React.useState<ConfigInvalidityReason | null>(null)
-    const [isSupplementaryConfigFetching, setIsSupplementaryConfigFetching] = React.useState(false)
     const [supplementaryConfigLocation, setSupplementaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/web')
-    const supplementaryConfigLocationRef = React.useRef<RNTextInput>(null)
+    const supplementaryConfigInputRef = React.useRef<RNTextInput>(null)
     const storedSupplementaryConfig = React.useRef<Config | null>(null)
-    useFetchConfig({
-        configLocation: supplementaryConfigLocation,
-        setIsConfigFetching: setIsSupplementaryConfigFetching,
-        setConfigInvalidReason: setSupplementaryConfigInvalidReason,
-        storedConfigRef: storedSupplementaryConfig,
-    })
+    const supplementaryConfigAsyncValidator = React.useCallback((value: string) => configUrlAsyncValidator(storedSupplementaryConfig, value), [storedSupplementaryConfig])
+    const [isSupplementaryConfigValid, setIsSupplementaryConfigValid] = React.useState(false)
 
     return <TopLevelScreenView><ScrollView maximumZoomScale={5}
         contentContainerSx={{ justifyContent: 'center', alignItems: ['left', 'center'], p: 16, backgroundColor: 'background' }}
@@ -91,38 +84,7 @@ export default function ChooseConfig() {
         <P>If you're not hosting anything yourself, leave both inputs below unchanged and hit OK.</P>
         <P sx={{color: 'highlight'}}>Don't worry! You will be able to change these at any point and—even on a per-household basis.</P>
 
-        <View sx={{ height: 48 }} />
-
-{/*
-        <View sx={{ width: '100%' }}>
-            <H2>Primary Server</H2>
-            <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                <TextInput value={primaryConfigLocation} onChangeText={setPrimaryConfigLocation} ref={primaryConfigLocationRef} sx={{ width: '80%' }}
-                    blurOnSubmit={false} onSubmitEditing={() => supplementaryConfigLocationRef.current?.focus()} />
-                <View sx={{  width: '20%', height: 32, alignItems: 'center', marginTop: -16 }}>
-                    {
-                        isPrimaryConfigFetching
-                            ? <ActivityIndicator size={32} color='highlight' />
-                            : primaryConfigInvalidReason
-                                ? <FontAwesomeIcon icon={faXmark} color='errorRed' size={32} />
-                                : <FontAwesomeIcon icon={faCheck} color='successGreen' size={32} />
-                    }
-                </View>
-            </Row>
-            <P sx={{color: 'textSecondary', marginTop: -4}}>
-                The Primary Server is the first server Stockedhome will grab data from.
-                If the primary server doesn't support that kind of data, though, the app will try the supplementary server.
-            </P>
-            <P sx={{color: 'textSecondary', marginTop: -4}}>
-                See <TextLink href='https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers'>the docs</TextLink> for more information.
-            </P>
-            {
-                !primaryConfigInvalidReason
-                    ? <View sx={{ height: 32 }} />
-                    : <P sx={{color: 'errorRed' }}>{stringifyConfigInvalidityReason(primaryConfigInvalidReason)}</P>
-            }
-        </View>
-*/}
+        <View sx={{ height: 32 }} />
 
         <ValidatedInput
             title={<H2>Primary Server</H2>}
@@ -137,41 +99,130 @@ export default function ChooseConfig() {
             </>}
             InputComponent={TextInput}
             defaultValue={primaryConfigLocation}
-            syncValidator={(value) => value ? getConfigAPIUrl(value) ? null : ConfigInvalidityReason.InvalidURL : ConfigInvalidityReason.InvalidURL}
+            syncValidator={configUrlSyncValidator}
+            asyncValidator={primaryConfigAsyncValidator}
             invalidityReasonEnum={ConfigInvalidityReason}
             onChangeProp={'onChangeText'}
             renderInvalidityReason={stringifyConfigInvalidityReason}
+            ref={primaryConfigInputRef}
+            inputProps={{
+                autoCapitalize: 'none',
+                autoCorrect: false,
+                autoComplete: 'url',
+                keyboardType: 'url',
+                returnKeyType: 'next',
+                blurOnSubmit: false,
+                onSubmitEditing: () => {
+                    supplementaryConfigInputRef.current?.focus()
+                }
+            }}
+            onValidationStateChanged={setIsPrimaryConfigValid}
         />
 
         <View sx={{ height: 16 }} />
 
-        <View sx={{ width: '100%' }}>
-            <H2>Supplementary Server</H2>
-            <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                <TextInput value={supplementaryConfigLocation} onChangeText={setSupplementaryConfigLocation} ref={supplementaryConfigLocationRef}
-                />
-                <View sx={{  width: '20%', height: 32, alignItems: 'center', marginTop: -16 }}>
-                {
-                        isSupplementaryConfigFetching
-                            ? <ActivityIndicator size={32} />
-                            : supplementaryConfigInvalidReason
-                                ? <FontAwesomeIcon icon={faXmark} color='errorRed' size={32} />
-                                : <FontAwesomeIcon icon={faCheck} color='successGreen' size={32} />
-                    }
-                </View>
-            </Row>
-            <P sx={{color: 'textSecondary', marginTop: -4}}>
-                The Supplementary Server is the server Stockedhome will hit if the Primary Server doesn't support the data it needs.
-                In "partial" self-hosting setups (you host some data, Stockedhome hosts other data), this is Stockedhome's server.
-            </P>
-            <P sx={{color: 'textSecondary', marginTop: -4}}>
-                See <A href='https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers'>the docs</A> for more information.
-            </P>
-            {
-                !supplementaryConfigInvalidReason
-                    ? <View sx={{ height: 32 }} />
-                    : <P sx={{color: 'errorRed' }}>{stringifyConfigInvalidityReason(supplementaryConfigInvalidReason)}</P>
-            }
-        </View>
+        <ValidatedInput
+            title={<H2>Supplementary Server</H2>}
+            description={<>
+                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                    The Supplementary Server is the server Stockedhome will hit if the Primary Server doesn't support the data it needs.
+                    In "partial" self-hosting setups (you host some data, Stockedhome hosts other data), this is Stockedhome's server.
+                </P>
+                <P sx={{color: 'textSecondary', marginTop: -4}}>
+                    See <TextLink href='https://docs.stockedhome.app/hosting/intro#primary-and-supplementary-servers'>the docs</TextLink> for more information.
+                </P>
+            </>}
+            InputComponent={TextInput}
+            defaultValue={supplementaryConfigLocation}
+            syncValidator={configUrlSyncValidator}
+            asyncValidator={supplementaryConfigAsyncValidator}
+            invalidityReasonEnum={ConfigInvalidityReason}
+            onChangeProp={'onChangeText'}
+            renderInvalidityReason={stringifyConfigInvalidityReason}
+            ref={supplementaryConfigInputRef}
+            inputProps={{
+                autoCapitalize: 'none',
+                autoCorrect: false,
+                autoComplete: 'url',
+                keyboardType: 'url',
+                returnKeyType: 'done',
+            }}
+            onValidationStateChanged={setIsSupplementaryConfigValid}
+        />
+
+        <View sx={{ height: 16 }} />
+
+        <Button title='OK' disabled={!isPrimaryConfigValid || !isSupplementaryConfigValid} onPress={async () => {
+            await Promise.all([
+                AsyncStorage.setItem('primaryConfigLocation_default', primaryConfigLocation),
+                AsyncStorage.setItem('supplementaryConfigLocation_default', supplementaryConfigLocation),
+            ]);
+
+            mobileConfigContext.setPrimaryConfig(storedPrimaryConfig.current!)
+            configContext.setSupplementaryConfig(storedSupplementaryConfig.current!)
+
+            nav.removeListener('beforeRemove', beforeRemoveListener)
+            nav.goBack();
+        }} />
+
+        <View sx={{ height: 32 }} />
+
     </ScrollView></TopLevelScreenView>
+}
+
+
+function configUrlSyncValidator(value: string): ConfigInvalidityReason | null {
+    return getConfigAPIUrl(value) ? null : ConfigInvalidityReason.InvalidURL
+}
+
+async function configUrlAsyncValidator(storedConfigRef: React.MutableRefObject<Config | null>, value: string) {
+    const url = getConfigAPIUrl(value)
+
+    if (!url) {
+        console.log('[configUrlAsyncValidator] Invalid URL:', value)
+        return ConfigInvalidityReason.InvalidURL
+    }
+
+    const res = await fetch(url, {
+        cache: 'force-cache',
+    }).catch((e) => {
+        console.error('[configUrlAsyncValidator] Failed to fetch config: error connecting with server', e)
+        return null
+    })
+    if (!res) {
+        return ConfigInvalidityReason.CouldNotConnect
+    }
+
+    if (!res.ok) {
+        console.log('[configUrlAsyncValidator] Failed to fetch config: response was not OK', res)
+        return ConfigInvalidityReason.NoConfigReturned
+    }
+
+    const configResData = await res.json().catch(() => null)
+
+    if (!configResData) {
+        console.log('[configUrlAsyncValidator] Failed to fetch config: response was either empty or not JSON', res)
+        return ConfigInvalidityReason.NoConfigReturned
+    }
+
+    if (typeof configResData !== 'object') {
+        console.log('[configUrlAsyncValidator] Failed to fetch config: response was JSON but not a JSON object', res)
+        return ConfigInvalidityReason.NoConfigReturned
+    }
+
+    if (!('result' in configResData) || !configResData.result || typeof configResData.result !== 'object' || !('data' in configResData.result) || !configResData.result.data || typeof configResData.result.data !== 'object') {
+        console.log('[configUrlAsyncValidator] Failed to fetch config: response was not in the expected tRPC format', res)
+        return ConfigInvalidityReason.NoConfigReturned
+    }
+
+    const config = configResData.result.data
+
+    const validationResult = configSchemaBaseWithComputations.safeParse(config)
+    if (!validationResult.success) {
+        console.log('Received config was considered invalid: Zod schema validation failed because of', validationResult.error)
+        return ConfigInvalidityReason.InvalidConfig
+    }
+
+    storedConfigRef.current = validationResult.data
+    return null
 }

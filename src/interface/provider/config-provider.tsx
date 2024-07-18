@@ -6,7 +6,7 @@ import React from "react";
 export interface ConfigProfile {
     primary: Config | null;
     supplementary: Config | null;
-    setSupplementary?: (config: Config) => void;
+    setSupplementaryConfig: (config: Config) => void;
     isSame: boolean;
 }
 
@@ -17,12 +17,12 @@ const configContext = React.createContext<ConfigProfile>(new Proxy({} as any, {
 }))
 
 export function ConfigProvider({ primaryConfig, children }: React.PropsWithChildren<{ primaryConfig: Config | null }>) {
-    const [supplementary, setSupplementary] = React.useState<Config | null>(primaryConfig);
+    const [supplementary, setSupplementaryConfig] = React.useState<Config | null>(primaryConfig);
 
     const value: ConfigProfile = React.useMemo(() => ({
         primary: primaryConfig,
         supplementary,
-        setSupplementary,
+        setSupplementaryConfig,
         isSame: !primaryConfig || !supplementary || primaryConfig.canonicalRoot.href === supplementary?.canonicalRoot.href
     }), [primaryConfig, supplementary]);
 

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { ComponentProps } from 'react';
 import { createThemedComponent, useDripsyTheme, ColorPath, StyledProps } from 'dripsy';
 import { get } from 'dripsy/build/core/css/get';
