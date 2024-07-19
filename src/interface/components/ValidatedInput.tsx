@@ -4,7 +4,8 @@ import { ActivityIndicator, P, Row, View, type TextInput } from "dripsy";
 import { FontAwesomeIcon } from "./FontAwesomeIcon";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import React, { type RefAttributes } from "react";
-import { authRouter } from "lib/trpc/auth";
+
+export const NULL_BUT_DO_NOT_VALIDATE_ASYNC = Symbol('NULL_BUT_DO_NOT_VALIDATE_ASYNC')
 
 type OnChangePropRecord<TProps extends Record<any, any>, TValueType = any> = { [TKey in keyof TProps as NonNullable<TProps[TKey]> extends ((value: NonNullable<TValueType>) => void) ? TKey : never]: NonNullable<TProps[TKey]> extends ((value: infer TValueType) => void) ? TValueType : never }
 type OnChangePropKeys<TProps extends Record<any, any>, TValueType = any> = keyof OnChangePropRecord<TProps, TValueType>
@@ -13,7 +14,7 @@ type PropsForComponent<TComponent extends React.ComponentType<any>> = TComponent
 type ExtraStuffForValidatedInput<TInputType extends React.ComponentType<any>, TOnChangeProp extends string | number | symbol, TValueType extends any, TInvalidityReason extends string> = {
     defaultValue: TValueType,
     inputProps?: Omit<PropsForComponent<TInputType>, 'ref'|'value'|TOnChangeProp>,
-    syncValidator?: (value: TValueType) => TInvalidityReason | null,
+    syncValidator?: (value: TValueType) => TInvalidityReason | null | typeof NULL_BUT_DO_NOT_VALIDATE_ASYNC,
     asyncValidator?: (value: TValueType, abortController: AbortController) => Promise<TInvalidityReason | null>,
     renderInvalidityReason: (reason: TInvalidityReason) => React.ReactNode,
     title?: React.ReactNode,
@@ -21,6 +22,7 @@ type ExtraStuffForValidatedInput<TInputType extends React.ComponentType<any>, TO
     onValidationStateChanged?: (isValid: boolean) => void,
     emptyValue?: TValueType,
 }
+
 
 function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value: any}>, TValueType extends PropsForComponent<TInputType>['value'], TInvalidityReasonEnum extends Record<string, string> & {UnknownError: any}, TOnChangeProp extends OnChangePropKeys<PropsForComponent<TInputType>, TValueType>>({
     invalidityReasonEnum,
@@ -54,27 +56,37 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
         if (syncValidator) {
             const syncInvalidityReason = syncValidator(value)
             if (syncInvalidityReason) {
-                setInvalidReason(syncInvalidityReason)
+                setIsFetching(false)
+                if (syncInvalidityReason !== NULL_BUT_DO_NOT_VALIDATE_ASYNC) {
+                    setInvalidReason(syncInvalidityReason)
+                }
                 return
             }
         }
 
         if (asyncValidator) {
             setIsFetching(true)
+
             const abortController = new AbortController()
-            asyncValidator(value, abortController).then((asyncInvalidityReason) => {
+            const debounceTimeout = setTimeout(() => {
                 if (abortController.signal.aborted) {
                     return
                 }
-                setInvalidReason(asyncInvalidityReason)
-            }).catch((e) => {
-                console.error('Failed to validate input', e)
-                setInvalidReason(invalidityReasonEnum.UnknownError)
-            }).finally(() => {
-                setIsFetching(false)
-            })
+                asyncValidator(value, abortController).then((asyncInvalidityReason) => {
+                    if (abortController.signal.aborted) {
+                        return
+                    }
+                    setInvalidReason(asyncInvalidityReason)
+                }).catch((e) => {
+                    console.error('Failed to validate input', e)
+                    setInvalidReason(invalidityReasonEnum.UnknownError)
+                }).finally(() => {
+                    setIsFetching(false)
+                })
+            }, 300)
 
             return () => {
+                clearTimeout(debounceTimeout)
                 abortController.abort()
             }
         }

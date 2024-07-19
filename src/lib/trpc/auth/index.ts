@@ -14,12 +14,13 @@ import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script
 import type { AuthPublicKey, User } from "@prisma/client";
 import { getServerSideReasonForInvalidPassword } from "./checks/passwords/server";
 import { StockedhomeErrorType, getStockedhomeErrorClassForCode } from "../../errors";
-import base64_ from '@hexagon/base64';
 import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from "./checks/emails/client";
 import { PasswordInvalidityReason } from "./checks/passwords/client";
 import { getServerSideReasonForInvalidEmail } from "./checks/emails/server";
 import { getServerSideReasonForInvalidUsername } from "./checks/usernames/server";
 import { UsernameInvalidityReason } from "./checks/usernames/client";
+import base64_ from '@hexagon/base64';
+import { hashPassword } from "./password";
 const base64 = base64_.base64;
 
 function getIp(req: NextRequest, config: ConfigSchemaBaseWithComputations) {
@@ -290,8 +291,7 @@ export const authRouter = createRouter({
                 const reasonForInvalidPassword = getServerSideReasonForInvalidPassword(input.password);
                 if (reasonForInvalidPassword) throw new Error(`Invalid password (${reasonForInvalidPassword}); please use the auth.checks.validPassword route to check passwords before trying to sign up!`);
 
-                const passwordSalt = crypto.getRandomValues(new Uint8Array(16));
-                const passwordHash = await crypto.subtle.digest('SHA-256',  new Uint8Array([...(new TextEncoder().encode(input.password)), ...passwordSalt, ...Buffer.from(base64.toArrayBuffer(process.env.PASSWORD_PEPPER!))]));
+                const { passwordSalt, passwordHash } = await hashPassword(input.password);
 
                 const user = await db.user.create({
                     data: {

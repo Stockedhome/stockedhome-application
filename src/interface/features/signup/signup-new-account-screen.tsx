@@ -5,7 +5,7 @@ import type { TextInput as RNTextInput } from 'react-native'
 import React from 'react'
 import { useTRPC } from '../../provider/tRPC-provider';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, PasswordInvalidityReason, getClientSideReasonForInvalidPassword } from 'lib/trpc/auth/checks/passwords/client';
-import { ValidatedInput } from '../../components/ValidatedInput';
+import { NULL_BUT_DO_NOT_VALIDATE_ASYNC, ValidatedInput } from '../../components/ValidatedInput';
 import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/trpc/auth/checks/emails/client';
 import { Button } from '../../components/Button';
 import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/checks/usernames/client';
@@ -89,51 +89,18 @@ export function SignUpNewAccountScreen({
 
     const emailInputRef = React.useRef<RNTextInput>(null)
     const [isEmailValid, setIsEmailValid] = React.useState(false);
-    const emailStorageRef = React.useRef<string | null>(null)
+    const emailStorageRef = React.useRef<string>('')
     const email = emailStorageRef.current
 
     const usernameInputRef = React.useRef<RNTextInput>(null)
     const [isUsernameValid, setIsUsernameValid] = React.useState(false);
-    const usernameStorageRef = React.useRef<string | null>(null)
+    const usernameStorageRef = React.useRef<string>('')
     const username = usernameStorageRef.current
 
     const passwordInputRef = React.useRef<RNTextInput>(null)
     const [isPasswordValid, setIsPasswordValid] = React.useState(false);
-    const passwordStorageRef = React.useRef<string | null>(null)
+    const passwordStorageRef = React.useRef<string>('')
     const password = passwordStorageRef.current
-
-// TODO: Implement debouncing in <ValidatedInput> component
-//    React.useEffect(() => {
-//        const basicReason = getClientSideReasonForInvalidPassword(password)
-//        if (basicReason) {
-//            setPasswordProblem(basicReason)
-//            return
-//        }
-//
-//        // MUST BE KEPT IN SYNC WITH RETURN TYPE OF `getServerSideReasonForInvalidPassword`
-//        // If the problem isn't something that can only be checked server-side, clear the problem.
-//        if (passwordProblem !== StockedhomeErrorType.Authentication_Registration_Password_TooCommon) {
-//            setPasswordProblem(null)
-//        }
-//
-//        setPasswordProblemFetching(true)
-//
-//        const abortController = new AbortController()
-//        const debounceTimeout = setTimeout(async () => {
-//            const serverSideReason = await trpcUtils.auth.checks.validPassword.fetch({password}, { signal: abortController.signal })
-//            if (serverSideReason === true) {
-//                setPasswordProblem(null)
-//            } else {
-//                setPasswordProblem(serverSideReason)
-//            }
-//            setPasswordProblemFetching(false)
-//        }, 500)
-//
-//        return () => {
-//            clearTimeout(debounceTimeout)
-//            abortController.abort()
-//        }
-//    }, [password])
 
     const [submitting, setSubmitting] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
@@ -141,7 +108,7 @@ export function SignUpNewAccountScreen({
 
     const submit = React.useCallback(async () => {
         if (submitting) return
-        if (!email || !username || !password) {
+        if (!isEmailValid || !isUsernameValid || !isPasswordValid) {
             return;
         }
 
@@ -149,9 +116,9 @@ export function SignUpNewAccountScreen({
 
         const signupData = await signUp.mutateAsync({
             clientGeneratedRandom,
-            email,
-            password,
-            username,
+            email: email!,
+            password: password!,
+            username: username!,
         });
 
         if (!signupData.success) {
@@ -162,7 +129,7 @@ export function SignUpNewAccountScreen({
 
         setUserId(signupData.userId)
         setKeypairRequestId(signupData.keypairRequestId)
-        setUsernameInParent(username)
+        setUsernameInParent(username!)
         setSignupStage('new-passkey')
     }, [email, username, password, submitting])
 
@@ -198,9 +165,17 @@ export function SignUpNewAccountScreen({
             onChangeProp='onChangeText'
             ref={emailInputRef}
             renderInvalidityReason={stringifyEmailInvalidReason}
-            syncValidator={getClientSideReasonForInvalidEmail}
+            syncValidator={(email: string) => {
+                const clientInvalidityReason = getClientSideReasonForInvalidEmail(email)
+                if (clientInvalidityReason) return clientInvalidityReason
+
+                const cachedServerInvalidityReason = trpcUtils.auth.checks.validEmail.getData({email})
+                if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
+                else if (cachedServerInvalidityReason === undefined) return null
+                else return cachedServerInvalidityReason
+            }}
             asyncValidator={async (email: string, abortController: AbortController) => {
-                const invalidityReason = await trpcUtils.auth.checks.validEmail.fetch({email}, { signal: abortController.signal })
+                const invalidityReason = await trpcUtils.auth.checks.validEmail.ensureData({email}, { signal: abortController.signal })
                 if (invalidityReason === true) return null;
                 else return invalidityReason
             }}
@@ -232,9 +207,17 @@ export function SignUpNewAccountScreen({
             onChangeProp='onChangeText'
             ref={usernameInputRef}
             renderInvalidityReason={stringifyUsernameInvalidReason}
-            syncValidator={getClientSideReasonForInvalidUsername}
+            syncValidator={(username: string) => {
+                const clientInvalidityReason = getClientSideReasonForInvalidUsername(username)
+                if (clientInvalidityReason) return clientInvalidityReason
+
+                const cachedServerInvalidityReason = trpcUtils.auth.checks.validUsername.getData({username})
+                if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
+                else if (cachedServerInvalidityReason === undefined) return null
+                else return cachedServerInvalidityReason
+            }}
             asyncValidator={async (username: string) => {
-                const invalidityReason = await trpcUtils.auth.checks.validUsername.fetch({username})
+                const invalidityReason = await trpcUtils.auth.checks.validUsername.ensureData({username})
                 if (invalidityReason === true) return null;
                 else return invalidityReason
             }}
@@ -268,9 +251,17 @@ export function SignUpNewAccountScreen({
             onChangeProp='onChangeText'
             ref={passwordInputRef}
             renderInvalidityReason={stringifyPasswordInvalidityReason}
-            syncValidator={getClientSideReasonForInvalidPassword}
+            syncValidator={(password: string) => {
+                const clientInvalidityReason = getClientSideReasonForInvalidPassword(password)
+                if (clientInvalidityReason) return clientInvalidityReason
+
+                const cachedServerInvalidityReason = trpcUtils.auth.checks.validPassword.getData({password})
+                if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
+                else if (cachedServerInvalidityReason === undefined) return null
+                else return cachedServerInvalidityReason
+            }}
             asyncValidator={async (password: string, abortController: AbortController) => {
-                const invalidityReason = await trpcUtils.auth.checks.validPassword.fetch({password}, { signal: abortController.signal })
+                const invalidityReason = await trpcUtils.auth.checks.validPassword.ensureData({password}, { signal: abortController.signal })
                 if (invalidityReason === true) return null;
                 else return invalidityReason
             }}
