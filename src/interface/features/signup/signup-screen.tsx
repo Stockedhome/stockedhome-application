@@ -8,7 +8,7 @@ import { SignUpTestNewPasskeyScreen } from './signup-test-new-passkey-screen';
 const base64 = base64_.base64;
 
 import * as Crypto from 'expo-crypto';
-import { TopLevelScreenView } from '../../TopLevelScreenView';
+import { TopLevelScreenView } from '../../components/TopLevelScreenView';
 if (!window.crypto) window.crypto = Crypto as any;
 
 export function SignUpScreen() {

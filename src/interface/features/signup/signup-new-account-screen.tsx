@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P, TextInput, SafeAreaView, H3, ActivityIndicator, Row } from 'dripsy'
+import { View, P, TextInput, SafeAreaView, H3, ActivityIndicator, Row, H1, Text } from 'dripsy'
 import type { TextInput as RNTextInput } from 'react-native'
 import React from 'react'
 import { useTRPC } from '../../provider/tRPC-provider';
@@ -148,9 +148,10 @@ export function SignUpNewAccountScreen({
     }
 
     return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
-            Sign Up for Stockedhome
-        </P>
+        <H1 sx={{textAlign: 'center'}}>
+            <Text>Sign Up</Text>{'\n'}
+            <Text>for Stockedhome</Text>
+        </H1>
         <Form>
             <ValidatedInput
                 InputComponent={TextInput}
@@ -158,7 +159,7 @@ export function SignUpNewAccountScreen({
                 emptyValue=''
                 title={<H3>Email</H3>}
                 description={<>
-                    <P sx={{color: 'textSecondary', marginTop: -4}}>
+                    <P sx={{color: 'textSecondary'}}>
                         We'll use your email to verify your account, send you important account and legal information, and help you recover your account.
                     </P>
                 </>}
@@ -201,7 +202,7 @@ export function SignUpNewAccountScreen({
                 emptyValue=''
                 title={<H3>Username</H3>}
                 description={<>
-                    <P sx={{color: 'textSecondary', marginTop: -4}}>
+                    <P sx={{color: 'textSecondary'}}>
                         Your username is how other people will see you on Stockedhome.
                     </P>
                 </>}

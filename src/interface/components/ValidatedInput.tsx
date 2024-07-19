@@ -112,12 +112,12 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
     // NOTE: After making changes to this file, make sure the types are still valid by removing this `any`!
     const InputComponent_ = InputComponent as any
 
-    return <View sx={{ width: '100%', height: 'auto' }}>
-        <View>
+    return <View sx={{ width: '100%', justifyContent: 'space-between', height: 'auto' }}>
+        {title && <View sx={{ width: '100%', justifyContent: 'flex-start' }}>
             {title}
-        </View>
+        </View>}
 
-        <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center', height: 56, }}>
+        <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center', height: 56 }}>
             <InputComponent_ {...(inputProps ?? {})} value={value} {...({[onChangeProp]: setValue})} ref={ref} />
 
             <View sx={{  width: '20%', height: 32, alignItems: 'center', marginTop: -16 }}>
@@ -132,9 +132,10 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
         </Row>
 
 
-        <View>
+        <View sx={{ width: '100%', justifyContent: 'flex-start', height: 'auto' }}>
             { description }
         </View>
+
         {
             value === emptyValue || value === undefined || !invalidityReason
                 ? <View sx={{ height: 32 }} />

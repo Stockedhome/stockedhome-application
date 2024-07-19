@@ -141,14 +141,6 @@ const theme = makeTheme({
             color: 'text',
             marginTop: 0,
         },
-        div: {
-            fontSize: 16,
-            color: 'text',
-        },
-        text: {
-            fontSize: 16,
-            color: 'text',
-        },
         bold: {
             fontWeight: 'bold',
         },
@@ -156,16 +148,19 @@ const theme = makeTheme({
             fontSize: 32,
             fontWeight: 'bold',
             color: 'textBright',
+            marginBottom: 16,
         },
         h2: {
             fontSize: 26,
             fontWeight: 'bold',
             color: 'textBright',
+            marginBottom: 14,
         },
         h3: {
             fontSize: 20,
             fontWeight: 'bold',
             color: 'textBright',
+            marginBottom: 12,
         },
         a: {
             color: 'primary',
@@ -176,6 +171,7 @@ const theme = makeTheme({
             mb: 16,
             width: '80%',
             padding: 8,
+            marginBottom: 10,
             borderRadius: 4,
             borderWidth: 2,
             borderColor: 'gray',
@@ -308,6 +304,12 @@ const theme = makeTheme({
     },
     // https://www.dripsy.xyz/usage/theming/create
 });
+
+type MyTheme = typeof theme
+
+declare module 'dripsy' {
+  interface DripsyCustomTheme extends MyTheme {}
+}
 
 export function ThemeProvider({ children }: { children: React.ReactNode; }) {
     return <Fonts><DripsyProvider theme={theme} ssr={true}>

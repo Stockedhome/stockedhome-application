@@ -2,12 +2,12 @@
 
 import { View, H1, P, Row, Text, A, useSx } from 'dripsy';
 import { TextLink } from 'solito/link';
-import { TopLevelScreenView } from '../../TopLevelScreenView';
+import { TopLevelScreenView } from '../../components/TopLevelScreenView';
 
 export function HomeScreen() {
     const sx = useSx();
     return <TopLevelScreenView>
-        <H1>Stockedhome <Text sx={{fontWeight: 'normal'}}>(Authentication)</Text></H1>
+        <H1 sx={{marginTop: 0}}>Stockedhome <Text sx={{fontWeight: 'normal'}}>(Authentication)</Text></H1>
 
         <View sx={{ maxWidth: 600 }}>
             <P sx={{ textAlign: 'center' }}>

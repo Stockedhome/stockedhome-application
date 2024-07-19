@@ -1,12 +1,11 @@
-import { View, P, H1, H2, ScrollView, TextInput } from 'dripsy';
+import { View, P, H1, H2, TextInput } from 'dripsy';
 import { useNavigation } from 'expo-router';
 import React from 'react';
 import { TextLink } from 'solito/link';
 import { type TextInput as RNTextInput } from 'react-native'
-import { TopLevelScreenView } from 'interface/TopLevelScreenView';
+import { TopLevelScreenView } from 'interface/components/TopLevelScreenView';
 import type { Config } from 'lib/config/schema';
 import { ValidatedInput } from 'interface/components/ValidatedInput';
-import { configSchemaBaseWithComputations } from "lib/config/schema-base";
 import { Button } from 'interface/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useConfig } from 'interface/provider/config-provider';
@@ -129,8 +128,6 @@ export default function ChooseConfig() {
             nav.removeListener('beforeRemove', beforeRemoveListener)
             nav.goBack();
         }} />
-
-        <View sx={{ height: 32 }} />
 
     </View></TopLevelScreenView>
 }
