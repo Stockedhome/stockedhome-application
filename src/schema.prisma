@@ -21,7 +21,7 @@ model User {
     username   String      @unique
     createdAt  DateTime    @default(now())
 
-    finishedSetup Bool
+    finishedSetup Bool     @default(false)
 
     // ---------------------
     //     Platform Data
