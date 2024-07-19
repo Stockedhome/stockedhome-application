@@ -201,7 +201,10 @@ importers:
         version: link:../lib
       moti:
         specifier: latest
-        version: 0.29.0(react-dom@18.3.1(react@18.3.1))(react-native-reanimated@3.11.0(@babel/core@7.24.7)(react-native@0.74.2(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 0.29.0(react-dom@18.3.1(react@18.3.1))(react-native-reanimated@3.11.0(@babel/core@7.24.7)(react-native@0.72.15(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      react-native:
+        specifier: '*'
+        version: 0.72.15(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(react@18.3.1)
       solito:
         specifier: link:../forks/solito
         version: link:../forks/solito
@@ -15451,10 +15454,10 @@ snapshots:
       - react
       - react-dom
 
-  moti@0.29.0(react-dom@18.3.1(react@18.3.1))(react-native-reanimated@3.11.0(@babel/core@7.24.7)(react-native@0.74.2(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  moti@0.29.0(react-dom@18.3.1(react@18.3.1))(react-native-reanimated@3.11.0(@babel/core@7.24.7)(react-native@0.72.15(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       framer-motion: 6.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-native-reanimated: 3.11.0(@babel/core@7.24.7)(react-native@0.74.2(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)
+      react-native-reanimated: 3.11.0(@babel/core@7.24.7)(react-native@0.72.15(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(react@18.3.1))(react@18.3.1)
     transitivePeerDependencies:
       - react
       - react-dom
@@ -16133,22 +16136,6 @@ snapshots:
       invariant: 2.2.4
       react: 18.3.1
       react-native: 0.72.15(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(react@18.3.1)
-    transitivePeerDependencies:
-      - supports-color
-
-  react-native-reanimated@3.11.0(@babel/core@7.24.7)(react-native@0.74.2(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@babel/core': 7.24.7
-      '@babel/plugin-transform-arrow-functions': 7.24.7(@babel/core@7.24.7)
-      '@babel/plugin-transform-nullish-coalescing-operator': 7.24.7(@babel/core@7.24.7)
-      '@babel/plugin-transform-optional-chaining': 7.24.7(@babel/core@7.24.7)
-      '@babel/plugin-transform-shorthand-properties': 7.24.7(@babel/core@7.24.7)
-      '@babel/plugin-transform-template-literals': 7.24.7(@babel/core@7.24.7)
-      '@babel/preset-typescript': 7.24.7(@babel/core@7.24.7)
-      convert-source-map: 2.0.0
-      invariant: 2.2.4
-      react: 18.3.1
-      react-native: 0.74.2(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1)
     transitivePeerDependencies:
       - supports-color
 

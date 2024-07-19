@@ -74,8 +74,8 @@ export default function ChooseConfig() {
                 autoCapitalize: 'none',
                 autoCorrect: false,
                 autoComplete: 'url',
-                keyboardType: 'url',
-                returnKeyType: 'next',
+                inputMode: 'url',
+                enterKeyHint: 'next',
                 blurOnSubmit: false,
                 onSubmitEditing: () => {
                     supplementaryConfigInputRef.current?.focus()
@@ -109,8 +109,8 @@ export default function ChooseConfig() {
                 autoCapitalize: 'none',
                 autoCorrect: false,
                 autoComplete: 'url',
-                keyboardType: 'url',
-                returnKeyType: 'done',
+                inputMode: 'url',
+                enterKeyHint: 'done',
             }}
             onValidationStateChanged={setIsSupplementaryConfigValid}
         />

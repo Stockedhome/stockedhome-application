@@ -24,7 +24,9 @@ export function SignUpNewPasskeyScreen({
     const [creatingPasskey, setCreatingPasskey] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
-    const trpc = useTRPC().useUtils()
+    const trpc = useTRPC()
+    const trpcUtils = trpc.useUtils()
+    const registerKeyMutation = trpc.auth.registerKey.useMutation()
 
     const createPasskey = React.useCallback(() => {
         if (creatingPasskey) return
@@ -33,7 +35,8 @@ export function SignUpNewPasskeyScreen({
         setCreatingPasskey(true)
 
         createNewWebAuthnCredential({
-            trpc,
+            trpcUtils,
+            registerKeyMutation,
             clientGeneratedRandom,
             userId,
             keypairRequestId,
@@ -45,7 +48,7 @@ export function SignUpNewPasskeyScreen({
         })
     }, [creatingPasskey])
 
-    return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             Welcome, {username}! 🎉
         </P>
@@ -72,5 +75,5 @@ export function SignUpNewPasskeyScreen({
                 : <Button title="Create Your First Passkey" onPress={createPasskey} />
         }
 
-    </SafeAreaView>
+    </View>
 }

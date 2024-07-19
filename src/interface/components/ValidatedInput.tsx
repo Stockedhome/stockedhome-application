@@ -21,6 +21,8 @@ type ExtraStuffForValidatedInput<TInputType extends React.ComponentType<any>, TO
     description?: React.ReactNode,
     onValidationStateChanged?: (isValid: boolean) => void,
     emptyValue?: TValueType,
+    onValueChange?: (value: TValueType) => void,
+    valueRef?: React.MutableRefObject<TValueType>,
 }
 
 
@@ -37,6 +39,8 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
     renderInvalidityReason,
     onValidationStateChanged,
     emptyValue,
+    onValueChange,
+    valueRef,
 }: {
     invalidityReasonEnum: TInvalidityReasonEnum,
     InputComponent: TInputType,
@@ -45,6 +49,18 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
     const [invalidityReason, setInvalidReason] = React.useState<TInvalidityReasonEnum[keyof TInvalidityReasonEnum] | null>(null)
     const [isFetching, setIsFetching] = React.useState(false)
     const [value, setValue] = React.useState<TValueType>(defaultValue)
+
+    React.useEffect(() => {
+        if (onValueChange) {
+            onValueChange(value)
+        }
+    }, [value])
+
+    React.useEffect(() => {
+        if (valueRef) {
+            valueRef.current = value
+        }
+    }, [value, valueRef])
 
     React.useEffect(() => {
         if (onValidationStateChanged) {
@@ -66,6 +82,7 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
 
         if (asyncValidator) {
             setIsFetching(true)
+            setInvalidReason(null)
 
             const abortController = new AbortController()
             const debounceTimeout = setTimeout(() => {

@@ -30,23 +30,23 @@ export function SignUpTestNewPasskeyScreen({
     }, [submitting])
 
     if (error) {
-        return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ color: 'red', mb: 16 }}>{error}</P>
             <Button title="Try Again" onPress={()=>setError(null)} />
-        </SafeAreaView>
+        </View>
     }
 
     if (submitting) {
-        return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ mb: 16 }}>Signing up...</P>
-        </SafeAreaView>
+        </View>
     }
 
-    return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <P sx={{ textAlign: 'center', mb: 16}}>
             You're all set up! You can now sign in with your new account!
         </P>
 
         <Button title="Get Started" onPress={testPasskey} />
-    </SafeAreaView>
+    </View>
 }

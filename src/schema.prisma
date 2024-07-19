@@ -11,7 +11,7 @@ datasource db {
 
 
 
-
+/// NOTE: Users who have not finished setup are pruned after 60 minutes
 model User {
     // --------------------
     //      Basic Data
@@ -20,6 +20,8 @@ model User {
     email      String      @unique
     username   String      @unique
     createdAt  DateTime    @default(now())
+
+    finishedSetup Bool
 
     // ---------------------
     //     Platform Data
@@ -63,12 +65,13 @@ model NewKeypairRequest {
     signedWithKeyId  String?
 }
 
-/// NOTE: When unsigned, the session is cleared after 30 minutes. When signed, the session is cleared after 24 hours.
+/// NOTE: When unsigned, the session is cleared after 30 minutes. When signed, the session is cleared 32 hours after last use.
 model AuthSession {
     id               String      @id @default(cuid())
 
     createdAt        DateTime    @default(now())
     updatedAt        DateTime    @updatedAt
+    lastUsedAt       DateTime    @default(now())
 
     user             User        @relation(fields: [userId], references: [id])
     userId           BigInt

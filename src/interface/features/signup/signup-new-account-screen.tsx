@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P, TextInput, SafeAreaView, H3 } from 'dripsy'
+import { View, P, TextInput, SafeAreaView, H3, ActivityIndicator, Row } from 'dripsy'
 import type { TextInput as RNTextInput } from 'react-native'
 import React from 'react'
 import { useTRPC } from '../../provider/tRPC-provider';
@@ -9,6 +9,7 @@ import { NULL_BUT_DO_NOT_VALIDATE_ASYNC, ValidatedInput } from '../../components
 import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/trpc/auth/checks/emails/client';
 import { Button } from '../../components/Button';
 import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/checks/usernames/client';
+import { Form } from '../../components/Form';
 
 // TODO: Require validation before submitting
 
@@ -47,8 +48,6 @@ export function stringifyEmailInvalidReason(reason: EmailInvalidityReason): Excl
             return 'This email address is already in use; please choose a different one.'
         case EmailInvalidityReason.DoesNotExist:
             return 'This email address does not exist; please use a real email address.'
-        case EmailInvalidityReason.LikelyTypo:
-            return 'We believe you have a typo in your email address. Please double-check it.'
     }
 }
 
@@ -141,144 +140,151 @@ export function SignUpNewAccountScreen({
     }
 
     if (submitting) {
-        return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <P sx={{ mb: 16 }}>Signing up...</P>
-        </View>
+        return <Row sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <P sx={{ mb: 16 }}>Signing up as {username}...</P>
+            <View sx={{ width: 16 }} />
+            <ActivityIndicator size={32} color='highlight' />
+        </Row>
     }
 
-    return <SafeAreaView sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             Sign Up for Stockedhome
         </P>
+        <Form>
+            <ValidatedInput
+                InputComponent={TextInput}
+                defaultValue=''
+                emptyValue=''
+                title={<H3>Email</H3>}
+                description={<>
+                    <P sx={{color: 'textSecondary', marginTop: -4}}>
+                        We'll use your email to verify your account, send you important account and legal information, and help you recover your account.
+                    </P>
+                </>}
+                invalidityReasonEnum={EmailInvalidityReason}
+                onChangeProp='onChangeText'
+                ref={emailInputRef}
+                renderInvalidityReason={stringifyEmailInvalidReason}
+                valueRef={emailStorageRef}
+                syncValidator={(email: string) => {
+                    const clientInvalidityReason = getClientSideReasonForInvalidEmail(email)
+                    if (clientInvalidityReason) return clientInvalidityReason
 
-        <ValidatedInput
-            InputComponent={TextInput}
-            defaultValue=''
-            emptyValue=''
-            title={<H3>Email</H3>}
-            description={<>
-                <P sx={{color: 'textSecondary', marginTop: -4}}>
-                    We'll use your email to verify your account, send you important account and legal information, and help you recover your account.
-                </P>
-            </>}
-            invalidityReasonEnum={EmailInvalidityReason}
-            onChangeProp='onChangeText'
-            ref={emailInputRef}
-            renderInvalidityReason={stringifyEmailInvalidReason}
-            syncValidator={(email: string) => {
-                const clientInvalidityReason = getClientSideReasonForInvalidEmail(email)
-                if (clientInvalidityReason) return clientInvalidityReason
+                    const cachedServerInvalidityReason = trpcUtils.auth.checks.validEmail.getData({email})
+                    if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
+                    else if (cachedServerInvalidityReason === undefined) return null
+                    else return cachedServerInvalidityReason
+                }}
+                asyncValidator={async (email: string, abortController: AbortController) => {
+                    const invalidityReason = await trpcUtils.auth.checks.validEmail.ensureData({email}, { signal: abortController.signal })
+                    if (invalidityReason === true) return null;
+                    else return invalidityReason
+                }}
+                onValidationStateChanged={setIsEmailValid}
+                inputProps={{
+                    autoCapitalize: 'none',
+                    autoCorrect: false,
+                    autoComplete: 'email',
+                    inputMode: 'email',
+                    enterKeyHint: 'next',
+                    blurOnSubmit: false,
+                    onSubmitEditing: () => {
+                        usernameInputRef.current?.focus()
+                    }
+                }}
+            />
 
-                const cachedServerInvalidityReason = trpcUtils.auth.checks.validEmail.getData({email})
-                if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
-                else if (cachedServerInvalidityReason === undefined) return null
-                else return cachedServerInvalidityReason
-            }}
-            asyncValidator={async (email: string, abortController: AbortController) => {
-                const invalidityReason = await trpcUtils.auth.checks.validEmail.ensureData({email}, { signal: abortController.signal })
-                if (invalidityReason === true) return null;
-                else return invalidityReason
-            }}
-            onValidationStateChanged={setIsEmailValid}
-            inputProps={{
-                autoCapitalize: 'none',
-                autoCorrect: false,
-                autoComplete: 'email',
-                keyboardType: 'email-address',
-                returnKeyType: 'next',
-                blurOnSubmit: false,
-                onSubmitEditing: () => {
-                    usernameInputRef.current?.focus()
-                }
-            }}
-        />
+            <ValidatedInput
+                InputComponent={TextInput}
+                defaultValue=''
+                emptyValue=''
+                title={<H3>Username</H3>}
+                description={<>
+                    <P sx={{color: 'textSecondary', marginTop: -4}}>
+                        Your username is how other people will see you on Stockedhome.
+                    </P>
+                </>}
+                invalidityReasonEnum={UsernameInvalidityReason}
+                onChangeProp='onChangeText'
+                ref={usernameInputRef}
+                renderInvalidityReason={stringifyUsernameInvalidReason}
+                valueRef={usernameStorageRef}
+                syncValidator={(username: string) => {
+                    const clientInvalidityReason = getClientSideReasonForInvalidUsername(username)
+                    if (clientInvalidityReason) return clientInvalidityReason
 
-        <ValidatedInput
-            InputComponent={TextInput}
-            defaultValue=''
-            emptyValue=''
-            title={<H3>Username</H3>}
-            description={<>
-                <P sx={{color: 'textSecondary', marginTop: -4}}>
-                    Your username is how other people will see you on Stockedhome.
-                </P>
-            </>}
-            invalidityReasonEnum={UsernameInvalidityReason}
-            onChangeProp='onChangeText'
-            ref={usernameInputRef}
-            renderInvalidityReason={stringifyUsernameInvalidReason}
-            syncValidator={(username: string) => {
-                const clientInvalidityReason = getClientSideReasonForInvalidUsername(username)
-                if (clientInvalidityReason) return clientInvalidityReason
+                    const cachedServerInvalidityReason = trpcUtils.auth.checks.validUsername.getData({username})
+                    if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
+                    else if (cachedServerInvalidityReason === undefined) return null
+                    else return cachedServerInvalidityReason
+                }}
+                asyncValidator={async (username: string) => {
+                    const invalidityReason = await trpcUtils.auth.checks.validUsername.ensureData({username})
+                    if (invalidityReason === true) return null;
+                    else return invalidityReason
+                }}
+                onValidationStateChanged={setIsUsernameValid}
+                inputProps={{
+                    autoCapitalize: 'none',
+                    autoCorrect: false,
+                    autoComplete: 'username-new',
+                    enterKeyHint: 'next',
+                    inputMode: 'text',
+                    blurOnSubmit: false,
+                    onSubmitEditing: () => {
+                        passwordInputRef.current?.focus()
+                    }
+                }}
+            />
 
-                const cachedServerInvalidityReason = trpcUtils.auth.checks.validUsername.getData({username})
-                if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
-                else if (cachedServerInvalidityReason === undefined) return null
-                else return cachedServerInvalidityReason
-            }}
-            asyncValidator={async (username: string) => {
-                const invalidityReason = await trpcUtils.auth.checks.validUsername.ensureData({username})
-                if (invalidityReason === true) return null;
-                else return invalidityReason
-            }}
-            onValidationStateChanged={setIsUsernameValid}
-            inputProps={{
-                autoCapitalize: 'none',
-                autoCorrect: false,
-                autoComplete: 'username',
-                returnKeyType: 'next',
-                blurOnSubmit: false,
-                onSubmitEditing: () => {
-                    passwordInputRef.current?.focus()
-                }
-            }}
-        />
+            <ValidatedInput
+                InputComponent={TextInput}
+                defaultValue=''
+                emptyValue=''
+                title={<H3>Password</H3>}
+                description={<>
+                    <P sx={{color: 'textSecondary' }}>
+                        You'll use your password any time you want to create a Passkey (device-specific login credential); more on that later.
+                    </P>
+                    <P sx={{color: 'textMuted', marginTop: -4}}>
+                        Passwords must be at least {MIN_PASSWORD_LENGTH} characters long.
+                    </P>
+                </>}
+                invalidityReasonEnum={PasswordInvalidityReason}
+                onChangeProp='onChangeText'
+                ref={passwordInputRef}
+                renderInvalidityReason={stringifyPasswordInvalidityReason}
+                valueRef={passwordStorageRef}
+                syncValidator={(password: string) => {
+                    const clientInvalidityReason = getClientSideReasonForInvalidPassword(password)
+                    if (clientInvalidityReason) return clientInvalidityReason
 
-        <ValidatedInput
-            InputComponent={TextInput}
-            defaultValue=''
-            emptyValue=''
-            title={<H3>Password</H3>}
-            description={<>
-                <P sx={{color: 'textSecondary' }}>
-                    You'll use your password any time you want to create a Passkey (device-specific login credential); more on that later.
-                </P>
-                <P sx={{color: 'textMuted', marginTop: -4}}>
-                    Passwords must be at least {MIN_PASSWORD_LENGTH} characters long.
-                </P>
-            </>}
-            invalidityReasonEnum={PasswordInvalidityReason}
-            onChangeProp='onChangeText'
-            ref={passwordInputRef}
-            renderInvalidityReason={stringifyPasswordInvalidityReason}
-            syncValidator={(password: string) => {
-                const clientInvalidityReason = getClientSideReasonForInvalidPassword(password)
-                if (clientInvalidityReason) return clientInvalidityReason
-
-                const cachedServerInvalidityReason = trpcUtils.auth.checks.validPassword.getData({password})
-                if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
-                else if (cachedServerInvalidityReason === undefined) return null
-                else return cachedServerInvalidityReason
-            }}
-            asyncValidator={async (password: string, abortController: AbortController) => {
-                const invalidityReason = await trpcUtils.auth.checks.validPassword.ensureData({password}, { signal: abortController.signal })
-                if (invalidityReason === true) return null;
-                else return invalidityReason
-            }}
-            onValidationStateChanged={setIsPasswordValid}
-            inputProps={{
-                autoCapitalize: 'none',
-                autoCorrect: false,
-                autoComplete: 'new-password',
-                secureTextEntry: true,
-                returnKeyType: 'go',
-                blurOnSubmit: false,
-                onSubmitEditing: submit
-            }}
-        />
+                    const cachedServerInvalidityReason = trpcUtils.auth.checks.validPassword.getData({password})
+                    if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
+                    else if (cachedServerInvalidityReason === undefined) return null
+                    else return cachedServerInvalidityReason
+                }}
+                asyncValidator={async (password: string, abortController: AbortController) => {
+                    const invalidityReason = await trpcUtils.auth.checks.validPassword.ensureData({password}, { signal: abortController.signal })
+                    if (invalidityReason === true) return null;
+                    else return invalidityReason
+                }}
+                onValidationStateChanged={setIsPasswordValid}
+                inputProps={{
+                    autoCapitalize: 'none',
+                    autoCorrect: false,
+                    autoComplete: 'new-password',
+                    secureTextEntry: true,
+                    enterKeyHint: 'go',
+                    blurOnSubmit: false,
+                    onSubmitEditing: submit
+                }}
+            />
+        </Form>
 
         <View sx={{ height: 16 }} />
-        <Button title="Sign Up" onPress={submit} disabled={!email || !username || !password} />
+        <Button title="Sign Up" onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid} />
 
-    </SafeAreaView>
+    </View>
 }

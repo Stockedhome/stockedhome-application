@@ -13,17 +13,15 @@ export async function getServerSideReasonForInvalidEmail(email: string): Promise
 
         validateRegex: false, // we already validated the email against
         validateDisposable: false, // we don't care if someone uses a disposable email
+        validateTypo: false, // gets confused; thought @bellcube.dev should be @bellcube.de (too many TLDs to keep track of)
 
         validateMx: true, // make sure the email server exists
-        validateTypo: true, // make sure a user doesn't accidentally typo a domain
         validateSMTP: true, // make sure the user has a mailbox
     })
 
     console.log('Email validation result:', validationResult)
 
-    if (!validationResult.validators.typo?.valid) {
-        return EmailInvalidityReason.LikelyTypo
-    } else if (!validationResult.validators.mx?.valid) {
+    if (!validationResult.validators.mx?.valid) {
         return EmailInvalidityReason.DoesNotExist
     } else if (!validationResult.validators.smtp?.valid) {
         if (validationResult.validators.smtp?.reason !== 'Timeout') // happened in testing; don't want to shove users out because Google is slow

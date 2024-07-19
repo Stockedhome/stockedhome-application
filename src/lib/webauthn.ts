@@ -1,39 +1,37 @@
 import { startRegistration } from '@simplewebauthn/browser';
 import type { TRPCClient } from '../interface/provider/tRPC-provider';
 
-import base64_ from '@hexagon/base64';
-import { StockedhomeError, StockedhomeError_Authentication_Registration_NewKeypair_CreationNoPublicKey } from './errors';
-const base64 = base64_.base64;
-
 export async function createNewWebAuthnCredential({
-    trpc,
+    trpcUtils,
+    registerKeyMutation,
     clientGeneratedRandom,
     userId,
     keypairRequestId,
 }: {
-    trpc: ReturnType<TRPCClient['useUtils']>,
+    trpcUtils: ReturnType<TRPCClient['useUtils']>,
+    registerKeyMutation: ReturnType<TRPCClient['auth']['registerKey']['useMutation']>,
     clientGeneratedRandom: string,
     userId: string,
     keypairRequestId: string,
 }) { // TODO: Actually handle errors in WebAuthn registration!
 //}): Promise<null | StockedhomeError> {
 
-    const credentialCreationOptions = await trpc.auth.getKeyRegistrationParameters.fetch({
+    const credentialCreationOptions = await trpcUtils.auth.getKeyRegistrationParameters.fetch({
         clientGeneratedRandom, userId, keypairRequestId,
     });
 
     const newCredential = await startRegistration(credentialCreationOptions);
 
     if (!newCredential.response.publicKey) {
-        throw new StockedhomeError_Authentication_Registration_NewKeypair_CreationNoPublicKey(newCredential)
+        throw new Error('No public key in response from WebAuthn registration!'); // TODO: functional problem-solving, not errors!
     }
 
-    const registeredKey = await trpc.auth.registerKey.fetch({
+    const registeredKey = await registerKeyMutation.mutateAsync({
         userId, keypairRequestId, clientGeneratedRandom,
         response: newCredential as typeof newCredential & {response: {publicKey: string}},
     })
 
     if (!registeredKey.success) {
-        throw new Error(registeredKey.error);
+        throw new Error(registeredKey.error); // TODO: functional problem-solving, not errors!
     }
 }

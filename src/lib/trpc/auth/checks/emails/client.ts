@@ -79,5 +79,4 @@ export enum EmailInvalidityReason {
     DomainLabelTooLong = 'DomainLabelTooLong',
     AlreadyInUse = 'AlreadyInUse',
     DoesNotExist = 'DoesNotExist',
-    LikelyTypo = 'LikelyTypo',
 }
