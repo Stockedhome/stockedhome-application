@@ -3,3 +3,4 @@ packages:
   - 'src/*'
   - 'src/platforms/*'
   - 'src/forks/*'
+  - '!src/forks/solito' # Solito's deps are outdated and only devDependencies
