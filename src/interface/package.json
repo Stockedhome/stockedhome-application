@@ -6,9 +6,10 @@
     "@expo-google-fonts/rubik": "^0.2.3",
     "dripsy": "^4.3.5",
     "expo-font": "^12.0.7",
+    "lib": "link:../lib",
     "moti": "latest",
-    "solito": "link:../forks/solito",
-    "lib": "link:../lib"
+    "react-native": "*",
+    "solito": "link:../forks/solito"
   },
   "sideEffects": false
 }

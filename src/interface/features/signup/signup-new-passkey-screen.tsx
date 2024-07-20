@@ -48,7 +48,7 @@ export function SignUpNewPasskeyScreen({
         })
     }, [creatingPasskey])
 
-    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center', maxWidth: 900, mx: 'auto' }}>
         <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
             Welcome, {username}! 🎉
         </P>
@@ -58,11 +58,11 @@ export function SignUpNewPasskeyScreen({
         </P>
 
         <P sx={{ textAlign: 'center', mb: 16 }}>
-            You'll use your password when you want to ask for a new passkey on a new device. You'll have to approve that request from a device that's already logged in.
+            You'll use your password when you want to ask for a new passkey on a new device. Once you make the request, you'll also have to approve that request from a device that already has a passkey.
         </P>
 
         <P sx={{ textAlign: 'center', mb: 16 }}>
-            Since you don't have any logged-in devices yet, click the button below to create your first passkey.
+            Since you don't have any devices with passkeys yet, click the button below to create your first passkey on this device.
         </P>
 
         { error

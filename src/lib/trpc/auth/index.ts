@@ -53,7 +53,7 @@ function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, ch
     user: Pick<User, 'id'|'username'>,
     publicKeys: Pick<AuthPublicKey, 'id'|'clientTransports'>[],
     challenge: string,
-}): GenerateRegistrationOptionsOpts {
+}) {
     return {
         challenge,
         rpName: 'Stockedhome',
@@ -72,7 +72,7 @@ function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, ch
             id: key.id,
             transports: key.clientTransports as AuthenticatorTransportFuture[],
         })),
-    };
+    } as const satisfies GenerateRegistrationOptionsOpts;
 };
 
 export const authRouter = createRouter({
@@ -121,10 +121,12 @@ export const authRouter = createRouter({
 
             await db.newKeypairRequest.update({
                 where: { id: input.keypairRequestId },
-                data: { challenge: Buffer.from(challenge) },
+                data: { challenge: options.challenge },
             });
 
-            return options;
+            return options as typeof options & {
+                rp: { id: string },
+            }
         })
     ,
 
@@ -204,8 +206,8 @@ export const authRouter = createRouter({
 
                 const verification = await verifyRegistrationResponse({
                     response: input.response,
-                    expectedChallenge: base64.fromArrayBuffer(dbData.challenge!),
-                    expectedOrigin: ctx.config.canonicalRoot.href,
+                    expectedChallenge: dbData.challenge!,
+                    expectedOrigin: ctx.config.canonicalRoot.origin,
                     expectedRPID: ctx.config.canonicalRoot.hostname,
                     expectedType: ['webauthn.create', 'public-key'],
                     requireUserVerification: true,

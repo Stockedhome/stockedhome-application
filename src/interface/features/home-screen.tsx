@@ -2,7 +2,7 @@
 
 import { View, H1, P, Row, Text, A, useSx } from 'dripsy';
 import { TextLink } from 'solito/link';
-import { TopLevelScreenView } from '../../components/TopLevelScreenView';
+import { TopLevelScreenView } from '../components/TopLevelScreenView';
 
 export function HomeScreen() {
     const sx = useSx();

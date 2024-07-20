@@ -1,10 +1,10 @@
 import { initTRPC } from '@trpc/server';
 import { NextRequest } from 'next/server';
-import type { ConfigForTRPCContext } from 'lib/config/schema';
+import type { ConfigSchemaBaseWithComputations } from 'lib/config/schema-base';
 
 interface TRPCGlobalContext {
     req: NextRequest,
-    config: ConfigForTRPCContext,
+    config: ConfigSchemaBaseWithComputations,
 }
 
 function generateTRPCInstance(): ReturnType<ReturnType<typeof initTRPC.context<TRPCGlobalContext>>['create']> {

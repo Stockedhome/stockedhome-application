@@ -1,4 +1,4 @@
-import { HomeScreen } from 'interface/features/home/screen'
+import { HomeScreen } from 'interface/features/home-screen'
 
 import {metadata as layoutMetadata } from './layout';
 

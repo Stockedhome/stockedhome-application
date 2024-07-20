@@ -58,12 +58,12 @@ model NewKeypairRequest {
     /// The client should provide a prettier version of the identifier to the user. How it is parsed is up to the client.
     identifier       String
 
-    challenge        Bytes?
+    challenge        String?
 
     /// Keypair requests must be signed by another device before they are approved.
     ///
     /// If `signedWithKey` is null, the request is pending. If it is not null, the request is approved.
-    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: SetNull)
+    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: [Cascade, SetNull])
     signedWithKeyId  String?
 }
 
@@ -79,7 +79,7 @@ model AuthSession {
     user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           BigInt
 
-    challenge        Bytes
+    challenge        String
 
     signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: Cascade)
     signedWithKeyId  String?
