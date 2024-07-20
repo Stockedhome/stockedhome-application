@@ -11,7 +11,7 @@ datasource db {
 
 
 
-/// NOTE: Users who have not finished setup are pruned after 60 minutes
+/// NOTE: Users who have not finished setup are pruned 60 minutes after their latest setup action.
 model User {
     // --------------------
     //      Basic Data
@@ -21,7 +21,7 @@ model User {
     username   String      @unique
     createdAt  DateTime    @default(now())
 
-    finishedSetup Bool     @default(false)
+    pruneAt    DateTime?
 
     // ---------------------
     //     Platform Data
@@ -44,24 +44,26 @@ model User {
 
 /// NOTE: NewKeypairRequest records are cleared 30 minutes after creation and are deleted after an approved/denied request
 model NewKeypairRequest {
-    id         String      @id @default(cuid())
-    createdAt  DateTime    @default(now())
-    user       User        @relation(fields: [userId], references: [id])
-    userId     BigInt
-    sendingIP  String
+    id               String      @id @default(cuid())
+    createdAt        DateTime    @default(now())
+    user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId           BigInt
+    sendingIP        String
+
+    pruneAt          DateTime
 
     /// An identifier not necessarily unique to the device but is unique enough to identify the device given a user ID and IP
     /// May be shown to the user under "Device Identifier"
     ///
     /// The client should provide a prettier version of the identifier to the user. How it is parsed is up to the client.
-    identifier String
+    identifier       String
 
     challenge        Bytes?
 
     /// Keypair requests must be signed by another device before they are approved.
     ///
     /// If `signedWithKey` is null, the request is pending. If it is not null, the request is approved.
-    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id])
+    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: SetNull)
     signedWithKeyId  String?
 }
 
@@ -71,14 +73,15 @@ model AuthSession {
 
     createdAt        DateTime    @default(now())
     updatedAt        DateTime    @updatedAt
-    lastUsedAt       DateTime    @default(now())
 
-    user             User        @relation(fields: [userId], references: [id])
+    pruneAt          DateTime
+
+    user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           BigInt
 
     challenge        Bytes
 
-    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id])
+    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: Cascade)
     signedWithKeyId  String?
 }
 
@@ -86,7 +89,7 @@ model AuthSession {
 model AuthPublicKey {
     createdAt                  DateTime    @default(now())
 
-    user                       User        @relation(fields: [userId], references: [id])
+    user                       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId                     BigInt
 
     /// ID as stored on the client device
@@ -111,7 +114,7 @@ model AuthPublicKey {
     /// If this public key was generated when creating the user account for the first time, this field will be null.
     ///
     /// Otherwise, this field will be the ID of the public key used to authenticate the device that authorized the creation of this key.
-    authorizedByKey            AuthPublicKey? @relation(fields: [userId, authorizedByKeyId], references: [userId, id], name: "AuthorizedKeys")
+    authorizedByKey            AuthPublicKey? @relation(fields: [userId, authorizedByKeyId], references: [userId, id], name: "AuthorizedKeys", onDelete: SetNull)
     authorizedByKeyId          String?
 
     /// Any AuthPublicKey records this key has approved the creation of

@@ -29,13 +29,28 @@ export async function getServerSideReasonForInvalidEmail(email: string): Promise
     } else if (/** for some other reason */ !validationResult.valid)
         return EmailInvalidityReason.DoesNotExist // best error we can give in this catch-all
 
-    const isUnique = !(await db.user.findUnique({
+    const userRecord = await db.user.findUnique({
         where: { email: email },
-        select: { id: true },
-    }));
+        select: { id: true, pruneAt: true }
+    });
 
-    if (!isUnique)
-        return EmailInvalidityReason.AlreadyInUse;
+    if (userRecord) {
+        if (userRecord.pruneAt === null)
+            return EmailInvalidityReason.AlreadyInUse;
+
+        if (userRecord.pruneAt.getTime() > Date.now()) {
+            return EmailInvalidityReason.AlreadyInUse;
+        } else {
+            await db.user.delete({
+                where: { id: userRecord.id },
+                include: {
+                    publicKeys: true,
+                    newKeypairRequests: true,
+                },
+            })
+        }
+    }
+
 
     return null;
 }

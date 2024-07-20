@@ -130,7 +130,7 @@ export function SignUpNewAccountScreen({
         setKeypairRequestId(signupData.keypairRequestId)
         setUsernameInParent(username!)
         setSignupStage('new-passkey')
-    }, [email, username, password, submitting])
+    }, [email, username, password, submitting, isEmailValid, isUsernameValid, isPasswordValid])
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

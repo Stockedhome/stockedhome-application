@@ -7,13 +7,27 @@ export async function getServerSideReasonForInvalidUsername(username: string): P
     if (clientSideReason)
         return clientSideReason;
 
-    const isUnique = !(await db.user.findUnique({
+    const userRecord = await db.user.findUnique({
         where: { username: username },
-        select: { id: true },
-    }));
+        select: { id: true, pruneAt: true },
+    });
 
-    if (!isUnique)
-        return UsernameInvalidityReason.AlreadyInUse;
+    if (userRecord) {
+        if (userRecord.pruneAt === null)
+            return UsernameInvalidityReason.AlreadyInUse;
+
+        if (userRecord.pruneAt.getTime() > Date.now()) {
+            return UsernameInvalidityReason.AlreadyInUse;
+        } else {
+            await db.user.delete({
+                where: { id: userRecord.id },
+                include: {
+                    publicKeys: true,
+                    newKeypairRequests: true,
+                },
+            })
+        }
+    }
 
     return null;
 }

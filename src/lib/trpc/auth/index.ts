@@ -175,8 +175,8 @@ export const authRouter = createRouter({
             }),
         ]))
         .mutation(async ({ctx, input}) => {
-            // FIXME: got error "Unexpected registration response type "webauthn.create", expected "public-key""
             // TODO: Account for every error thrown in the simplewebauthn validator
+            //       Maybe even fork it and replace every error with an enum value return instead 🤔
             try {
                 const userId = BigInt(input.userId);
                 const dbData = await db.newKeypairRequest.findUnique({
@@ -195,12 +195,7 @@ export const authRouter = createRouter({
                         challenge: true,
                         signedWithKeyId: true,
                         user: {select:{
-                            username: true,
-                            id: true,
-                            publicKeys: {select:{
-                                id: true,
-                                clientTransports: true,
-                            }}
+                            pruneAt: true,
                         }}
                     }
                 });
@@ -232,9 +227,15 @@ export const authRouter = createRouter({
                     }
                 });
 
-                await db.newKeypairRequest.delete({
-                    where: { id: input.keypairRequestId },
-                });
+                await Promise.all([
+                    db.newKeypairRequest.delete({
+                        where: { id: input.keypairRequestId },
+                    }),
+                    dbData.user.pruneAt !== null && db.user.update({
+                        where: { id: userId },
+                        data: { pruneAt: new Date(Date.now() + 1000 * 60 * 60 ) }, // if user's on a timer, restart it at 1 hour
+                    }),
+                ]);
 
                 return {
                     success: true,
@@ -293,17 +294,23 @@ export const authRouter = createRouter({
 
                 const { passwordSalt, passwordHash } = await hashPassword(input.password);
 
+                // Unfinished users are pruned after 1 hour
+                // Should treat this keypair request the same way
+                const pruneAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+
                 const user = await db.user.create({
                     data: {
                         username: input.username,
                         email: input.email,
                         passwordSalt: Buffer.from(passwordSalt),
                         passwordHash: Buffer.from(passwordHash),
+                        pruneAt,
 
                         newKeypairRequests: {
                             create: {
                                 sendingIP: getIp(ctx.req, ctx.config),
                                 identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
+                                pruneAt,
                             },
                         }
                     },
