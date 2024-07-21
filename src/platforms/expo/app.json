@@ -9,7 +9,9 @@
       "android"
     ],
     "ios": {
-      "bundleIdentifier": "app.stockedhome.mobile"
+      "supportsTablet": true,
+      "bundleIdentifier": "app.stockedhome.mobile",
+      "associatedDomains": ["webcredentials:stockedhome.app"]
     },
     "android": {
       "package": "app.stockedhome.mobile",

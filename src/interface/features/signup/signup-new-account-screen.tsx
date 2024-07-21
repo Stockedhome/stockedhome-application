@@ -73,13 +73,13 @@ export function SignUpNewAccountScreen({
     setUsername: setUsernameInParent,
     setUserId,
     setKeypairRequestId,
-    setSignupStage,
+    setSignupStep,
 }: {
     clientGeneratedRandom: string
     setUsername: (username: string) => void
     setUserId: (userId: string) => void
     setKeypairRequestId: (keypairRequestId: string) => void
-    setSignupStage: (stage: 'new-passkey') => void
+    setSignupStep: (stage: 'new-passkey') => void
 }) {
     const trpc = useTRPC()
     const trpcUtils = trpc.useUtils()
@@ -129,7 +129,7 @@ export function SignUpNewAccountScreen({
         setUserId(signupData.userId)
         setKeypairRequestId(signupData.keypairRequestId)
         setUsernameInParent(username!)
-        setSignupStage('new-passkey')
+        setSignupStep('new-passkey')
     }, [email, username, password, submitting, isEmailValid, isUsernameValid, isPasswordValid])
 
     if (error) {

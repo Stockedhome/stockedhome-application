@@ -12,13 +12,13 @@ export function SignUpNewPasskeyScreen({
     keypairRequestId,
     username,
     clientGeneratedRandom,
-    setSignupStage,
+    setSignupStep,
 }: {
     userId: string,
     keypairRequestId: string,
     username: string,
     clientGeneratedRandom: string,
-    setSignupStage: (stage: 'test-passkey') => void
+    setSignupStep: (stage: 'test-passkey') => void
 }) {
 
     const [creatingPasskey, setCreatingPasskey] = React.useState(false)
@@ -41,8 +41,9 @@ export function SignUpNewPasskeyScreen({
             userId,
             keypairRequestId,
         }).then(() => {
-            setSignupStage('test-passkey')
+            setSignupStep('test-passkey')
         }).catch((err) => {
+            console.error(err)
             setError(err.message)
             setCreatingPasskey(false)
         })

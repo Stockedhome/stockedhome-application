@@ -63,7 +63,7 @@ model NewKeypairRequest {
     /// Keypair requests must be signed by another device before they are approved.
     ///
     /// If `signedWithKey` is null, the request is pending. If it is not null, the request is approved.
-    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: [Cascade, SetNull])
+    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: Cascade)
     signedWithKeyId  String?
 }
 

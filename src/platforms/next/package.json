@@ -14,7 +14,7 @@
     "@react-native/assets-registry": "link:../../forks/assets-registry",
     "interface": "link:../../interface",
     "lib": "link:../../lib",
-    "next": "^14.2.4",
+    "next": "link:../../node_modules/next",
     "next-compose-plugins": "^2.2.1",
     "next-fonts": "^1.5.1",
     "next-images": "^1.8.5",

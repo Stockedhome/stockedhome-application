@@ -28,13 +28,13 @@ function SignUpScreenInternal() {
     const [userId, setUserId] = React.useState('');
     const [keypairRequestId, setKeypairRequestId] = React.useState('');
 
-    const [signupStage, setSignupStage] = React.useState<'new-account' | 'new-passkey' | 'test-passkey'>('new-account');
+    const [signupStep, setSignupStep] = React.useState<'new-account' | 'new-passkey' | 'test-passkey'>('new-account');
 
-    switch (signupStage) {
+    switch (signupStep) {
         case 'new-account':
-            return <SignUpNewAccountScreen clientGeneratedRandom={clientGeneratedRandom} setUsername={setUsername} setUserId={setUserId} setKeypairRequestId={setKeypairRequestId} setSignupStage={setSignupStage} />;
+            return <SignUpNewAccountScreen clientGeneratedRandom={clientGeneratedRandom} setUsername={setUsername} setUserId={setUserId} setKeypairRequestId={setKeypairRequestId} setSignupStep={setSignupStep} />;
         case 'new-passkey':
-            return <SignUpNewPasskeyScreen userId={userId} keypairRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStage={setSignupStage} />;
+            return <SignUpNewPasskeyScreen userId={userId} keypairRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStep={setSignupStep} />;
         case 'test-passkey':
             return <SignUpTestNewPasskeyScreen userId={userId} />; // auth code generates its own random
     }
