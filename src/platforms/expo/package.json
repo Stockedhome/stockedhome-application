@@ -20,17 +20,15 @@
     "react-native-safe-area-context": "*",
     "react-native-screens": "*",
     "react-native-web": "*",
-    "solito": "link:../../forks/solito"
+    "solito": "link:../../forks/solito",
+    "react": "18.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.6",
     "@types/react": "~18.2.79",
     "typescript": "^5.3.3"
   },
-
-  "autolinking": {
-    
-  },
+  "autolinking": {},
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
