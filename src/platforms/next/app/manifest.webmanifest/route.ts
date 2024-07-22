@@ -2,6 +2,8 @@ import { MetadataRoute } from 'next'
 import { resolveMetaUrl } from '../metadataUtils';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-static'
+
 export function GET() {
     const manifest: MetadataRoute.Manifest = {
         name: 'Stockedhome',

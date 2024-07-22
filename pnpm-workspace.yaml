@@ -3,4 +3,7 @@ packages:
   - 'src/*'
   - 'src/platforms/*'
   - 'src/forks/*'
-  - '!src/forks/solito' # Solito's deps are outdated and only devDependencies
+
+   # We don't care about devDependencies for these forks:
+  - '!src/forks/solito'
+  - '!src/forks/react-native-passkey'

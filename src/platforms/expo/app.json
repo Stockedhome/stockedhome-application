@@ -30,7 +30,18 @@
       "resizeMode": "contain"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.0"
+          },
+          "android": {
+            "compileSdkVersion": 34
+          }
+        }
+      ]
     ],
     "extra": {
       "router": {

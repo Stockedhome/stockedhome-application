@@ -4,6 +4,7 @@
     "babel-preset-es2018": "^1.0.0",
     "dripsy": "*",
     "expo": "link:../../../node_modules/expo",
+    "expo-build-properties": "^0.12.3",
     "expo-crypto": "~13.0.2",
     "expo-linear-gradient": "~13.0.2",
     "expo-linking": "~6.3.1",
@@ -14,7 +15,7 @@
     "lib": "link:..\\..\\lib",
     "react-native": "0.74.3",
     "react-native-gesture-handler": "*",
-    "react-native-passkey": "*",
+    "react-native-passkey": "link:../../forks/react-native-passkey",
     "react-native-reanimated": "*",
     "react-native-safe-area-context": "*",
     "react-native-screens": "*",
@@ -25,6 +26,10 @@
     "@babel/core": "^7.24.6",
     "@types/react": "~18.2.79",
     "typescript": "^5.3.3"
+  },
+
+  "autolinking": {
+    
   },
   "scripts": {
     "start": "expo start",

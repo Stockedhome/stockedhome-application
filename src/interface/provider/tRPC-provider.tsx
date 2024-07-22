@@ -71,7 +71,7 @@ type RecordOfBooleansOrObjects<TIndexObj extends Record<any, any> = Record<any, 
     [Tkey in Exclude<keyof TIndexObj, `use${string}`>]: RecordOfBooleansOrObjectsLevel<any>
 }
 
-function getServerForPath<TRouter extends TRPCClient | BuiltRouter<{ ctx: any; meta: any; errorShape: any; transformer: any; }, RouterRecord>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, remainingPath: string[]): 'primary' | 'supplementary' {
+export function getServerForPath<TRouter extends TRPCClient | BuiltRouter<{ ctx: any; meta: any; errorShape: any; transformer: any; }, RouterRecord>>(currentConfigLevel: RecordOfBooleansOrObjectsLevel<TRouter>, remainingPath: string[]): 'primary' | 'supplementary' {
     if (currentConfigLevel === undefined) {
         return 'primary';
     }

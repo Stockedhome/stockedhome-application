@@ -1,4 +1,4 @@
-import { Passkey } from 'react-native-passkey';
+import { NativePasskey } from 'react-native-passkey/lib/module/NativePasskey';
 import type { TRPCClient } from '../interface/provider/tRPC-provider';
 import type { AuthenticatorTransportFuture, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server/script/deps';
 
@@ -48,6 +48,7 @@ export function isValidDomain(hostname: string): boolean {
 
 import { WebAuthnError } from '@simplewebauthn/browser';
 import type { PasskeyRegistrationRequest } from 'react-native-passkey/lib/typescript/Passkey';
+import { NativeModules } from 'react-native';
 
 /**
  * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.create()`
@@ -196,8 +197,44 @@ async function startRegistration(
     // Wait for the user to complete attestation
     let credential;
     try {
-        console.log('[startRegistration] options:', options)
-        credential = (await Passkey.register(options)) as unknown as RegistrationCredential;
+        const options___ = {
+            "challenge": "WjVPNUdpM2tGMlN1SlIvTHRnd0dzckR5NG1TdktjWTNlVjFNWnVVdEJ0UT0",
+            "rp": {
+                "name": "Stockedhome",
+                "id": "self.bellcube.dev"
+            },
+            "user": {
+                "id": "MTY&&&&&&&&&&&",
+                "name": "ggggghhuuuyed",
+                "displayName": "ggggghhuuuyed"
+            },
+            "pubKeyCredParams": [
+                {
+                    "alg": -8,
+                    "type": "public-key"
+                },
+                {
+                    "alg": -7,
+                    "type": "public-key"
+                },
+                {
+                    "alg": -257,
+                    "type": "public-key"
+                }
+            ],
+            "timeout": 60000,
+            "attestation": "none",
+            "excludeCredentials": [],
+            "authenticatorSelection": {
+                "userVerification": "discouraged"
+            },
+            "extensions": {
+                "credProps": true
+            }
+        }
+        console.log('[startRegistration] options:', options___)
+
+        credential = (await NativePasskey.register(options___)) as unknown as RegistrationCredential;
     } catch (err) {
         throw identifyRegistrationError({ error: err as Error, options });
     }
