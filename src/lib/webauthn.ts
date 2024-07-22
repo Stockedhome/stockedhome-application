@@ -1,4 +1,4 @@
-import { NativePasskey } from 'react-native-passkey/lib/module/NativePasskey';
+import { Passkey } from 'react-native-passkey';
 import type { TRPCClient } from '../interface/provider/tRPC-provider';
 import type { AuthenticatorTransportFuture, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server/script/deps';
 
@@ -47,7 +47,7 @@ export function isValidDomain(hostname: string): boolean {
 }
 
 import { WebAuthnError } from '@simplewebauthn/browser';
-import type { PasskeyRegistrationRequest } from 'react-native-passkey/lib/typescript/Passkey';
+import type { PasskeyRegistrationRequest } from 'react-native-passkey';
 import { NativeModules } from 'react-native';
 
 /**
@@ -234,7 +234,7 @@ async function startRegistration(
         }
         console.log('[startRegistration] options:', options___)
 
-        credential = (await NativePasskey.register(options___)) as unknown as RegistrationCredential;
+        credential = (await Passkey.register(options___)) as unknown as RegistrationCredential;
     } catch (err) {
         throw identifyRegistrationError({ error: err as Error, options });
     }
