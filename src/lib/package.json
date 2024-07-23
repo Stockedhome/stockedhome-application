@@ -12,7 +12,6 @@
     "@trpc/next": "*",
     "@trpc/react-query": "*",
     "@trpc/server": "*",
-    "react-native-passkey": "link:../forks/react-native-passkey",
     "zod": "*"
   },
   "sideEffects": false

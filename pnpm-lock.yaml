@@ -102,9 +102,6 @@ importers:
       react-native-gesture-handler:
         specifier: ~2.16.2
         version: 2.16.2(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)
-      react-native-passkey:
-        specifier: link:src/forks/react-native-passkey
-        version: link:src/forks/react-native-passkey
       react-native-reanimated:
         specifier: ~3.10.1
         version: 3.10.1(@babel/core@7.24.7)(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.2.0))(react@18.2.0)
@@ -177,9 +174,6 @@ importers:
       react-native:
         specifier: 0.74.3
         version: 0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1)
-      react-native-passkey:
-        specifier: link:../forks/react-native-passkey
-        version: link:../forks/react-native-passkey
       react-native-safe-area-context:
         specifier: '*'
         version: 4.10.5(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)
@@ -213,9 +207,6 @@ importers:
       '@trpc/server':
         specifier: '*'
         version: 10.45.2
-      react-native-passkey:
-        specifier: link:../forks/react-native-passkey
-        version: link:../forks/react-native-passkey
       zod:
         specifier: '*'
         version: 3.23.8
@@ -270,9 +261,6 @@ importers:
       react-native-gesture-handler:
         specifier: '*'
         version: 2.16.2(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.2.0))(react@18.2.0)
-      react-native-passkey:
-        specifier: link:../../forks/react-native-passkey
-        version: link:../../forks/react-native-passkey
       react-native-reanimated:
         specifier: '*'
         version: 3.10.1(@babel/core@7.24.7)(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.2.0))(react@18.2.0)

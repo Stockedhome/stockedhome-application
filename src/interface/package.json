@@ -9,7 +9,6 @@
     "lib": "link:../lib",
     "moti": "latest",
     "react-native": "0.74.3",
-    "react-native-passkey": "link:../forks/react-native-passkey",
     "react-native-safe-area-context": "*",
     "solito": "link:../forks/solito",
     "expo-splash-screen": "*"

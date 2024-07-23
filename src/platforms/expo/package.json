@@ -15,7 +15,6 @@
     "lib": "link:..\\..\\lib",
     "react-native": "0.74.3",
     "react-native-gesture-handler": "*",
-    "react-native-passkey": "link:../../forks/react-native-passkey",
     "react-native-reanimated": "*",
     "react-native-safe-area-context": "*",
     "react-native-screens": "*",
