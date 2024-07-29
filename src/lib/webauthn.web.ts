@@ -42,15 +42,21 @@ export async function authenticateWithWebAuthn({
     submitAuthenticationMutation,
 }: {
     trpcUtils: ReturnType<TRPCClient['useUtils']>,
-    clientGeneratedRandom: string,
     username: string,
     submitAuthenticationMutation: ReturnType<TRPCClient['auth']['submitAuthentication']['useMutation']>,
-}) {
+}): Promise<void> { // TODO: Actually handle errors in WebAuthn authentication!
     const {authSessionId, options} = await trpcUtils.auth.getAuthenticationParameters.fetch({
         username,
     });
 
     const authResponse = await startAuthentication(options);
 
+    const submittedAuthentication = await submitAuthenticationMutation.mutateAsync({
+        authSessionId,
+        response: authResponse,
+    });
 
+    if (!submittedAuthentication.success) {
+        throw new Error(submittedAuthentication.error); // TODO: functional problem-solving, not errors!
+    }
 }

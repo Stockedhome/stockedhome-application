@@ -36,6 +36,6 @@ function SignUpScreenInternal() {
         case 'new-passkey':
             return <SignUpNewPasskeyScreen userId={userId} keypairRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStep={setSignupStep} />;
         case 'test-passkey':
-            return <SignUpTestNewPasskeyScreen userId={userId} />; // auth code generates its own random
+            return <SignUpTestNewPasskeyScreen username={username} />; // auth code generates its own random
     }
 }

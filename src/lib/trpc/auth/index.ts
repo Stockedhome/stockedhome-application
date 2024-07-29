@@ -24,6 +24,7 @@ import { getServerSideReasonForInvalidUsername } from "./checks/usernames/server
 import { UsernameInvalidityReason } from "./checks/usernames/client";
 import base64_ from '@hexagon/base64';
 import { hashPassword } from "./password";
+import { cookies } from "next/headers";
 const base64 = base64_.base64;
 
 function getIp(req: NextRequest, config: ConfigSchemaBaseWithComputations) {
@@ -468,6 +469,7 @@ export const authRouter = createRouter({
                     userId: dbData.id,
                     challenge: options.challenge,
                     pruneAt: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes
+                    finalExpiration: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14), // 2 weeks
                 },
                 select: {
                     id: true,
@@ -481,66 +483,69 @@ export const authRouter = createRouter({
         }),
 
 
+    // TODO: Abstract the authentication verification stuff
     submitAuthentication: publicProcedure
         .input(z.object({
-            //id: Base64URLString;
-            id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-            //rawId: Base64URLString;
-            rawId: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-            //response: AuthenticatorAssertionResponseJSON;
+            authSessionId: z.string(),
             response: z.object({
-                //clientDataJSON: Base64URLString;
-                clientDataJSON: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                //authenticatorData: Base64URLString;
-                authenticatorData: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                //signature: Base64URLString;
-                signature: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                //userHandle?: Base64URLString;
-                userHandle: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }).optional(),
+                //id: Base64URLString;
+                id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
+                //rawId: Base64URLString;
+                rawId: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
+                //response: AuthenticatorAssertionResponseJSON;
+                response: z.object({
+                    //clientDataJSON: Base64URLString;
+                    clientDataJSON: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
+                    //authenticatorData: Base64URLString;
+                    authenticatorData: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
+                    //signature: Base64URLString;
+                    signature: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
+                    //userHandle?: Base64URLString;
+                    userHandle: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }).optional(),
+                }),
+                //authenticatorAttachment?: AuthenticatorAttachment;
+                authenticatorAttachment: z.enum(['platform', 'cross-platform']).optional(),
+                //clientExtensionResults: AuthenticationExtensionsClientOutputs;
+                clientExtensionResults: z.object({
+                    //appid?: boolean;
+                    appid: z.boolean().optional(),
+                    //credProps?: CredentialPropertiesOutput;
+                    credProps: z.object({
+                        //rk?: boolean;
+                        rk: z.boolean().optional(),
+                    }).optional(),
+                    //hmacCreateSecret?: boolean;
+                    hmacCreateSecret: z.boolean().optional(),
+                }),
+                type: z.enum(['public-key']),
             }),
-            //authenticatorAttachment?: AuthenticatorAttachment;
-            authenticatorAttachment: z.enum(['platform', 'cross-platform']).optional(),
-            //clientExtensionResults: AuthenticationExtensionsClientOutputs;
-            clientExtensionResults: z.object({
-                //appid?: boolean;
-                appid: z.boolean().optional(),
-                //credProps?: CredentialPropertiesOutput;
-                credProps: z.object({
-                    //rk?: boolean;
-                    rk: z.boolean().optional(),
-                }).optional(),
-                //hmacCreateSecret?: boolean;
-                hmacCreateSecret: z.boolean().optional(),
-            }),
-            type: z.enum(['public-key']),
         }))
         .output(z.union([
             z.object({
                 success: z.literal(true),
-                reauthenticateAt: z.string().refine(v => v.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)((-(\d{2}):(\d{2})|Z)?)$/), { message: 'value must be an ISO 8601 date' }),
                 error: z.undefined(),
             }),
             z.object({
                 success: z.literal(false),
-                reauthenticateAt: z.undefined(),
                 error: z.string(),
             }),
         ]))
-        .query(async ({ctx, input}) => {
+        .mutation(async ({ctx, input: {response, authSessionId}}) => {
             try {
                 const sessionData = await db.authSession.findUnique({
-                    where: { id: input.id, signedWithKeyId: null },
+                    where: { id: authSessionId, signedWithKeyId: null },
                     select: {
                         userId: true,
                         challenge: true,
                         pruneAt: true,
+                        finalExpiration: true,
                     }
                 });
 
                 if (!sessionData) throw new Error('No pending auth session exists by this ID. Perhaps it was already signed or created more than 15 minutes ago? Please try again.');
 
                 const keyData = await db.authPublicKey.findUnique({
-                    where: { id_userId: { id: input.rawId, userId: sessionData.userId } },
+                    where: { id_userId: { id: response.rawId, userId: sessionData.userId } },
                     select: {
                         userId: true,
                         sessionCounter: true,
@@ -553,7 +558,7 @@ export const authRouter = createRouter({
                 if (!keyData) throw new Error('No public key exists by this ID for this user. Please try again.');
 
                 const verification = await verifyAuthenticationResponse({
-                    response: input,
+                    response: response,
                     expectedChallenge: sessionData.challenge!,
                     expectedOrigin: ctx.config.canonicalRoot.origin,
                     expectedRPID: ctx.config.canonicalRoot.hostname,
@@ -569,29 +574,42 @@ export const authRouter = createRouter({
 
                 if (!verification.verified) throw new Error('Authentication failed! Please try again.');
 
-                const updatedAuthSession = await db.authSession.update({
-                    where: { id: input.id },
+                const expiration = new Date(Math.min(Date.now() + 1000 * 60 * 60 * 32, sessionData.finalExpiration.getTime())); // 32 hours from now or the finalExpiration date--whichever is sooner
+
+                await db.authSession.update({
+                    where: { id: response.id },
                     data: {
                         signedWithKeyId: keyData.id,
-                        pruneAt: new Date(Date.now() + 1000 * 60 * 60 * 32), // 32 hours
+                        pruneAt: expiration,
+                        updatePruneAtAt: new Date(Date.now() + 1000 * 60 * 60 * 8), // in 8 hours
                     },
+                });
+
+                cookies().set({
+                    name: 'stockedhome-session-token',
+                    value: JSON.stringify({ authSessionId, response }),
+                    domain: ctx.config.canonicalRoot.hostname,
+                    expires: expiration,
+                    httpOnly: true,
+                    partitioned: true,
+                    sameSite: 'strict',
+                    secure: true,
                 });
 
                 return {
                     success: true,
-                    reauthenticateAt: new Date(updatedAuthSession.pruneAt.getTime() - 1000 * 60 * 60 * 24).toISOString(), // 24 hours before the session is pruned; reauthenticate every 8 hours
+                    error: undefined,
+                }
             } catch (e) {
                 console.error(e);
                 if (!e) throw e;
                 if (typeof e === 'string') return {
                     success: false,
-                    reauthenticateAt: undefined,
                     error: e,
                 };
                 if (typeof e !== 'object') throw e;
                 if ('message' in e && typeof e.message === 'string') return {
                     success: false,
-                    reauthenticateAt: undefined,
                     error: e.message,
                 };
                 throw e;

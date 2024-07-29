@@ -43,9 +43,13 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
     }, [loaded, error]);
 
     if (error) {
-        SplashScreen.hideAsync();
         console.error('Error loading fonts:', error);
-        return <RNText>Error loading fonts: {error.stack || error.message}</RNText>;
+        if (Platform.OS === 'android' || Platform.OS === 'ios') {
+            SplashScreen.hideAsync();
+            return <RNText>Error loading fonts: {error.stack || error.message}</RNText>;
+        } else {
+            return <>{children}</>;
+        }
     }
 
     if (loaded) {

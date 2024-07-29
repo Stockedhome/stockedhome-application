@@ -83,6 +83,10 @@ model AuthSession {
     ///
     /// This value will be 2 weeks after the session is initially signed.
     finalExpiration  DateTime
+    /// When to reset the pruneAt/expiration timer
+    ///
+    /// If set, should be 8 hours from the last reset
+    updatePruneAtAt  DateTime?
 
     user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           BigInt
