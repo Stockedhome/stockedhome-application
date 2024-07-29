@@ -2,19 +2,16 @@ import 'raf/polyfill'
 import 'setimmediate'
 import './global.default.css'
 
-import { ProvidersAfterConfig, ProvidersBeforeConfig } from 'interface/provider'
 import React from 'react'
 import type { Metadata, Viewport } from 'next';
-import type { Icon, IconDescriptor, Icons } from 'next/dist/lib/metadata/types/metadata-types';
+import type { IconDescriptor, Icons } from 'next/dist/lib/metadata/types/metadata-types';
 import { metadataBase, resolveMetaUrl } from './metadataUtils';
-import { ConfigProvider } from 'interface/provider/config-provider';
 import { loadConfigServer } from 'lib/config/loader-server';
-import { withTRPC } from '@trpc/next';
 
 export const metadata: Metadata = {
     title: {
         default: '%% ERROR %%',
-        template: '%s | Stockedhome Web App',
+        template: '%s | Stockedhome',
     },
     description: 'Stockedhome is an app for managing your home inventory.',
     applicationName: 'Stockedhome',
@@ -25,9 +22,9 @@ export const metadata: Metadata = {
 
     appLinks: {
         android: {
-            package: 'app.stockedhome',
+            package: 'app.stockedhome.mobile',
             app_name: 'Stockedhome',
-            url: 'https://play.google.com/store/apps/details?id=app.stockedhome',
+            url: 'https://play.google.com/store/apps/details?id=app.stockedhome.mobile',
         },
         ios: {
             url: 'https://apps.apple.com/us/app/stockedhome/id1234567890', // TODO: Get real apple app ID
@@ -58,17 +55,17 @@ export const metadata: Metadata = {
         appId: '1234567890', // TODO: Get real apple app ID
     },
     publisher: 'Stockedhome',
-    generator: 'Next.js & React Native',
+    generator: 'Next.js',
     twitter: {
         app: {
             id: {
-                googleplay: 'app.stockedhome',
+                googleplay: 'app.stockedhome.mobile',
                 ipad: '1234567890', // TODO: Get real apple app ID
                 iphone: '1234567890', // TODO: Get real apple app ID
             },
             name: 'Stockedhome',
             url: {
-                googleplay: 'https://play.google.com/store/apps/details?id=app.stockedhome',
+                googleplay: 'https://play.google.com/store/apps/details?id=app.stockedhome.mobile',
                 ipad: 'https://apps.apple.com/us/app/stockedhome/id1234567890', // TODO: Get real apple app ID
                 iphone: 'https://apps.apple.com/us/app/stockedhome/id1234567890', // TODO: Get real apple app ID
             },
@@ -84,7 +81,7 @@ export const metadata: Metadata = {
         type: 'website',
         url: resolveMetaUrl('/'),
         description: 'Stockedhome is a web app for managing your home inventory.',
-        siteName: 'Stockedhome (Web App)',
+        siteName: 'Stockedhome',
         determiner: "",
         images: [
             { // only one image or Discord freaks out and puts the image at the bottom of the embed
@@ -98,7 +95,7 @@ export const metadata: Metadata = {
     icons: {
         icon: [
             {
-                url: resolveMetaUrl('assets/logo.1024.png'),
+                url: resolveMetaUrl('assets/logo-transparent.1024.png'),
                 sizes: '1024x1024',
                 type: 'image/png',
                 fetchPriority: 'high',
@@ -205,13 +202,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {sheet && <style dangerouslySetInnerHTML={{ __html: sheet.textContent }} id={sheet.id} />}
         </head>
         <body>
-            <ProvidersBeforeConfig>
-                <ConfigProvider primaryConfig={await configPromise}>
-                    <ProvidersAfterConfig>
-                        {children}
-                    </ProvidersAfterConfig>
-                </ConfigProvider>
-            </ProvidersBeforeConfig>
+            {children}
         </body>
     </html>
 }

@@ -13,6 +13,6 @@ trustLocalNetwork: true
 # That way, you don't have to worry about the hassle that might cause.
 singleHousehold: true
 
-canonicalRoot: https://localhost:443/web
+canonicalRoot: https://localhost:443/
 
 trustProxy: false

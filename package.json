@@ -12,9 +12,11 @@
     "schema": "src/schema.prisma"
   },
   "scripts": {
-    "dev-expo": "cd src/platforms/expo && pnpm run start",
+    "dev-expo:android": "cd src/platforms/expo && pnpm run android",
+    "dev-expo:ios": "cd src/platforms/expo && pnpm run ios",
     "dev-next": "next dev src/platforms/next",
     "codegen": "pnpm exec prisma generate && tsx codegen/index.mjs",
+    "prepare": "pnpm run codegen",
     "prebuild-next": "pnpm run codegen",
     "build-next": "next build src/platforms/next",
     "prebuild-build-expo-NEEDS-PLATFORM": "pnpm run codegen",
@@ -48,7 +50,7 @@
     "@types/nearley": "^2.11.5",
     "checkeasy": "^1.1.0",
     "deep-email-validator": "^0.1.21",
-    "expo": "~51.0.21",
+    "expo": "~51.0.22",
     "expo-auth-session": "^5.5.2",
     "expo-module-scripts": "*",
     "flowtype-loader": "^0.2.2",

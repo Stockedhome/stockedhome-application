@@ -26,14 +26,14 @@ export default function ChooseConfig() {
         return () => nav.removeListener('beforeRemove', beforeRemoveListener);
     }, [nav]);
 
-    const [primaryConfigLocation, setPrimaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/web')
+    const [primaryConfigLocation, setPrimaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/')
     const storedPrimaryConfig = React.useRef<Config | null>(null)
     const primaryConfigInputRef = React.useRef<RNTextInput>(null)
     const primaryConfigAsyncValidator = React.useCallback((value: string) => configUrlAsyncValidator(storedPrimaryConfig, value), [storedPrimaryConfig])
     const [isPrimaryConfigValid, setIsPrimaryConfigValid] = React.useState(false)
 
     // NOTE: This will be removed once we have households and such but, you know what? get over it
-    const [supplementaryConfigLocation, setSupplementaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/web')
+    const [supplementaryConfigLocation, setSupplementaryConfigLocation] = React.useState(process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? 'https://stockedhome.app/')
     const supplementaryConfigInputRef = React.useRef<RNTextInput>(null)
     const storedSupplementaryConfig = React.useRef<Config | null>(null)
     const supplementaryConfigAsyncValidator = React.useCallback((value: string) => configUrlAsyncValidator(storedSupplementaryConfig, value), [storedSupplementaryConfig])

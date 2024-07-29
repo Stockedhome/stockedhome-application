@@ -5,7 +5,7 @@ import {metadata as layoutMetadata } from './layout';
 export const metadata = {
     ...layoutMetadata,
     title: {
-        absolute: 'Stockedhome',
+        absolute: 'Home | Stockedhome Web App',
     },
 }
 

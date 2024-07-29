@@ -12,7 +12,7 @@ import getConfig from 'next/config'
 const trpc = createTRPCClient<APIRouter>({
     links: [
         httpBatchLink({
-            url: `http://localhost:${process.env.PORT ?? 3000}/web/api/`,
+            url: `http://localhost:${process.env.PORT ?? 3000}/api/`,
         }),
     ],
 });

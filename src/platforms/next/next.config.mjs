@@ -73,8 +73,8 @@ const nextConfig = withExpo(withFonts(
         //    '@react-native/assets-registry': 'react-native-web/dist/exports/AssetsRegistry',
         //},
 
-        basePath: "/web",
-        assetPrefix: "/web/",
+        basePath: "",
+        assetPrefix: "/",
     }
 ));
 

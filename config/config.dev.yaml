@@ -6,7 +6,7 @@
 # This should NOT be used as a security measure.
 # If your application is only accessible from your home network, do not forward ports to the application.
 # The best attack surface is no attack surface.
-canonicalRoot: https://self.bellcube.dev/web
+canonicalRoot: https://self.bellcube.dev/
 
 # Configuration for the server started with a NODE_ENV of anything other than "production"
 # The configs are separated for ease of development. The default config shouldn't be nearly so open.

@@ -40,44 +40,8 @@
 			"label": "Dev Server - Expo",
 			"detail": "Runs `pnpm edv-expo`",
 			"type": "shell",
-			"command": "pnpm",
-			"args": ["run", "dev-expo"],
-			"group": {
-				"kind": "build",
-			},
-			"presentation": {
-				"echo": true,
-				"reveal": "always",
-				"focus": false,
-				"panel": "dedicated",
-				"showReuseMessage": true,
-				"clear": true
-			},
-			"icon": {
-				"id": "server-environment",
-				"color": "terminal.ansiCyan",
-			},
-			"isBackground": true,
-			"problemMatcher": [
-				{ // Mark as done when Expo is started up
-					"background": {
-						"activeOnStart": true,
-						"beginsPattern": "^bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb---this-is-not-real-regex---bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-						"endsPattern": "^› Metro waiting on .*?$",
-					},
-					"pattern": {
-						"regexp": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb---this-is-not-real-regex---bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-					},
-				}
-
-			],
-		},
-		{
-			"label": "Dev Server - Expo (Clear Cache)",
-			"detail": "Runs `pnpm edv-expo`",
-			"type": "shell",
-			"command": "pnpm",
-			"args": ["run", "dev-expo", "--clear"],
+			"command": "./.vscode/androidOrIOS.ps1",
+			"args": ["pnpm run dev-expo"],
 			"group": {
 				"kind": "build",
 			},

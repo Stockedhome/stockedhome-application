@@ -1,4 +1,4 @@
-import { Passkey } from '../platforms/expo/modules/expo-webauthn'
+import { Passkey } from 'react-native-passkey'
 import type { TRPCClient } from '../interface/provider/tRPC-provider';
 import type { AuthenticatorTransportFuture, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server/script/deps';
 

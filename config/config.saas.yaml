@@ -6,7 +6,7 @@
 # This should NOT be used as a security measure.
 # If your application is only accessible from your home network, do not forward ports to the application.
 # The best attack surface is no attack surface.
-canonicalRoot: https://stockedhome.app/web
+canonicalRoot: https://stockedhome.app/
 
 
 
