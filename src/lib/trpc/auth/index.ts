@@ -9,6 +9,7 @@ import {
     generateAuthenticationOptions,
     type GenerateAuthenticationOptionsOpts,
     verifyAuthenticationResponse,
+    type VerifyAuthenticationResponseOpts,
   } from '@simplewebauthn/server';
 
 import type { ConfigSchemaBaseWithComputations } from "../../config/schema-base";
@@ -243,7 +244,7 @@ export const authRouter = createRouter({
                         id: input.response.id,
                         clientTransports: input.response.response.transports,
                         userId,
-                        publicKey: Buffer.from(base64.toArrayBuffer(input.response.response.publicKey)),
+                        publicKey: Buffer.from(verification.registrationInfo!.credentialPublicKey),
                         authorizedByKeyId: dbData.signedWithKeyId,
                         sessionCounter: verification.registrationInfo?.counter,
                     },
@@ -567,7 +568,7 @@ export const authRouter = createRouter({
                     authenticator: {
                         counter: keyData.sessionCounter || 0,
                         credentialID: keyData.id,
-                        credentialPublicKey: keyData.publicKey,
+                        credentialPublicKey: Uint8Array.from(keyData.publicKey),
                         transports: keyData.clientTransports as AuthenticatorTransportFuture[],
                     },
                 });
@@ -577,7 +578,7 @@ export const authRouter = createRouter({
                 const expiration = new Date(Math.min(Date.now() + 1000 * 60 * 60 * 32, sessionData.finalExpiration.getTime())); // 32 hours from now or the finalExpiration date--whichever is sooner
 
                 await db.authSession.update({
-                    where: { id: response.id },
+                    where: { id: authSessionId },
                     data: {
                         signedWithKeyId: keyData.id,
                         pruneAt: expiration,
