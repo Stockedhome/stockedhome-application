@@ -67,14 +67,22 @@ model NewKeypairRequest {
     signedWithKeyId  String?
 }
 
-/// NOTE: When unsigned, the session is cleared after 30 minutes. When signed, the session is cleared 32 hours after last use.
+/// NOTE: When unsigned, the session is cleared after 15 minutes. When signed, the session is cleared 32 hours after last use.
 model AuthSession {
     id               String      @id @default(cuid())
 
     createdAt        DateTime    @default(now())
     updatedAt        DateTime    @updatedAt
 
+    /// The time at which the session will be pruned
+    ///
+    /// When the session is unsigned, this is 15 minutes after creation.
+    /// When the session is signed, this is 32 hours after the last authentication with the session.
     pruneAt          DateTime
+    /// The time when this session will expire. This value will not change after session creation.
+    ///
+    /// This value will be 2 weeks after the session is initially signed.
+    finalExpiration  DateTime
 
     user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           BigInt

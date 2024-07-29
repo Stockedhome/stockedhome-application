@@ -1,4 +1,4 @@
-import { startRegistration } from '@simplewebauthn/browser';
+import { startAuthentication, startRegistration } from '@simplewebauthn/browser';
 import type { TRPCClient } from '../interface/provider/tRPC-provider';
 
 export async function createNewWebAuthnCredential({
@@ -34,4 +34,23 @@ export async function createNewWebAuthnCredential({
     if (!registeredKey.success) {
         throw new Error(registeredKey.error); // TODO: functional problem-solving, not errors!
     }
+}
+
+export async function authenticateWithWebAuthn({
+    trpcUtils,
+    username,
+    submitAuthenticationMutation,
+}: {
+    trpcUtils: ReturnType<TRPCClient['useUtils']>,
+    clientGeneratedRandom: string,
+    username: string,
+    submitAuthenticationMutation: ReturnType<TRPCClient['auth']['submitAuthentication']['useMutation']>,
+}) {
+    const {authSessionId, options} = await trpcUtils.auth.getAuthenticationParameters.fetch({
+        username,
+    });
+
+    const authResponse = await startAuthentication(options);
+
+
 }
