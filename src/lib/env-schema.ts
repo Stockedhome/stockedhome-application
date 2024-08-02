@@ -1,10 +1,5 @@
 import z from "zod";
-
-export enum HostingConfiguration {
-    Development = 'dev',
-    Local = 'local',
-    SoftwareAsAService = 'saas',
-}
+import { HostingConfiguration } from "./miscEnums/HostingConfiguration";
 
 // TODO: Add this all to the docs
 // TODO: Integrate this validator into instrumentation.ts
@@ -105,4 +100,4 @@ type EnvWithComputedPropsAndProcessEnv<T extends EnvBase> = T & ComputedEnvProps
 
 export type Env = EnvWithComputedPropsAndProcessEnv<EnvBase>;
 
-export const env = (process.env.IN_CODEGEN === 'true' ? process.env : envSchema.parse(process.env)) as Env & typeof process.env;
+export const env = ('IN_CODEGEN' in process.env && process.env.IN_CODEGEN === 'true' ? process.env : envSchema.parse(process.env)) as Env & typeof process.env;

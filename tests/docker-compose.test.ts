@@ -4,7 +4,7 @@ import { Octokit } from 'octokit';
 import path from 'path';
 import { beforeAll, describe, test, expect, beforeEach } from 'vitest';
 import yaml from 'js-yaml';
-import type { DockerCompose } from './docker-compose';
+import type { DockerCompose } from './docker-compose-schema';
 
 // https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml
 
@@ -53,7 +53,7 @@ if (await fs.access('tests/cache/docker-compose/.supabase-release-id.txt', fs.co
 }
 
 if (downloadDockerCompose) {
-    let latestReleaseTagPromise: Promise<unknown> = Promise.resolve();
+    let latestReleaseTagPromise: Promise<string> = Promise.resolve(latestReleaseTag);
     if (latestReleaseTag === '________[  ]_____  NOT  BASE64  ____[  ]___________') {
         latestReleaseTagPromise = octokit.rest.repos.getLatestRelease({
             owner: 'supabase',
@@ -67,7 +67,7 @@ if (downloadDockerCompose) {
         owner: 'supabase',
         repo: 'supabase',
         path: 'docker/docker-compose.yml',
-        ref: latestReleaseTag,
+        ref: await latestReleaseTagPromise,
     });
 
     if (Array.isArray(supabaseDockerComposeRes)) throw new Error('Expected Supabase\'s docker-compose.yaml to be a file! What did you do?!!')

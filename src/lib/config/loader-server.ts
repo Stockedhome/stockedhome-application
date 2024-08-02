@@ -4,24 +4,8 @@ import path from 'path';
 import type { Config } from './schema';
 import type { ComputedConfigProps } from './schema-base';
 import { apiRouter } from '../trpc/primaryRouter';
-import { HostingConfiguration } from '../env-schema';
-
-export function getHostingConfiguration(): HostingConfiguration {
-    if (!process.env.HOSTING_CONFIGURATION) {
-        throw new Error('No hosting configuration (process.env.HOSTING_CONFIGURATION) found. [https://docs.stockedhome.app/hosting/configuration/environment-variables/props/HOSTING_CONFIGURATION]');
-    }
-
-    switch (process.env.HOSTING_CONFIGURATION) {
-        case 'dev':
-            return HostingConfiguration.Development;
-        case 'local':
-            return HostingConfiguration.Local;
-        case 'saas':
-            return HostingConfiguration.SoftwareAsAService;
-        default:
-            throw new Error(`Unknown hosting configuration (process.env.HOSTING_CONFIGURATION, currently "${process.env.HOSTING_CONFIGURATION}")! [https://docs.stockedhome.app/hosting/configuration/environment-variables/props/HOSTING_CONFIGURATION]`);
-    }
-}
+import { env } from '../env-schema';
+import { HostingConfiguration } from '../miscEnums/HostingConfiguration';
 
 declare global {
     var ___config___: Config;
@@ -34,9 +18,8 @@ export async function loadConfigServer(): Promise<Config> {
         return globalThis.___config___;
     }
 
-    const thisHostingConfig = getHostingConfiguration();
-    const configDir = path.resolve(process.env.CONFIG_DIR || './config');
-    let configPath = path.join(configDir, `config.${thisHostingConfig}.yaml`);
+    const configDir = path.resolve(env.CONFIG_DIR || './config');
+    let configPath = path.join(configDir, `config.${env.HOSTING_CONFIGURATION}.yaml`);
 
     try {
         console.log('Checking config directory...')
@@ -79,7 +62,7 @@ export async function loadConfigServer(): Promise<Config> {
         console.log('Validating config file...')
         const { configSchema } = await import('./schema');
         validatedConfig = Object.assign(configSchema.parse(configYamlParsed), {
-            devMode: thisHostingConfig === HostingConfiguration.Development,
+            devMode: env.HOSTING_CONFIGURATION === HostingConfiguration.Development,
         } satisfies ComputedConfigProps);
     } catch (e) {
         console.log(e);
