@@ -1,4 +1,4 @@
-import { Passkey } from 'react-native-passkey';
+import { Passkey } from 'react-native-passkeys';
 
 export function isDeviceSupported(): boolean {
     return false;

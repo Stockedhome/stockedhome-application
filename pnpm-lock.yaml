@@ -207,9 +207,9 @@ importers:
       '@trpc/server':
         specifier: '*'
         version: 10.45.2
-      react-native-passkey:
-        specifier: ^2.1.1
-        version: 2.1.1(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)
+      react-native-passkeys:
+        specifier: ^0.2.2
+        version: 0.2.2(expo@51.0.22(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7)))(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)
       zod:
         specifier: '*'
         version: 3.23.8
@@ -307,6 +307,9 @@ importers:
       interface:
         specifier: link:../../interface
         version: link:../../interface
+      json-loader:
+        specifier: ^0.5.7
+        version: 0.5.7
       lib:
         specifier: link:../../lib
         version: link:../../lib
@@ -4893,6 +4896,9 @@ packages:
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
 
+  json-loader@0.5.7:
+    resolution: {integrity: sha512-QLPs8Dj7lnf3e3QYS1zkCo+4ZwqOiF9d/nZnYozTISxXWCfNs9yuky5rJw4/W34s7POaNlbZmQGaB5NiXCbP4w==}
+
   json-parse-better-errors@1.0.2:
     resolution: {integrity: sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==}
 
@@ -5952,9 +5958,10 @@ packages:
     peerDependencies:
       react: ^16.6.0 || ^17.0.0 || ^18.0.0
 
-  react-native-passkey@2.1.1:
-    resolution: {integrity: sha512-/SBlL+8aJOiAAyO4jmRhJAxo1LklMpjQijLyl1jZlt9bKtRnh4Uz94z7AYouBR2anTB+DaEycLIhunG7h8Xbwg==}
+  react-native-passkeys@0.2.2:
+    resolution: {integrity: sha512-NBfEZfDlg6ulqxqOM0TLbcUm+9WdbF/yPQz1HdJAaT4GR4Ku/6Mr+9qhGpkduqxKPTmSlU2+owI85FdpgRC5pA==}
     peerDependencies:
+      expo: '*'
       react: '*'
       react-native: '*'
 
@@ -13548,6 +13555,8 @@ snapshots:
 
   json-buffer@3.0.1: {}
 
+  json-loader@0.5.7: {}
+
   json-parse-better-errors@1.0.2: {}
 
   json-parse-even-better-errors@2.3.1: {}
@@ -14832,8 +14841,9 @@ snapshots:
       react-fast-compare: 3.2.2
       shallowequal: 1.1.0
 
-  react-native-passkey@2.1.1(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1):
+  react-native-passkeys@0.2.2(expo@51.0.22(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7)))(react-native@0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1):
     dependencies:
+      expo: 51.0.22(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))
       react: 18.3.1
       react-native: 0.74.3(@babel/core@7.24.7)(@babel/preset-env@7.24.7(@babel/core@7.24.7))(@types/react@18.3.3)(react@18.3.1)
 

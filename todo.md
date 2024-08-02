@@ -53,6 +53,7 @@
     * Rating
     * Allergies & Dietary Restrictions (default to household's restrictions)
       * Allow users to save restriction presets
+* https://docs.expo.dev/guides/deep-linking/
 
 
 ## Before Release

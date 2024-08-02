@@ -4,6 +4,3 @@
 [submodule "src/platforms/next/public/assets"]
 	path = src/platforms/next/public/assets
 	url = https://github.com/Stockedhome/stockedhome-assets.git
-[submodule "src/forks/react-native-passkey"]
-	path = src/forks/react-native-passkey
-	url = https://github.com/Stockedhome/fork-react-native-passkey

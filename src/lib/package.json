@@ -13,7 +13,7 @@
     "@trpc/react-query": "*",
     "@trpc/server": "*",
     "zod": "*",
-    "react-native-passkey": "^2.1.1"
+    "react-native-passkeys": "^0.2.2"
   },
   "sideEffects": false
 }

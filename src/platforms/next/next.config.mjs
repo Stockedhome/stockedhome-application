@@ -15,6 +15,7 @@ if (!fs.existsSync(path.join(nextRoot, './.env'))) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withExpo(withFonts(
+    /** @type {import('next').NextConfig} */
     {
         //       // ~~reanimated (and thus, Moti) doesn't work with strict mode currently...~~
         // fixed // ~~https://github.com/nandorojo/moti/issues/224~~
@@ -41,18 +42,10 @@ const nextConfig = withExpo(withFonts(
 //            },
         },
 
-//        webpack(config, options) {
-//            config.resolve.alias = {
-//                ...(config.resolve.alias || {}),
-//                '@react-native/assets-registry': '../../forks/assets-registry-web'
-//            }
-//
-//            config.plugins.push(
-//                new webpack.NormalModuleReplacementPlugin(/@react-native\/assets-registry/, '../../forks/assets-registry-web')
-//            )
-//
-//            return config;
-//        },
+    /** @param {import('webpack').Configuration} config */
+       webpack(config, options) {
+            return config;
+       },
 
         transpilePackages: [
             "react-native",
