@@ -3,10 +3,9 @@
 import { View, P, SafeAreaView } from 'dripsy'
 import React from 'react'
 import { Button } from 'react-native'
-import { createNewWebAuthnCredential } from 'lib/webauthn';
+import { createNewWebAuthnCredential, authenticateWithWebAuthn } from 'lib/webauthn';
 import { useTRPC } from '../../provider/tRPC-provider';
 import { useRouter } from 'solito/app/navigation';
-import { authenticateWithWebAuthn } from 'lib/webauthn.web';
 
 export function SignUpTestNewPasskeyScreen({
     username,

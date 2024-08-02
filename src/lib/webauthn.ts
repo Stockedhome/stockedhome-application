@@ -1,17 +1,140 @@
-import { Passkey } from 'react-native-passkey'
+import { create, get } from 'react-native-passkeys'
 import type { TRPCClient } from '../interface/provider/tRPC-provider';
-import type { AuthenticatorTransportFuture, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server/script/deps';
-
-import { bufferToBase64URLString } from '@simplewebauthn/browser';
+import type {  PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server/script/deps';
+import type { PublicKeyCredentialDescriptorJSON, RegistrationCredential,AuthenticationCredential, AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/types';
 import { base64URLStringToBuffer } from '@simplewebauthn/browser';
-import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
-import { WebAuthnAbortService } from '@simplewebauthn/browser';
-import type { PublicKeyCredentialDescriptorJSON, RegistrationCredential } from '@simplewebauthn/types';
+// TODO: Follow platform-specific stuff in https://github.com/f-23/react-native-passkeys/blob/stable/README.md
 
-// TODO: Follow platform-specific stuff in https://github.com/f-23/react-native-passkey/blob/stable/README.md
-
-// Code forked from
+//
+// Code forked from SimpleWebAuthn's browser package
+// Specifically, these two files and any helper functions they depend on:
 // https://github.com/MasterKale/SimpleWebAuthn/blob/a169def3c663cb671cdc6bc6e00a4993944a61ae/packages/browser/src/methods/startRegistration.ts
+// https://github.com/MasterKale/SimpleWebAuthn/blob/master/packages/browser/src/methods/startAuthentication.ts
+//
+// For a more clean view of the logic, check out webauthn.web.ts instead
+//
+
+/**
+ * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.get()`
+ */
+export function identifyAuthenticationError({
+    error,
+    options,
+}: {
+    error: Error;
+    options: CredentialRequestOptions;
+}): WebAuthnError | Error {
+    const { publicKey } = options;
+
+    if (!publicKey) {
+        throw Error('options was missing required publicKey property');
+    }
+
+    if (error.name === 'AbortError') {
+        if (options.signal instanceof AbortSignal) {
+            // https://www.w3.org/TR/webauthn-2/#sctn-createCredential (Step 16)
+            return new WebAuthnError({
+                message: 'Authentication ceremony was sent an abort signal',
+                code: 'ERROR_CEREMONY_ABORTED',
+                cause: error,
+            });
+        }
+    } else if (error.name === 'NotAllowedError') {
+        /**
+         * Pass the error directly through. Platforms are overloading this error beyond what the spec
+         * defines and we don't want to overwrite potentially useful error messages.
+         */
+        return new WebAuthnError({
+            message: error.message,
+            code: 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY',
+            cause: error,
+        });
+    } else if (error.message === 'NoCredentials') {
+        // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 7)
+        return new WebAuthnError({
+            message: 'No credentials were available for this user',
+            code: 'ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY',
+            cause: error,
+        });
+    } else if (error.name === 'SecurityError') {
+        const effectiveDomain = window.location.hostname;
+        if (!isValidDomain(effectiveDomain)) {
+            // https://www.w3.org/TR/webauthn-2/#sctn-discover-from-external-source (Step 5)
+            return new WebAuthnError({
+                message: `${window.location.hostname} is an invalid domain`,
+                code: 'ERROR_INVALID_DOMAIN',
+                cause: error,
+            });
+        } else if (publicKey.rpId !== effectiveDomain) {
+            // https://www.w3.org/TR/webauthn-2/#sctn-discover-from-external-source (Step 6)
+            return new WebAuthnError({
+                message: `The RP ID "${publicKey.rpId}" is invalid for this domain`,
+                code: 'ERROR_INVALID_RP_ID',
+                cause: error,
+            });
+        }
+    } else if (error.name === 'UnknownError') {
+        // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 1)
+        // https://www.w3.org/TR/webauthn-2/#sctn-op-get-assertion (Step 12)
+        return new WebAuthnError({
+            message:
+                'The authenticator was unable to process the specified options, or could not create a new assertion signature',
+            code: 'ERROR_AUTHENTICATOR_GENERAL_ERROR',
+            cause: error,
+        });
+    }
+
+    return error;
+}
+
+/**
+ * Begin authenticator "login" via WebAuthn assertion
+ *
+ * @param optionsJSON Output from **@simplewebauthn/server**'s `generateAuthenticationOptions()`
+ * @param useBrowserAutofill (Optional) Initialize conditional UI to enable logging in via browser autofill prompts. Defaults to `false`.
+ */
+export async function startAuthentication(
+    optionsJSON: PublicKeyCredentialRequestOptionsJSON,
+    useBrowserAutofill = false,
+): Promise<AuthenticationResponseJSON> {
+    // We need to convert some values to Uint8Arrays before passing the credentials to the navigator
+    const publicKey: Parameters<typeof get>[0] = {
+        ...optionsJSON,
+        extensions: optionsJSON.extensions as Record<string, unknown> | undefined,
+    };
+
+    // Prepare options for `.get()`
+    const options: CredentialRequestOptions = { publicKey: publicKey as any };
+
+    /**
+     * Set up the page to prompt the user to select a credential for authentication via the browser's
+     * input autofill mechanism.
+     */
+    if (useBrowserAutofill) {
+        throw Error('Mobile does not support WebAuthn autofill');
+    }
+
+    // Wait for the user to complete assertion
+    let credential;
+    try {
+        credential = await get(publicKey);
+    } catch (err) {
+        console.error('[startAuthentication] error:', err)
+        throw identifyAuthenticationError({ error: err as Error, options });
+    }
+
+    if (!credential) {
+        throw new Error('Authentication was not completed');
+    }
+
+    return {
+        ...credential,
+        clientExtensionResults: credential.clientExtensionResults as AuthenticationExtensionsClientOutputs,
+        authenticatorAttachment: toAuthenticatorAttachment(
+            credential.authenticatorAttachment ?? null,
+        ),
+    };
+}
 
 export function toPublicKeyCredentialDescriptor(
     descriptor: PublicKeyCredentialDescriptorJSON,
@@ -47,8 +170,8 @@ export function isValidDomain(hostname: string): boolean {
 }
 
 import { WebAuthnError } from '@simplewebauthn/browser';
-import type { PasskeyRegistrationRequest } from 'react-native-passkey';
-import { NativeModules } from 'react-native';
+import { any } from 'zod';
+type PasskeyRegistrationRequest = Parameters<typeof create>[0];
 
 /**
  * Attempt to intuit _why_ an error was raised after calling `navigator.credentials.create()`
@@ -195,46 +318,9 @@ async function startRegistration(
     };
 
     // Wait for the user to complete attestation
-    let credential;
+    let credential: Awaited<ReturnType<typeof create>>;
     try {
-        const options___ = {
-            "challenge": "WjVPNUdpM2tGMlN1SlIvTHRnd0dzckR5NG1TdktjWTNlVjFNWnVVdEJ0UT0",
-            "rp": {
-                "name": "Stockedhome",
-                "id": "self.bellcube.dev"
-            },
-            "user": {
-                "id": "MTY&&&&&&&&&&&",
-                "name": "ggggghhuuuyed",
-                "displayName": "ggggghhuuuyed"
-            },
-            "pubKeyCredParams": [
-                {
-                    "alg": -8,
-                    "type": "public-key"
-                },
-                {
-                    "alg": -7,
-                    "type": "public-key"
-                },
-                {
-                    "alg": -257,
-                    "type": "public-key"
-                }
-            ],
-            "timeout": 60000,
-            "attestation": "none",
-            "excludeCredentials": [],
-            "authenticatorSelection": {
-                "userVerification": "discouraged"
-            },
-            "extensions": {
-                "credProps": true
-            }
-        }
-        console.log('[startRegistration] options:', options___)
-
-        credential = (await Passkey.register(options___)) as unknown as RegistrationCredential;
+        credential = await create(options);
     } catch (err) {
         throw identifyRegistrationError({ error: err as Error, options });
     }
@@ -243,73 +329,11 @@ async function startRegistration(
         throw new Error('Registration was not completed');
     }
 
-    const { id, rawId, response, type } = credential;
-
-    console.log('[startRegistration] credential:', credential)
-
-    // Continue to play it safe with `getTransports()` for now, even when L3 types say it's required
-    let transports: AuthenticatorTransportFuture[] | undefined = undefined;
-    if (typeof response.getTransports === 'function') {
-        transports = response.getTransports();
-    }
-
-    console.log('[startRegistration] transports:', transports)
-
-    // L3 says this is required, but browser and webview support are still not guaranteed.
-    let responsePublicKeyAlgorithm: number | undefined = undefined;
-    if (typeof response.getPublicKeyAlgorithm === 'function') {
-        try {
-            responsePublicKeyAlgorithm = response.getPublicKeyAlgorithm();
-        } catch (error) {
-            warnOnBrokenImplementation('getPublicKeyAlgorithm()', error as Error);
-        }
-    }
-
-    console.log('[startRegistration] responsePublicKeyAlgorithm:', responsePublicKeyAlgorithm)
-
-    let responsePublicKey: string | undefined = undefined;
-    if (typeof response.getPublicKey === 'function') {
-        try {
-            const _publicKey = response.getPublicKey();
-            if (_publicKey !== null) {
-                responsePublicKey = bufferToBase64URLString(_publicKey);
-            }
-        } catch (error) {
-            warnOnBrokenImplementation('getPublicKey()', error as Error);
-        }
-    }
-
-    console.log('[startRegistration] responsePublicKey:', responsePublicKey)
-
-    // L3 says this is required, but browser and webview support are still not guaranteed.
-    let responseAuthenticatorData: string | undefined;
-    if (typeof response.getAuthenticatorData === 'function') {
-        try {
-            responseAuthenticatorData = bufferToBase64URLString(
-                response.getAuthenticatorData(),
-            );
-        } catch (error) {
-            warnOnBrokenImplementation('getAuthenticatorData()', error as Error);
-        }
-    }
-
-    console.log('[startRegistration] responseAuthenticatorData:', responseAuthenticatorData)
-
     return {
-        id,
-        rawId: bufferToBase64URLString(rawId),
-        response: {
-            attestationObject: bufferToBase64URLString(response.attestationObject),
-            clientDataJSON: bufferToBase64URLString(response.clientDataJSON),
-            transports,
-            publicKeyAlgorithm: responsePublicKeyAlgorithm,
-            publicKey: responsePublicKey,
-            authenticatorData: responseAuthenticatorData,
-        },
-        type,
-        clientExtensionResults: credential.getClientExtensionResults(),
+        ...credential,
+        clientExtensionResults: credential.clientExtensionResults as AuthenticationExtensionsClientOutputs,
         authenticatorAttachment: toAuthenticatorAttachment(
-            credential.authenticatorAttachment,
+            credential.authenticatorAttachment ?? null,
         ),
     };
 }
@@ -376,5 +400,30 @@ export async function createNewWebAuthnCredential({
 
     if (!registeredKey.success) {
         throw new Error(registeredKey.error); // TODO: functional problem-solving, not errors!
+    }
+}
+
+export async function authenticateWithWebAuthn({
+    trpcUtils,
+    username,
+    submitAuthenticationMutation,
+}: {
+    trpcUtils: ReturnType<TRPCClient['useUtils']>,
+    username: string,
+    submitAuthenticationMutation: ReturnType<TRPCClient['auth']['submitAuthentication']['useMutation']>,
+}): Promise<void> { // TODO: Actually handle errors in WebAuthn authentication!
+    const {authSessionId, options} = await trpcUtils.auth.getAuthenticationParameters.fetch({
+        username,
+    });
+
+    const authResponse = await startAuthentication(options);
+
+    const submittedAuthentication = await submitAuthenticationMutation.mutateAsync({
+        authSessionId,
+        authResponse: authResponse,
+    });
+
+    if (!submittedAuthentication.success) {
+        throw new Error(submittedAuthentication.error); // TODO: functional problem-solving, not errors!
     }
 }

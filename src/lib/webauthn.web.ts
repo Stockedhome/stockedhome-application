@@ -53,7 +53,7 @@ export async function authenticateWithWebAuthn({
 
     const submittedAuthentication = await submitAuthenticationMutation.mutateAsync({
         authSessionId,
-        response: authResponse,
+        authResponse: authResponse,
     });
 
     if (!submittedAuthentication.success) {

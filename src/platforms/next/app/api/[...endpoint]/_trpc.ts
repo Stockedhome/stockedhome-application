@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server';
 import { NextRequest } from 'next/server';
 import type { ConfigSchemaBaseWithComputations } from 'lib/config/schema-base';
 
-interface TRPCGlobalContext {
+export interface TRPCGlobalContext {
     req: NextRequest,
     config: ConfigSchemaBaseWithComputations,
 }
@@ -12,7 +12,6 @@ function generateTRPCInstance(): ReturnType<ReturnType<typeof initTRPC.context<T
     return initTRPC.context<TRPCGlobalContext>().create({
         experimental: {
             iterablesAndDeferreds: true,
-
         },
     });
 }

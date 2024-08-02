@@ -23,10 +23,12 @@ import { PasswordInvalidityReason } from "./checks/passwords/client";
 import { getServerSideReasonForInvalidEmail } from "./checks/emails/server";
 import { getServerSideReasonForInvalidUsername } from "./checks/usernames/server";
 import { UsernameInvalidityReason } from "./checks/usernames/client";
-import base64_ from '@hexagon/base64';
 import { hashPassword } from "./password";
 import { cookies } from "next/headers";
+import base64_ from '@hexagon/base64';
+import { SessionValidationFailureReason, authResponseValidator, authenticateUser, getExpectedOrigin } from "../../auth";
 const base64 = base64_.base64;
+
 
 function getIp(req: NextRequest, config: ConfigSchemaBaseWithComputations) {
     if (req.ip) return req.ip;
@@ -54,7 +56,7 @@ function getDeviceIdentifier(req: NextRequest, clientGeneratedRandom: string): D
 }
 
 // If an attacker has physical access to your device, them accessing your grocery list is the least of your concerns
-const userVerification = 'discouraged' as const satisfies UserVerificationRequirement
+export const userVerification = 'discouraged' as const satisfies UserVerificationRequirement
 
 function generateGenerateAuthenticationOptionsInput({ config, publicKeys, challenge }: {
     config: ConfigSchemaBaseWithComputations,
@@ -231,7 +233,7 @@ export const authRouter = createRouter({
                 const verification = await verifyRegistrationResponse({
                     response: input.response,
                     expectedChallenge: dbData.challenge!,
-                    expectedOrigin: ctx.config.canonicalRoot.origin,
+                    expectedOrigin: getExpectedOrigin(ctx, input.response.response.clientDataJSON),
                     expectedRPID: ctx.config.canonicalRoot.hostname,
                     expectedType: ['webauthn.create', 'public-key'],
                     requireUserVerification: true,
@@ -488,38 +490,7 @@ export const authRouter = createRouter({
     submitAuthentication: publicProcedure
         .input(z.object({
             authSessionId: z.string(),
-            response: z.object({
-                //id: Base64URLString;
-                id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                //rawId: Base64URLString;
-                rawId: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                //response: AuthenticatorAssertionResponseJSON;
-                response: z.object({
-                    //clientDataJSON: Base64URLString;
-                    clientDataJSON: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                    //authenticatorData: Base64URLString;
-                    authenticatorData: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                    //signature: Base64URLString;
-                    signature: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                    //userHandle?: Base64URLString;
-                    userHandle: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }).optional(),
-                }),
-                //authenticatorAttachment?: AuthenticatorAttachment;
-                authenticatorAttachment: z.enum(['platform', 'cross-platform']).optional(),
-                //clientExtensionResults: AuthenticationExtensionsClientOutputs;
-                clientExtensionResults: z.object({
-                    //appid?: boolean;
-                    appid: z.boolean().optional(),
-                    //credProps?: CredentialPropertiesOutput;
-                    credProps: z.object({
-                        //rk?: boolean;
-                        rk: z.boolean().optional(),
-                    }).optional(),
-                    //hmacCreateSecret?: boolean;
-                    hmacCreateSecret: z.boolean().optional(),
-                }),
-                type: z.enum(['public-key']),
-            }),
+            authResponse: authResponseValidator,
         }))
         .output(z.union([
             z.object({
@@ -528,92 +499,22 @@ export const authRouter = createRouter({
             }),
             z.object({
                 success: z.literal(false),
-                error: z.string(),
+                error: z.enum(Object.values(SessionValidationFailureReason)),
             }),
         ]))
-        .mutation(async ({ctx, input: {response, authSessionId}}) => {
-            try {
-                const sessionData = await db.authSession.findUnique({
-                    where: { id: authSessionId, signedWithKeyId: null },
-                    select: {
-                        userId: true,
-                        challenge: true,
-                        pruneAt: true,
-                        finalExpiration: true,
-                    }
-                });
+        .mutation(async ({ctx, input}) => {
+            const result = await authenticateUser(ctx, input);
 
-                if (!sessionData) throw new Error('No pending auth session exists by this ID. Perhaps it was already signed or created more than 15 minutes ago? Please try again.');
-
-                const keyData = await db.authPublicKey.findUnique({
-                    where: { id_userId: { id: response.rawId, userId: sessionData.userId } },
-                    select: {
-                        userId: true,
-                        sessionCounter: true,
-                        id: true,
-                        publicKey: true,
-                        clientTransports: true,
-                    }
-                });
-
-                if (!keyData) throw new Error('No public key exists by this ID for this user. Please try again.');
-
-                const verification = await verifyAuthenticationResponse({
-                    response: response,
-                    expectedChallenge: sessionData.challenge!,
-                    expectedOrigin: ctx.config.canonicalRoot.origin,
-                    expectedRPID: ctx.config.canonicalRoot.hostname,
-                    expectedType: ['webauthn.get', 'public-key'],
-                    requireUserVerification: (userVerification as UserVerificationRequirement) === 'required',
-                    authenticator: {
-                        counter: keyData.sessionCounter || 0,
-                        credentialID: keyData.id,
-                        credentialPublicKey: Uint8Array.from(keyData.publicKey),
-                        transports: keyData.clientTransports as AuthenticatorTransportFuture[],
-                    },
-                });
-
-                if (!verification.verified) throw new Error('Authentication failed! Please try again.');
-
-                const expiration = new Date(Math.min(Date.now() + 1000 * 60 * 60 * 32, sessionData.finalExpiration.getTime())); // 32 hours from now or the finalExpiration date--whichever is sooner
-
-                await db.authSession.update({
-                    where: { id: authSessionId },
-                    data: {
-                        signedWithKeyId: keyData.id,
-                        pruneAt: expiration,
-                        updatePruneAtAt: new Date(Date.now() + 1000 * 60 * 60 * 8), // in 8 hours
-                    },
-                });
-
-                cookies().set({
-                    name: 'stockedhome-session-token',
-                    value: JSON.stringify({ authSessionId, response }),
-                    domain: ctx.config.canonicalRoot.hostname,
-                    expires: expiration,
-                    httpOnly: true,
-                    partitioned: true,
-                    sameSite: 'strict',
-                    secure: true,
-                });
-
+            if (!result) {
                 return {
                     success: true,
                     error: undefined,
                 }
-            } catch (e) {
-                console.error(e);
-                if (!e) throw e;
-                if (typeof e === 'string') return {
+            } else {
+                return {
                     success: false,
-                    error: e,
+                    error: result,
                 };
-                if (typeof e !== 'object') throw e;
-                if ('message' in e && typeof e.message === 'string') return {
-                    success: false,
-                    error: e.message,
-                };
-                throw e;
             }
         }),
 })

@@ -18,7 +18,7 @@ export function HomeScreen() {
         <View sx={{ height: 32 }} />
 
         <Row>
-            <TextLink href="/signup" textProps={{style: sx({ color: 'primary', fontWeight: 'bold' })}}>
+            <TextLink href="/web/signup" textProps={{style: sx({ color: 'primary', fontWeight: 'bold' })}}>
                 Sign Up for Stockedhome
             </TextLink>
             <View sx={{ width: 32 }} />
