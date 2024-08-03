@@ -26,7 +26,7 @@ import { UsernameInvalidityReason } from "./checks/usernames/client";
 import { hashPassword } from "./password";
 import { cookies } from "next/headers";
 import base64_ from '@hexagon/base64';
-import { SessionValidationFailureReason, authResponseValidator, authenticateUser, getExpectedOrigin } from "../../auth";
+import { STOCKEDHOME_COOKIE_NAME, SessionValidationFailureReason, authResponseValidator, authenticateUser, getExpectedOrigin, getSessionTokenFromRequest } from "../../auth";
 const base64 = base64_.base64;
 
 
@@ -486,7 +486,6 @@ export const authRouter = createRouter({
         }),
 
 
-    // TODO: Abstract the authentication verification stuff
     submitAuthentication: publicProcedure
         .input(z.object({
             authSessionId: z.string(),
@@ -520,5 +519,21 @@ export const authRouter = createRouter({
                     expiresAt: expirationOrError,
                 }
             }
+        }),
+
+    signOut: publicProcedure
+        .output(z.literal(true))
+        .mutation(async ({ctx, input}) => {
+            const sessionOrError = getSessionTokenFromRequest()
+            if (typeof sessionOrError === 'string') return true as const;
+
+            cookies().delete(STOCKEDHOME_COOKIE_NAME);
+
+            await db.authSession.delete({
+                where: { id: sessionOrError.authSessionId },
+                select: { id: true },
+            });
+
+            return true as const;
         }),
 })

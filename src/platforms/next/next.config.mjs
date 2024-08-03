@@ -65,9 +65,6 @@ const nextConfig = withExpo(withFonts(
         //resolveAlias: {
         //    '@react-native/assets-registry': 'react-native-web/dist/exports/AssetsRegistry',
         //},
-
-        basePath: "",
-        assetPrefix: "/",
     }
 ));
 

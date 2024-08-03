@@ -1,11 +1,22 @@
 import { SafeAreaView, ScrollView, View } from "dripsy";
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 export function TopLevelScreenView({ children, scrollable }: React.PropsWithChildren<{ scrollable?: boolean }>) {
+    //  // ref
+    //const bottomSheetRef = useRef<BottomSheet>(null);
+    //
+    //// callbacks
+    //const handleSheetChanges = useCallback((index: number) => {
+    //    console.log('handleSheetChanges', index);
+    //}, []);
+
     return <View sx={{ backgroundColor: 'background', justifyContent: 'center', alignItems: 'center', width: '100%', height: 'auto' }}>
         <SafeAreaView sx={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', paddingTop: 32 }}>
-            <OptionallyScrollable scrollable={scrollable}>
-                {children}
-            </OptionallyScrollable>
+            <BottomSheetModalProvider>
+                <OptionallyScrollable scrollable={scrollable}>
+                    {children}
+                </OptionallyScrollable>
+            </BottomSheetModalProvider>
         </SafeAreaView>
     </View>
 }

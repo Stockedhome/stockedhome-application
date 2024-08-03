@@ -11,6 +11,8 @@ import type { AuthSessionResult } from "expo-auth-session";
 import type { Prisma } from "@prisma/client";
 const base64 = base64_.base64;
 
+export const STOCKEDHOME_COOKIE_NAME = 'stockedhome-session-token';
+
 export const authResponseValidator = z.object({
     //id: Base64URLString;
     id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
@@ -68,7 +70,7 @@ export enum SessionValidationFailureReason {
 }
 
 export function getSessionTokenFromRequest(): SessionToken | SessionValidationFailureReason {
-    const sessionTokenRaw = cookies().get('stockedhome-session-token');
+    const sessionTokenRaw = cookies().get(STOCKEDHOME_COOKIE_NAME);
     if (!sessionTokenRaw) return SessionValidationFailureReason.NoSessionCookie;
 
     let sessionTokenJson: any;
@@ -79,7 +81,10 @@ export function getSessionTokenFromRequest(): SessionToken | SessionValidationFa
     }
 
     const validated = sessionTokenValidator.safeParse(sessionTokenJson);
-    if (!validated.success) return SessionValidationFailureReason.CookieNotSchemaCompliant;
+    if (!validated.success) {
+        console.log(validated.error.errors, sessionTokenJson);
+        return SessionValidationFailureReason.CookieNotSchemaCompliant;
+    }
 
     return validated.data;
 }
@@ -187,8 +192,8 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
         }
 
         cookies().set({
-            name: 'stockedhome-session-token',
-            value: JSON.stringify({ authSessionId, response: authResponse }),
+            name: STOCKEDHOME_COOKIE_NAME,
+            value: JSON.stringify({ authSessionId, authResponse }),
             domain: ctx.config.canonicalRoot.hostname,
             expires: expiration,
             httpOnly: true,

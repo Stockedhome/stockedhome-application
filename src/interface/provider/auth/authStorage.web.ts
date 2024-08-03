@@ -1,17 +1,11 @@
 'use client'
 
 import React from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Note about web: Because localStorage is accessible synchronously, isLoading is always false; we return it as a constant false.
 
 export function useUsername() {
-    const [username, setUsername] = React.useState<string | undefined>(undefined);
-
-    React.useEffect(()=>{
-        if (username) return;
-        const newUsername = window.localStorage.getItem("last_username")
-        if (!newUsername) return;
-        setUsername(username)
-    }, []); // no deps because we only want this to run first. We still check `username` first though so we don't overwrite something in some weird case.
+    const [username, setUsername] = React.useState<string | undefined>(window.localStorage.getItem("last_username") ?? undefined);
 
     React.useEffect(()=>{
         if (username) {
@@ -21,18 +15,17 @@ export function useUsername() {
         }
     }, [username])
 
-    return [username, setUsername] as const;
+    return [username, setUsername, false] as const;
 }
 
 export function useAuthExpiration() {
-    const [expiresAt, setExpiresAt] = React.useState<Date | undefined>(undefined);
+    const localStorageExpiresAt = React.useMemo(()=> {
+        const str = window.localStorage.getItem("auth_expires_at")
+        if (!str) return undefined;
+        return new Date(str)
+    }, []);
 
-    React.useEffect(()=>{
-        if (expiresAt) return;
-        const newExpiresAt = window.localStorage.getItem("auth_expires_at")
-        if (!newExpiresAt) return;
-        setExpiresAt(new Date(newExpiresAt))
-    }, []); // no deps because we only want this to run first. We still check `expiresAt` first though so we don't overwrite something in some weird case.
+    const [expiresAt, setExpiresAt] = React.useState<Date | undefined>(localStorageExpiresAt);
 
     React.useEffect(()=>{
         if (expiresAt) {
@@ -42,5 +35,5 @@ export function useAuthExpiration() {
         }
     }, [expiresAt])
 
-    return [expiresAt, setExpiresAt] as const;
+    return [expiresAt, setExpiresAt, false] as const;
 }

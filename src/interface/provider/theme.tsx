@@ -72,8 +72,9 @@ const theme = makeTheme({
     colors: {
         gray: "hsl(210, 50%, 60%)",
 
+        accentDark: '#1c62a4',
         accent: '#097eed',
-        primary: '#3a8fe0',
+        primary: '#3d9cf6',
         highlight: '#5db0ff',
 
         background: '#222222',
@@ -167,7 +168,7 @@ const theme = makeTheme({
             marginBottom: 12,
         },
         a: {
-            color: 'primary',
+            color: 'accent',
         },
     },
     forms: {
@@ -181,6 +182,35 @@ const theme = makeTheme({
             borderColor: 'gray',
             color: 'text',
             height: 40,
+        },
+    },
+    buttons: {
+        default: {
+            backgroundColor: 'accentDark',
+            borderColor: 'accent',
+            color: '#fff',
+
+            //'&:hover': {
+            //    backgroundColor: 'highlight', // TODO: Find a way to actually do this
+            //},
+
+            fontWeight: 'heading',
+
+            borderRadius: 4,
+            borderWidth: 2,
+
+            paddingTop: 4,
+            paddingBottom: 4,
+            paddingLeft: 10,
+            paddingRight: 10,
+
+
+            marginBottom: 10,
+            marginLeft: 10,
+            marginRight: 10,
+
+            cursor: 'pointer',
+
         },
     },
     "styles": {

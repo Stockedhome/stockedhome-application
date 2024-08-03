@@ -20,9 +20,11 @@ export function isTRPCClientError(
 interface AuthenticationData {
     refetchUser(signal: AbortSignal): Promise<void>;
     requestNewAuth(customUsername?: string): Promise<void>;
+    logOut(): void;
     expiresAt: Date | undefined;
     user: APIRouter['authenticated']['users']['me']['_def']['$types']['output'] | undefined,
     username: string | undefined;
+    loading: boolean;
 }
 
 const authContext = React.createContext<AuthenticationData>(new Proxy({}, {
@@ -40,18 +42,26 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
     const trpcUtils = trpc?.useUtils()
     const router = useRouter();
     const submitAuthenticationMutation = trpc?.auth.submitAuthentication.useMutation()
+    const signOutMutation = trpc?.auth.signOut.useMutation()
 
-    const [username, setUsername] = useUsername() // fetches the previous username for us, if it exists
-    const [expiresAt, setExpiresAt] = useAuthExpiration()
+    const [username, setUsername_, isLoadingUsername] = useUsername() // fetches the previous username for us, if it exists
+    const [expiresAt, setExpiresAt, isLoadingExpiration] = useAuthExpiration()
     const [hasFetchedForThisUser, setHasFetchedForThisUser] = React.useState(false)
 
+    const setUsername = React.useCallback((newUsername: string | undefined) => {
+        setUsername_(newUsername)
+        setHasFetchedForThisUser(false)
+    }, [setUsername_])
 
     const [user, setUser] = React.useState<AuthenticationData['user']>(undefined)
+
+    const [isTryingToAuthenticate, setIsTryingToAuthenticate] = React.useState(true)
 
     const [refetchUserQueued, setRefetchUserQueued] = React.useState(false)
     const refetchUser = React.useCallback(async (signal?: AbortSignal) => {
         if (!trpcUtils) return setRefetchUserQueued(true)
 
+        setIsTryingToAuthenticate(true)
         try {
             const user = await trpcUtils.authenticated.users.me.fetch(undefined, { signal })
             if (signal?.aborted) return;
@@ -66,11 +76,13 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
             } else {
                 throw e
             }
+        } finally {
+            setIsTryingToAuthenticate(false)
         }
     }, [trpcUtils]);
 
     React.useEffect(() => {
-        if (!username || hasFetchedForThisUser) return;
+        if (!username || hasFetchedForThisUser) return setIsTryingToAuthenticate(false)
 
         const controller = new AbortController();
         refetchUser(controller.signal).then(() => {
@@ -82,32 +94,61 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
 
     const requestNewAuth = React.useCallback(async (customUsername?: string) => {
         if (!trpcUtils || !submitAuthenticationMutation) {
-            return console.warn('Cannot request new auth without trpc!')
+            return console.warn('Cannot request new auth without trpc!');
         }
 
         const usernameToUse = customUsername ?? username;
         if (!usernameToUse) {
-            return router.push('/web/login')
+            return router.push('/web/login');
         }
 
-        const expiration = await authenticateWithWebAuthn({
-            username: usernameToUse,
-            submitAuthenticationMutation,
-            trpcUtils,
-        })
+        setIsTryingToAuthenticate(true);
 
-        setUsername(usernameToUse)
-        setExpiresAt(expiration)
+        try {
+            const expiration = await authenticateWithWebAuthn({
+                username: usernameToUse,
+                submitAuthenticationMutation,
+                trpcUtils,
+            });
+
+            setUsername_(usernameToUse);
+            setHasFetchedForThisUser(true);
+            setExpiresAt(expiration);
+            setUser(undefined);
+            await refetchUser();
+        } finally {
+            setIsTryingToAuthenticate(false);
+        }
     }, [username, submitAuthenticationMutation, trpcUtils]);
 
+    React.useEffect(() => {
+        if (expiresAt && expiresAt.getTime() < new Date().getTime() - 60_000) {
+            requestNewAuth().catch(console.error);
+        }
+    });
+
+    const logOut = React.useCallback(() => {
+        setUsername(undefined);
+        setExpiresAt(undefined);
+        setUser(undefined);
+        setHasFetchedForThisUser(false);
+        signOutMutation?.mutateAsync();
+    }, [setUsername, setExpiresAt, setUser, setHasFetchedForThisUser, signOutMutation]);
+
+    const loading = isLoadingUsername || isLoadingExpiration || isTryingToAuthenticate
     const value = React.useMemo(() => ({
         refetchUser,
         requestNewAuth,
         expiresAt,
         user,
         username,
-    }), [refetchUser, requestNewAuth, user, username, expiresAt]);
+        loading,
+        logOut,
+    }), [refetchUser, requestNewAuth, user, username, expiresAt, loading, logOut]);
 
+    React.useEffect(() => {
+        if (user) console.log(`Authenticated as ${user.username}`)
+    }, [user])
 
     return <authContext.Provider value={value}>{children}</authContext.Provider>;
 }

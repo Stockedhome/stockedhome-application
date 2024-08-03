@@ -137,7 +137,7 @@ export function SignUpNewAccountScreen({
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ color: 'red', mb: 16 }}>{error}</P>
-            <Button title="Try Again" onPress={()=>setError(null)} />
+            <Button onPress={()=>setError(null)}>Try Again</Button>
         </View>
     }
 
@@ -287,7 +287,7 @@ export function SignUpNewAccountScreen({
         </Form>
 
         <View sx={{ height: 16 }} />
-        <Button title="Sign Up" onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid} />
+        <Button onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid}>Sign Up</Button>
 
     </View>
 }
