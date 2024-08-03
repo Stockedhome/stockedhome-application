@@ -1,15 +1,17 @@
 import { initTRPC } from '@trpc/server';
 import { NextRequest } from 'next/server';
 import type { ConfigSchemaBaseWithComputations } from 'lib/config/schema-base';
+import superjson from 'superjson';
 
 export interface TRPCGlobalContext {
     req: NextRequest,
     config: ConfigSchemaBaseWithComputations,
 }
 
-function generateTRPCInstance(): ReturnType<ReturnType<typeof initTRPC.context<TRPCGlobalContext>>['create']> {
+function generateTRPCInstance() {
     console.log('Generating TRPC instance')
     return initTRPC.context<TRPCGlobalContext>().create({
+        transformer: superjson,
         experimental: {
             iterablesAndDeferreds: true,
         },

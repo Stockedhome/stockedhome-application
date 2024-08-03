@@ -1,17 +1,17 @@
-//import { publicProcedure } from "../_trpc";
-//import { TRPCError } from '@trpc/server';
-//
-//export const authedProcedure = publicProcedure.use(async function isAuthed(opts) {
-//    const authToken =
-//
-//    if (!ctx.user) {
-//        throw new TRPCError({ code: 'UNAUTHORIZED' });
-//    }
-//
-//    return opts.next({
-//        ctx: {
-//            // ✅ user value is known to be non-null now
-//            user: ctx.user,
-//        },
-//    });
-//});
+import { authenticateUser } from "../../auth";
+import { publicProcedure } from "../_trpc";
+import { TRPCError } from '@trpc/server';
+
+export const authedProcedure = publicProcedure.use(async function isAuthed(opts) {
+    const sessionOrError = await authenticateUser(opts.ctx, undefined, true);
+
+    if (typeof sessionOrError === 'string') {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: sessionOrError });
+    }
+
+    return opts.next({
+        ctx: {
+            authSession: sessionOrError,
+        },
+    });
+});

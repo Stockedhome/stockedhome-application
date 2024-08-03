@@ -2,10 +2,13 @@ import { loadConfigServer } from '../config/loader-server';
 import type { ConfigSchemaBaseWithComputations } from '../config/schema-base';
 import { createRouter, publicProcedure } from './_trpc';
 import { authRouter } from './auth';
+import { authenticatedRouter } from './authenticated';
+import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 
 export type APIRouter = typeof apiRouter;
 export const apiRouter = createRouter({
     auth: authRouter,
+    authenticated: authenticatedRouter,
     config: publicProcedure.query(async () => {
         return await (loadConfigServer as ()=>Promise<ConfigSchemaBaseWithComputations>)();
     }),

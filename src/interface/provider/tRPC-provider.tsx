@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { BuiltRouter, RouterRecord } from '@trpc/server/unstable-core-do-not-import';
 import { createTRPCReact } from '@trpc/react-query';
 import type { Config } from 'lib/config/schema';
+import superjson from 'superjson';
 
 export type TRPCClient = Omit<typeof trpc, 'Provider' | 'useContext' | ''>;
 
@@ -32,7 +33,10 @@ function createTRPCClient(primaryConfig: Config, supplementaryConfig: Config | n
     if (!supplementaryConfig || primaryConfig.canonicalRoot === supplementaryConfig.canonicalRoot) {
         return trpc.createClient({
             links: [
-                httpBatchLink({ url: `${primaryConfig.canonicalRoot}/api/` }),
+                httpBatchLink({
+                    url: `${primaryConfig.canonicalRoot}/api/`,
+                    transformer: superjson
+                }),
             ],
         });
 

@@ -7,6 +7,8 @@ import type { TRPCGlobalContext } from "./trpc/_trpc";
 import { z } from "zod";
 import base64_ from '@hexagon/base64';
 import type { NextRequest } from "next/server";
+import type { AuthSessionResult } from "expo-auth-session";
+import type { Prisma } from "@prisma/client";
 const base64 = base64_.base64;
 
 export const authResponseValidator = z.object({
@@ -94,21 +96,25 @@ export function getExpectedOrigin(ctx: TRPCGlobalContext, clientDataJsonRAW: str
     return ctx.config.canonicalRoot.origin;
 }
 
-export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest()): Promise<SessionValidationFailureReason | undefined> {
+const authSessionSelect = {
+    userId: true,
+    challenge: true,
+    pruneAt: true,
+    finalExpiration: true,
+    updatePruneAtAt: true,
+    signedWithKeyId: true,
+} as const satisfies Prisma.AuthSessionSelect
+
+export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | undefined, getUser: true): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}>>
+export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken?: SessionToken | undefined, getUser?: false): Promise<SessionValidationFailureReason | undefined>
+export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest(), getSession?: boolean): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}> | undefined> {
     try {
         if (typeof sessionToken === 'string') return sessionToken;
         const {authResponse, authSessionId} = sessionToken;
 
-        const sessionData = await db.authSession.findUnique({
+        let sessionData = await db.authSession.findUnique({
             where: { id: authSessionId },
-            select: {
-                userId: true,
-                challenge: true,
-                pruneAt: true,
-                finalExpiration: true,
-                updatePruneAtAt: true,
-                signedWithKeyId: true,
-            }
+            select: authSessionSelect
         }).catch(e => {
             console.error(e);
             return SessionValidationFailureReason.DatabaseError;
@@ -160,20 +166,20 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
         if (!verification.verified) return SessionValidationFailureReason.InvalidAuthResponse;
 
         if (sessionData.updatePruneAtAt && sessionData.updatePruneAtAt.getTime() < Date.now()) {
-            return undefined;
+            return getSession ? sessionData : undefined
         }
 
         const expiration = new Date(Math.min(Date.now() + 1000 * 60 * 60 * 32, sessionData.finalExpiration.getTime())); // 32 hours from now or the finalExpiration date--whichever is sooner
 
         try {
-            await db.authSession.update({
+            sessionData = await db.authSession.update({
                 where: { id: authSessionId },
                 data: {
                     signedWithKeyId: keyData.id,
                     pruneAt: expiration,
                     updatePruneAtAt: new Date(Date.now() + 1000 * 60 * 60 * 8), // in 8 hours
                 },
-                select: { id: true }
+                select: authSessionSelect
             });
         } catch (e) {
             console.error(e);
@@ -191,7 +197,7 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
             secure: true,
         });
 
-        return undefined;
+        return getSession ? sessionData : undefined;
     } catch (e) {
         console.error(e);
         return SessionValidationFailureReason.UnknownError;
