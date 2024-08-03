@@ -12,7 +12,7 @@ import superjson from 'superjson';
 
 export type TRPCClient = Omit<typeof trpc, 'Provider' | 'useContext' | ''>;
 
-const trpcContext = React.createContext<TRPCClient>(new Proxy({} as any, {
+const trpcContext = React.createContext<TRPCClient | null>(new Proxy({} as any, {
     get(target, prop) {
         throw new Error(`TRPCProvider not mounted. Tried to access ${String(prop)}`);
     }
@@ -35,7 +35,7 @@ function createTRPCClient(primaryConfig: Config, supplementaryConfig: Config | n
             links: [
                 httpBatchLink({
                     url: `${primaryConfig.canonicalRoot}/api/`,
-                    transformer: superjson
+                    transformer: superjson,
                 }),
             ],
         });
@@ -45,8 +45,8 @@ function createTRPCClient(primaryConfig: Config, supplementaryConfig: Config | n
             links: [
                 (runtime) => {
                     const servers = {
-                        primary: httpBatchLink({ url: new URL('api', primaryConfig.canonicalRoot) })(runtime),
-                        supplementary: httpBatchLink({ url: new URL('api', supplementaryConfig.canonicalRoot) })(runtime),
+                        primary: httpBatchLink({ url: new URL('api', primaryConfig.canonicalRoot), transformer: superjson })(runtime),
+                        supplementary: httpBatchLink({ url: new URL('api', supplementaryConfig.canonicalRoot), transformer: superjson })(runtime),
                     } as const;
 
                     return (ctx) => {
@@ -99,7 +99,9 @@ export function TRPCProvider({ children }: React.PropsWithChildren) {
     const config = useConfig();
     const client = React.useMemo(() => config.primary && createTRPCClient(config.primary, config.supplementary), [config.primary?.canonicalRoot.href, config.supplementary?.canonicalRoot.href]);
 
-    if (!client) return <>{children}</>;
+    if (!client) return <trpcContext.Provider value={null}>
+        {children}
+    </trpcContext.Provider>;
 
     return <trpcContext.Provider value={trpc}>
         <trpc.Provider client={client} queryClient={queryClient}>

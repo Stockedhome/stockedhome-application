@@ -7,12 +7,13 @@ import { notFound } from 'next/navigation';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { APIRouter } from 'lib/trpc/primaryRouter';
 
-import getConfig from 'next/config'
+import superjson from 'superjson';
 
 const trpc = createTRPCClient<APIRouter>({
     links: [
         httpBatchLink({
             url: `http://localhost:${process.env.PORT ?? 3000}/api/`,
+            transformer: superjson,
         }),
     ],
 });
@@ -48,17 +49,18 @@ export async function middleware(request: NextRequest) {
 
     const serviceConfig = await serviceConfigPromise;
 
-    if (!request.nextUrl.href.startsWith(serviceConfig.canonicalRoot)) {
-        const path = `${request.nextUrl.pathname}${request.nextUrl.search}${request.nextUrl.hash}`.slice(1)
-        const canonicalRoot = serviceConfig.canonicalRoot
-        const newUrl = new URL(path, canonicalRoot);
+    if (!request.nextUrl.href.startsWith(serviceConfig.canonicalRoot.href)) {
+        let path = `${request.nextUrl.pathname}${request.nextUrl.search}${request.nextUrl.hash}`.slice(1)
+        const newUrl = new URL(path, serviceConfig.canonicalRoot);
         console.log({
-            originalUrl: request.nextUrl,
+            originalUrl: request.nextUrl.href,
+            canonicalRoot: serviceConfig.canonicalRoot.href,
             path,
-            canonicalRoot,
             newUrl: newUrl.href
         })
-        return NextResponse.redirect(newUrl);
+        if (newUrl.href !== request.nextUrl.href) {
+            return NextResponse.redirect(newUrl);
+        }
     }
 
     if(request.nextUrl.pathname.startsWith('/debug')) {

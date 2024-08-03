@@ -1,4 +1,5 @@
 // import { ConfigProvider } from './config';
+import { AuthenticationProvider } from './auth/authentication';
 import { ConfigProvider } from './config-provider';
 import { ThemeProvider } from './theme'
 import { TRPCProvider } from './tRPC-provider';
@@ -10,7 +11,7 @@ export function ProvidersBeforeConfig({ children }: { children: React.ReactNode}
 }
 
 export function ProvidersAfterConfig({ children }: { children: React.ReactNode }) {
-    return <TRPCProvider>
+    return <TRPCProvider><AuthenticationProvider>
         {children}
-    </TRPCProvider>
+    </AuthenticationProvider></TRPCProvider>
 }

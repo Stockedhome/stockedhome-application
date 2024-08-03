@@ -24,7 +24,7 @@ export const configSchemaBase = z.object({
      * If your application is only accessible from your home network, do not forward ports to the application.
      * The best attack surface is no attack surface.
     */
-    canonicalRoot: z.string().refine(value => URL.canParse(value), {message: "Invalid URL"}).transform(value => new URL(value)).describe(`
+    canonicalRoot: z.union([z.instanceof(URL), z.string().refine(value => URL.canParse(value), {message: "Invalid URL"}).transform(value => new URL(value))]).describe(`
 The root URI of the application. This is used to generate URLs for the application.
 Any requests made to the server from a non-root URI will be redirected to the root.
 

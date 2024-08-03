@@ -495,26 +495,30 @@ export const authRouter = createRouter({
         .output(z.union([
             z.object({
                 success: z.literal(true),
+                expiresAt: z.date(),
                 error: z.undefined(),
             }),
             z.object({
                 success: z.literal(false),
+                expiresAt: z.undefined(),
                 error: z.enum(Object.values(SessionValidationFailureReason)),
             }),
         ]))
         .mutation(async ({ctx, input}) => {
-            const result = await authenticateUser(ctx, input);
+            const expirationOrError = await authenticateUser(ctx, input);
 
-            if (!result) {
+            if (typeof expirationOrError === 'string') {
+                return {
+                    success: false,
+                    error: expirationOrError,
+                    expiresAt: undefined,
+                };
+            } else {
                 return {
                     success: true,
                     error: undefined,
+                    expiresAt: expirationOrError,
                 }
-            } else {
-                return {
-                    success: false,
-                    error: result,
-                };
             }
         }),
 })

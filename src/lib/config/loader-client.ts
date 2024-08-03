@@ -1,5 +1,6 @@
 import type { Config } from "./schema";
 import { configSchemaBaseWithComputations } from "./schema-base";
+import superjson from 'superjson';
 
 
 export enum ConfigInvalidityReason {
@@ -77,7 +78,7 @@ export async function loadConfigClient(baseUrl: string): Promise<ConfigInvalidit
         return ConfigInvalidityReason.NoConfigReturned
     }
 
-    const config = configResData.result.data
+    const config = superjson.deserialize(configResData.result.data)
 
     const validationResult = configSchemaBaseWithComputations.safeParse(config)
     if (!validationResult.success) {

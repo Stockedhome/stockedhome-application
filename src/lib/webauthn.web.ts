@@ -1,5 +1,6 @@
 import { startAuthentication, startRegistration } from '@simplewebauthn/browser';
 import type { TRPCClient } from '../interface/provider/tRPC-provider';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/typescript-types';
 
 export async function createNewWebAuthnCredential({
     trpcUtils,
@@ -44,12 +45,12 @@ export async function authenticateWithWebAuthn({
     trpcUtils: ReturnType<TRPCClient['useUtils']>,
     username: string,
     submitAuthenticationMutation: ReturnType<TRPCClient['auth']['submitAuthentication']['useMutation']>,
-}): Promise<void> { // TODO: Actually handle errors in WebAuthn authentication!
+}): Promise<Date> { // TODO: Actually handle errors in WebAuthn authentication!
     const {authSessionId, options} = await trpcUtils.auth.getAuthenticationParameters.fetch({
         username,
     });
 
-    const authResponse = await startAuthentication(options);
+    const authResponse = await startAuthentication(options as PublicKeyCredentialRequestOptionsJSON);
 
     const submittedAuthentication = await submitAuthenticationMutation.mutateAsync({
         authSessionId,
@@ -59,4 +60,6 @@ export async function authenticateWithWebAuthn({
     if (!submittedAuthentication.success) {
         throw new Error(submittedAuthentication.error); // TODO: functional problem-solving, not errors!
     }
+
+    return submittedAuthentication.expiresAt;
 }

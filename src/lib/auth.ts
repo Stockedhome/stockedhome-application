@@ -106,8 +106,8 @@ const authSessionSelect = {
 } as const satisfies Prisma.AuthSessionSelect
 
 export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | undefined, getUser: true): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}>>
-export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken?: SessionToken | undefined, getUser?: false): Promise<SessionValidationFailureReason | undefined>
-export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest(), getSession?: boolean): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}> | undefined> {
+export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken?: SessionToken | undefined, getUser?: false): Promise<SessionValidationFailureReason | Date>
+export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest(), getSession?: boolean): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}> | Date> {
     try {
         if (typeof sessionToken === 'string') return sessionToken;
         const {authResponse, authSessionId} = sessionToken;
@@ -166,7 +166,7 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
         if (!verification.verified) return SessionValidationFailureReason.InvalidAuthResponse;
 
         if (sessionData.updatePruneAtAt && sessionData.updatePruneAtAt.getTime() < Date.now()) {
-            return getSession ? sessionData : undefined
+            return getSession ? sessionData : sessionData.pruneAt;
         }
 
         const expiration = new Date(Math.min(Date.now() + 1000 * 60 * 60 * 32, sessionData.finalExpiration.getTime())); // 32 hours from now or the finalExpiration date--whichever is sooner
@@ -197,7 +197,7 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
             secure: true,
         });
 
-        return getSession ? sessionData : undefined;
+        return getSession ? sessionData : expiration;
     } catch (e) {
         console.error(e);
         return SessionValidationFailureReason.UnknownError;

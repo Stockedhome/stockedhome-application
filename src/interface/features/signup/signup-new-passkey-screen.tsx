@@ -25,6 +25,7 @@ export function SignUpNewPasskeyScreen({
     const [error, setError] = React.useState<string | null>(null)
 
     const trpc = useTRPC()
+    if (!trpc) throw new Error('No TRPC provider found; this page should not be accessible without one.')
     const trpcUtils = trpc.useUtils()
     const registerKeyMutation = trpc.auth.registerKey.useMutation()
 

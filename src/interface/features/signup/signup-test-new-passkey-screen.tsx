@@ -6,6 +6,7 @@ import { Button } from 'react-native'
 import { createNewWebAuthnCredential, authenticateWithWebAuthn } from 'lib/webauthn';
 import { useTRPC } from '../../provider/tRPC-provider';
 import { useRouter } from 'solito/app/navigation';
+import { useAuthentication } from '../../provider/auth/authentication';
 
 export function SignUpTestNewPasskeyScreen({
     username,
@@ -16,30 +17,29 @@ export function SignUpTestNewPasskeyScreen({
     const [submitting, setSubmitting] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
-    const trpc = useTRPC()
-    const trpcUtils = trpc.useUtils()
-    const submitAuthenticationMutation = trpc.auth.submitAuthentication.useMutation()
-
     const router = useRouter()
+
+    const auth = useAuthentication()
+
+    if (auth.user?.id) {
+        console.log('User is authenticated; redirecting to get-started!', JSON.stringify(auth.user, null, 4))
+        router.push('/get-started')
+    }
 
     const testPasskey = React.useCallback(() => {
         if (submitting) return
 
         setSubmitting(true)
 
-        authenticateWithWebAuthn({
-            trpcUtils,
-            username,
-            submitAuthenticationMutation,
-        }).then(res => {
-            router.push('/get-started')
-        }).catch((e) => {
+        auth.requestNewAuth(username).catch((e) => {
             console.error(e)
             setError(e.message)
             setSubmitting(false)
+        }).finally(() => {
+            setSubmitting(false)
         })
 
-    }, [submitting])
+    }, [submitting, username])
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

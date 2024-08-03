@@ -415,19 +415,28 @@ export async function authenticateWithWebAuthn({
     trpcUtils: ReturnType<TRPCClient['useUtils']>,
     username: string,
     submitAuthenticationMutation: ReturnType<TRPCClient['auth']['submitAuthentication']['useMutation']>,
-}): Promise<void> { // TODO: Actually handle errors in WebAuthn authentication!
+}): Promise<Date> { // TODO: Actually handle errors in WebAuthn authentication!
+    console.log('Getting options so we can perform WebAuthn authentication for mobile.')
     const {authSessionId, options} = await trpcUtils.auth.getAuthenticationParameters.fetch({
         username,
     });
 
+    console.log('Starting WebAuthn authentication for mobile.')
+
     const authResponse = await startAuthentication(options as PublicKeyCredentialRequestOptionsJSON);
+
+    console.log('WebAuthn authentication completed for mobile. Submitting to server.')
 
     const submittedAuthentication = await submitAuthenticationMutation.mutateAsync({
         authSessionId,
         authResponse: authResponse,
     });
 
+    console.log('WebAuthn authentication submitted to server.')
+
     if (!submittedAuthentication.success) {
         throw new Error(submittedAuthentication.error); // TODO: functional problem-solving, not errors!
     }
+
+    return submittedAuthentication.expiresAt;
 }

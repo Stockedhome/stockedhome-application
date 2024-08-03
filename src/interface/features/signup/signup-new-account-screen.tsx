@@ -82,6 +82,8 @@ export function SignUpNewAccountScreen({
     setSignupStep: (stage: 'new-passkey') => void
 }) {
     const trpc = useTRPC()
+    if (!trpc) throw new Error('No TRPC provider found; this page should not be accessible without one.')
+
     const trpcUtils = trpc.useUtils()
 
     const signUp = trpc.auth.signUp.useMutation()
