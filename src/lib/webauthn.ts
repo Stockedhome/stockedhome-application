@@ -117,7 +117,9 @@ export async function startAuthentication(
     // Wait for the user to complete assertion
     let credential;
     try {
+        console.log('Authenticating with passkey. Options:', publicKey)
         credential = await get(publicKey);
+        console.log('Authenticated with passkey. Credential:', credential)
     } catch (err) {
         console.error('[startAuthentication] error:', err)
         throw identifyAuthenticationError({ error: err as Error, options });
@@ -320,7 +322,9 @@ async function startRegistration(
     // Wait for the user to complete attestation
     let credential: Awaited<ReturnType<typeof create>>;
     try {
+        console.log('Registering passkey. Options:', options)
         credential = await create(options);
+        console.log('Registered passkey. Credential:', credential)
     } catch (err) {
         throw identifyRegistrationError({ error: err as Error, options });
     }
@@ -416,7 +420,7 @@ export async function authenticateWithWebAuthn({
         username,
     });
 
-    const authResponse = await startAuthentication(options);
+    const authResponse = await startAuthentication(options as PublicKeyCredentialRequestOptionsJSON);
 
     const submittedAuthentication = await submitAuthenticationMutation.mutateAsync({
         authSessionId,

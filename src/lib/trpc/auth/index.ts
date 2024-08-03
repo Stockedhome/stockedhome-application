@@ -174,7 +174,7 @@ export const authRouter = createRouter({
                     attestationObject: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
                     /** This is base64!!! */
                     authenticatorData: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }).optional(),
-                    transports: z.array(z.enum(['ble', 'cable', 'hybrid', 'internal', 'nfc', 'smart-card', 'usb'])).optional(),
+                    transports: z.array(z.string()).optional(),
                     publicKeyAlgorithm: z.number().optional(),
                     /** This is base64!!! */
                     publicKey: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
@@ -231,12 +231,12 @@ export const authRouter = createRouter({
                 if (!dbData) throw new Error('Invalid keypair request! This could be because of a bad request, an unsigned keypair request, you didn\'t call auth.getKeyRegistrationParameters first, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
 
                 const verification = await verifyRegistrationResponse({
-                    response: input.response,
+                    response: input.response as typeof input.response & { response: typeof input.response.response & { transports: AuthenticatorTransportFuture[] } },
                     expectedChallenge: dbData.challenge!,
                     expectedOrigin: getExpectedOrigin(ctx, input.response.response.clientDataJSON),
                     expectedRPID: ctx.config.canonicalRoot.hostname,
                     expectedType: ['webauthn.create', 'public-key'],
-                    requireUserVerification: true,
+                    requireUserVerification: userVerification as UserVerificationRequirement === 'required',
                 });
 
                 if (!verification.verified) throw new Error('Verification failed! Please try again. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
@@ -436,7 +436,7 @@ export const authRouter = createRouter({
                 rpId: z.string(),
                 allowCredentials: z.array(z.object({
                     id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                    transports: z.array(z.enum(['ble', 'cable', 'hybrid', 'internal', 'nfc', 'smart-card', 'usb'])).optional(),
+                    transports: z.array(z.string()).optional(),
                     type: z.literal('public-key'),
                 })).optional(),
                 userVerification: z.literal(userVerification),
