@@ -89,7 +89,7 @@ function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, ch
         userDisplayName: user.username,
         userID: Buffer.from(user.id.toString()),
         authenticatorSelection: {
-            //residentKey: 'required', -- this shows a different prompt on mobile and, personally, I prefer the non-resident prompt
+            residentKey: 'preferred', // -- this shows a different prompt on mobile and, personally, I prefer the non-resident prompt
             userVerification,
             //authenticatorAttachment: 'cross-platform', -- nobody told me I could just, like, not define this and it doesn't filter
         },
