@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P, SafeAreaView } from 'dripsy'
+import { View, P, SafeAreaView, Text } from 'dripsy'
 import React from 'react'
 import { Button } from '../../components/Button';
 import { useRouter } from 'solito/app/navigation';
@@ -37,7 +37,7 @@ export function SignUpTestNewPasskeyScreen({
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ color: 'red', mb: 16 }}>{error}</P>
-            <Button onPress={()=>{logIn}}>Try Again</Button>
+            <Button onPress={()=>{logIn}}><Text>Try Again</Text></Button>
         </View>
     }
 
@@ -52,6 +52,6 @@ export function SignUpTestNewPasskeyScreen({
             You're all set up! You can now sign in with your new account!
         </P>
 
-        <Button onPress={logIn}>Get Started</Button>
+        <Button onPress={logIn}><Text>Get Started</Text></Button>
     </View>
 }

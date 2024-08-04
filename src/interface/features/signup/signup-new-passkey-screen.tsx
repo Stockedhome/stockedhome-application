@@ -6,6 +6,7 @@ import { Button } from '../../components/Button';
 import { createNewWebAuthnCredential } from 'lib/webauthn';
 import { useTRPC } from '../../provider/tRPC-provider';
 import { useRouter } from 'solito/app/navigation';
+import { Text } from 'dripsy';
 
 export function SignUpNewPasskeyScreen({
     userId,
@@ -70,11 +71,11 @@ export function SignUpNewPasskeyScreen({
         { error
             ? <View sx={{marginTop: 8}}>
                 <P sx={{ color: 'red', mb: 16 }}>{error}</P>
-                <Button onPress={createPasskey}>Try Again</Button>
+                <Button onPress={createPasskey}><Text>Try Again</Text></Button>
             </View>
             : creatingPasskey
-                ? <Button>Hold tight...</Button>
-                : <Button onPress={createPasskey}>Create Your First Passkey</Button>
+                ? <Button><Text>Hold tight...</Text></Button>
+                : <Button onPress={createPasskey}><Text>Create Your First Passkey</Text></Button>
         }
 
     </View>

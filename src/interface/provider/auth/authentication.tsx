@@ -28,8 +28,8 @@ interface AuthenticationData {
 }
 
 const authContext = React.createContext<AuthenticationData>(new Proxy({}, {
-    get: () => {
-        throw new Error("No authentication context provided");
+    get(target, prop, receiver) {
+        throw new Error(`AuthenticationProvider not mounted; tried to access ${String(prop)}`);
     }
 }) as any);
 

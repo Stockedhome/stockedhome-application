@@ -1,4 +1,4 @@
-import { View, P, H1, H2, TextInput } from 'dripsy';
+import { View, P, H1, H2, TextInput, Text } from 'dripsy';
 import { useNavigation } from 'expo-router';
 import React from 'react';
 import { TextLink } from 'solito/link';
@@ -6,11 +6,11 @@ import { type TextInput as RNTextInput } from 'react-native'
 import { TopLevelScreenView } from 'interface/components/TopLevelScreenView';
 import type { Config } from 'lib/config/schema';
 import { ValidatedInput } from 'interface/components/ValidatedInput';
-import { Button } from 'interface/components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useConfig } from 'interface/provider/config-provider';
 import { useMobileConfigContext } from '../mobile-config';
 import { loadConfigClient, ConfigInvalidityReason, getConfigAPIUrl, stringifyConfigInvalidityReason } from 'lib/config/loader-client';
+import { Button } from 'interface/components/Button';
 
 
 export default function ChooseConfig() {
@@ -116,7 +116,7 @@ export default function ChooseConfig() {
 
         <View sx={{ height: 16 }} />
 
-        <Button title='OK' disabled={!isPrimaryConfigValid || !isSupplementaryConfigValid} onPress={async () => {
+        <Button disabled={!isPrimaryConfigValid || !isSupplementaryConfigValid} onPress={async () => {
             await Promise.all([
                 AsyncStorage.setItem('primaryConfigServerURL_default', primaryConfigLocation),
                 AsyncStorage.setItem('supplementaryConfigLocation_default', supplementaryConfigLocation),
@@ -127,7 +127,7 @@ export default function ChooseConfig() {
 
             nav.removeListener('beforeRemove', beforeRemoveListener)
             nav.goBack();
-        }} />
+        }}><Text>OK</Text></Button>
 
     </View></TopLevelScreenView>
 }

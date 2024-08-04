@@ -78,6 +78,8 @@ const theme = makeTheme({
         highlight: '#5db0ff',
 
         background: '#222222',
+        backgroundDark: '#181818',
+        backgroundVeryDark: '#111111',
 
         text: '#cccccc',
         textBright: '#dddddd',
@@ -188,7 +190,8 @@ const theme = makeTheme({
         default: {
             backgroundColor: 'accentDark',
             borderColor: 'accent',
-            color: '#fff',
+            color: '#ffffff',
+            fontSize: 18,
 
             //'&:hover': {
             //    backgroundColor: 'highlight', // TODO: Find a way to actually do this
