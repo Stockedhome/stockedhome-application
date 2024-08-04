@@ -46,6 +46,7 @@ export function BottomSheetOrModal({ hide, isVisible, children }: { hide(): void
         ref={bottomSheetModalRef}
         enableDynamicSizing
         enablePanDownToClose
+        enableDismissOnClose
         onDismiss={hide}
         backgroundStyle={sx({
             backgroundColor: 'backgroundDark',
@@ -63,12 +64,11 @@ export function BottomSheetOrModal({ hide, isVisible, children }: { hide(): void
             justifyContent: 'center',
             alignItems: 'center',
         })}><SafeAreaView sx={{
+            width: '90%',
+            alignItems: 'center',
             padding: 16,
             paddingTop: 32,
             paddingBottom: 32,
-            width: '90%',
-            justifyContent: 'center',
-            alignItems: 'center',
         }}>
             {children}
         </SafeAreaView></BottomSheetView>

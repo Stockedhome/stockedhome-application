@@ -1,0 +1,42 @@
+dialog {
+    display: block;
+    box-shadow: 0 0 4rem 0 rgba(14, 18, 22, 1);
+}
+
+dialog:not([open]) {
+    pointer-events: none;
+
+    opacity: 0;
+    transform: translateY(10%);
+    transition: opacity 0.2s, transform 0.2s;
+    transition-timing-function: ease-out;
+}
+
+dialog[open] {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.1s, transform 0.13s;
+    transition-timing-function: ease-out;
+}
+
+dialog::backdrop {
+    display: none;
+}
+
+dialog + .backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+    background-color: rgba(0, 0, 0, .4);
+    backdrop-filter: blur(0.1rem);
+    pointer-events: none;
+}
+
+dialog[open] + .backdrop {
+    opacity: 1;
+    transition: opacity 0.15s ease-in;
+}

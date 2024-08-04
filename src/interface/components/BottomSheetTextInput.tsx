@@ -28,7 +28,7 @@ const colorKeys: Record<ColorKeys, true> = {
     placeholderTextColor: true,
 };
 
-export function BottomSheetTextInput({ ...props }) {
+export function BottomSheetTextInput({ ...props }: DripsyTextInputProps) {
     const { theme } = useDripsyTheme();
     Object.keys(colorKeys).forEach((key) => {
         if (props[key] && theme?.colors) {
