@@ -30,33 +30,25 @@ function HomeScreenInternal() {
 
         <View sx={{ height: 8 }} />
 
-        <Row sx={{ justifyContent: 'center', gap: 32 }}>
+        <Row sx={{ justifyContent: 'center', alignItems: 'center', gap: 32 }}>
             {
                 auth.loading ? <P>Loading...</P>
                 : auth.user ? <>
-                    <P>Logged in as <Text sx={{ color: '#aaffaa' }}>{auth.user.username}</Text>.</P>
-                    <Button onPress={auth.logOut}><ButtonText>Log Out</ButtonText></Button>
+                    <P sx={{marginBottom: 0}}>Logged in as <Text sx={{ color: '#aaffaa' }}>{auth.user.username}</Text>.</P>
+                    <Button sx={{marginBottom: 0}} onPress={auth.logOut}><ButtonText>Log Out</ButtonText></Button>
                 </>
                 : <>
                     <TextLink href="/web/signup" textProps={{style: sx({ color: 'primary', fontWeight: 'bold' })}}>
                         Sign Up for Stockedhome
                     </TextLink>
-                    {
-                        Platform.select({
-                            web: <Pressable onPress={showLogInScreen}>
-                                <P sx={{ color: 'primary', fontWeight: 'bold' }}>Log In</P>
-                            </Pressable>,
-                            default: <TextLink href="/web/login" onClick={showLogInScreen} textProps={{onPress: showLogInScreen, style: sx({ color: 'primary', fontWeight: 'bold' })}}>
-                                Log In
-                            </TextLink>,
-                        })
-                    }
-
+                    <Pressable onPress={showLogInScreen}>
+                        <P sx={{ color: 'primary', fontWeight: 'bold' }}>Log In</P>
+                    </Pressable>
                 </>
             }
         </Row>
 
-        <View sx={{ height: 16 }} />
+        <View sx={{ height: 24 }} />
 
         <TextLink href="https://github.com/Stockedhome/stockedhome-application" textProps={{style: sx({ color: 'primary', fontWeight: 'bold' })}}>
             GitHub Repo

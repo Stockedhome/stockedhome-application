@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P } from 'dripsy'
+import { View, P, ActivityIndicator } from 'dripsy'
 import React from 'react'
 import { Button, ButtonText } from '../../components/Button';
 import { useRouter } from 'solito/app/navigation';
@@ -18,17 +18,14 @@ export function SignUpTestNewPasskeyScreen({
 
     const auth = useAuthentication()
 
-    if (auth.user?.id) {
-        console.log('User is authenticated; redirecting to get-started!', auth.user)
-        router.push('/get-started')
-    }
-
     const logIn = React.useCallback(() => {
         if (auth.loading) return
         setError(null);
 
 
-        auth.requestNewAuth(username).catch((e) => {
+        auth.requestNewAuth(username).then(()=> {
+            router.push('/web/getting-started')
+        }).catch((e) => {
             console.error(e)
             setError(e.message)
         })
@@ -36,19 +33,19 @@ export function SignUpTestNewPasskeyScreen({
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <P sx={{ color: 'red', mb: 16 }}>{error}</P>
+            <P sx={{ color: 'red' }}>{error}</P>
             <Button onPress={()=>{logIn}}><ButtonText>Try Again</ButtonText></Button>
         </View>
     }
 
-    if (auth.loading) {
+    if (auth.loading || auth.user) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <P sx={{ mb: 16 }}>Signing up...</P>
+            <P>Signing in...</P> <ActivityIndicator size={48} />
         </View>
     }
 
     return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <P sx={{ textAlign: 'center', mb: 16}}>
+        <P sx={{ textAlign: 'center'}}>
             You're all set up! You can now sign in with your new account!
         </P>
 

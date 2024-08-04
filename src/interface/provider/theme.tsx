@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { DripsyProvider, makeTheme } from 'dripsy';
 import { useFonts } from 'expo-font';
-import { Rubik_500Medium, Rubik_500Medium_Italic, Rubik_600SemiBold, Rubik_600SemiBold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
+import { Rubik_400Regular, Rubik_400Regular_Italic, Rubik_500Medium, Rubik_500Medium_Italic, Rubik_600SemiBold, Rubik_600SemiBold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
 import { Platform, Text as RNText } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -12,6 +12,8 @@ SplashScreen.preventAutoHideAsync();
 export function Fonts({ children }: React.PropsWithChildren<{}>) {
 
     const [loaded, error] = useFonts({
+        Rubik_400Regular,
+        Rubik_400Regular_Italic,
         Rubik_500Medium,
         Rubik_500Medium_Italic,
         Rubik_600SemiBold,
@@ -94,7 +96,7 @@ const theme = makeTheme({
     fonts: {
         heading: "inherit",
         monospace: "Menlo, monospace",
-        root: 'Rubik_500Medium',
+        root: 'rubik',
     },
     borders: {
         default: {
@@ -127,7 +129,7 @@ const theme = makeTheme({
             height: 32,
         },
         default: {
-            
+
         }
     },
     text: {
@@ -150,6 +152,10 @@ const theme = makeTheme({
             fontSize: 16,
             color: 'text',
             marginTop: 0,
+            fontWeight: '400',
+        },
+        thicker: {
+            fontWeight: '500',
         },
         bold: {
             fontWeight: 'bold',
@@ -340,7 +346,8 @@ const theme = makeTheme({
 
     customFonts: {
         rubik: {
-            400: 'Rubik_500Medium',
+            light: 'Rubik_400Regular',
+            400: 'Rubik_400Regular',
             default: 'Rubik_500Medium',
             normal: 'Rubik_500Medium',
             500: 'Rubik_500Medium',
