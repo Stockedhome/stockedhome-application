@@ -2,7 +2,6 @@ import { SafeAreaView, ScrollView, View, css } from "dripsy";
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { LogInScreenProvider } from "../features/login-bottom-sheet";
 import { GestureHandlerRootView } from "./GestureHandlerRootView";
-import type { ViewStyle } from "react-native";
 
 export function TopLevelScreenView({ children, scrollable }: React.PropsWithChildren<{ scrollable?: boolean }>) {
     //  // ref
@@ -13,7 +12,7 @@ export function TopLevelScreenView({ children, scrollable }: React.PropsWithChil
     //    console.log('handleSheetChanges', index);
     //}, []);
 
-    return <GestureHandlerRootView sx={{ backgroundColor: 'background', justifyContent: 'center', alignItems: 'center', width: '100%', height: 'auto', marginLeft: 0, marginBottom: 0, marginRight: 0, marginTop: 0, padding: 0, borderWidth: 0 }}>
+    return <GestureHandlerRootView sx={{ backgroundColor: 'background', justifyContent: 'center', alignItems: 'center', width: '100%', height: 'auto', marginLeft: 0, marginBottom: 0, marginRight: 0, marginTop: 0, padding: 0, borderWidth: 0, cursor: 'auto' }}>
             <BottomSheetModalProvider>
                 <LogInScreenProvider>
                     <SafeAreaView sx={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', paddingTop: 32 }}>

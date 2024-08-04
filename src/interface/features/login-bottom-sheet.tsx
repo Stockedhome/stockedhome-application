@@ -1,14 +1,11 @@
 'use client';
 
-import { View, H1, P, useSx, Text, TextInput, SafeAreaView } from 'dripsy';
-import { TextLink } from 'solito/link';
-import { TopLevelScreenView } from '../components/TopLevelScreenView';
+import { H1, P, useSx, TextInput, Row } from 'dripsy';
 import { useAuthentication } from '../provider/auth/authentication';
-import { Button } from '../components/Button';
-import { BottomSheetView, BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useBottomSheet } from '@gorhom/bottom-sheet';
+import { Button, ButtonText } from '../components/Button';
 import React from 'react';
-import { SafeArea } from '../provider/safe-area';
+import { BottomSheetOrModal } from '../components/BottomSheetOrModal';
+import { BottomSheetTextInput } from '../components/BottomSheetTextInput';
 
 export interface LogInScreenContext {
     showLogInScreen(e?: {preventDefault?(): unknown}): void;
@@ -47,18 +44,13 @@ export function useLogInScreen() {
 
 export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible }: { hideLogInScreen(): void, isLogInScreenVisible: boolean }) {
     const sx = useSx();
-    const auth = useAuthentication();
-
-    const bottomSheetModalRef = React.useRef<BottomSheetModal>(null);
+    const auth = useAuthentication()
 
     const [username, setUsername] = React.useState(auth.username);
 
     React.useEffect(() => {
         if (isLogInScreenVisible) {
             setUsername(auth.username);
-            bottomSheetModalRef.current?.present();
-        } else {
-            bottomSheetModalRef.current?.dismiss();
         }
     }, [isLogInScreenVisible, auth.username]);
 
@@ -68,31 +60,17 @@ export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible }: 
         auth.requestNewAuth(username).catch(e => setError(e.message));
     }, [auth, username]);
 
-    return <BottomSheetModal
-        ref={bottomSheetModalRef}
-        enableDynamicSizing
-        backgroundStyle={sx({
-            backgroundColor: 'backgroundVeryDark',
-            width: '100%',
-        })}
-        style={sx({
-            flex: 1,
-        })}
-    >
-        <BottomSheetView><SafeAreaView sx={{
-            padding: 16,
-            paddingTop: 32,
-            paddingBottom: 32,
-        }}>
+    return <BottomSheetOrModal hide={hideLogInScreen} isVisible={isLogInScreenVisible}>
             <H1 sx={{marginTop: 0}}>Log In</H1>
 
-            <TextInput placeholder="Username" value={username} onChangeText={setUsername} />
+            <Row>
+                <BottomSheetTextInput placeholder="Username" value={username} onChangeText={setUsername} sx={{minWidth: [null, null, 400]}} />
+                <Button onPress={logIn}><ButtonText>Log In</ButtonText></Button>
+            </Row>
 
-            <Button onPress={logIn}><Text>Log In</Text></Button>
 
             {error && <P>{error}</P>}
 
-            <Button onPress={hideLogInScreen}><Text>Close</Text></Button>
-        </SafeAreaView></BottomSheetView>
-    </BottomSheetModal>;
+            <Button onPress={hideLogInScreen}><ButtonText>Close</ButtonText></Button>
+    </BottomSheetOrModal>;
 }

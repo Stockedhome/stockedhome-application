@@ -7,7 +7,7 @@ import { useTRPC } from '../../provider/tRPC-provider';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, PasswordInvalidityReason, getClientSideReasonForInvalidPassword } from 'lib/trpc/auth/checks/passwords/client';
 import { NULL_BUT_DO_NOT_VALIDATE_ASYNC, ValidatedInput } from '../../components/ValidatedInput';
 import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/trpc/auth/checks/emails/client';
-import { Button } from '../../components/Button';
+import { Button, ButtonText } from '../../components/Button';
 import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/checks/usernames/client';
 import { Form } from '../../components/Form';
 
@@ -137,7 +137,7 @@ export function SignUpNewAccountScreen({
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ color: 'red', mb: 16 }}>{error}</P>
-            <Button onPress={()=>setError(null)}><Text>Try Again</Text></Button>
+            <Button onPress={()=>setError(null)}><ButtonText>Try Again</ButtonText></Button>
         </View>
     }
 
@@ -287,7 +287,7 @@ export function SignUpNewAccountScreen({
         </Form>
 
         <View sx={{ height: 16 }} />
-        <Button onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid}><Text>Sign Up</Text></Button>
+        <Button onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid}><ButtonText>Sign Up</ButtonText></Button>
 
     </View>
 }

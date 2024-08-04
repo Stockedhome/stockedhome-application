@@ -2,7 +2,7 @@
 
 import { View, P, SafeAreaView } from 'dripsy'
 import React from 'react'
-import { Button } from '../../components/Button';
+import { Button, ButtonText } from '../../components/Button';
 import { createNewWebAuthnCredential } from 'lib/webauthn';
 import { useTRPC } from '../../provider/tRPC-provider';
 import { useRouter } from 'solito/app/navigation';
@@ -71,11 +71,11 @@ export function SignUpNewPasskeyScreen({
         { error
             ? <View sx={{marginTop: 8}}>
                 <P sx={{ color: 'red', mb: 16 }}>{error}</P>
-                <Button onPress={createPasskey}><Text>Try Again</Text></Button>
+                <Button onPress={createPasskey}><ButtonText>Try Again</ButtonText></Button>
             </View>
             : creatingPasskey
-                ? <Button><Text>Hold tight...</Text></Button>
-                : <Button onPress={createPasskey}><Text>Create Your First Passkey</Text></Button>
+                ? <Button><ButtonText>Hold tight...</ButtonText></Button>
+                : <Button onPress={createPasskey}><ButtonText>Create Your First Passkey</ButtonText></Button>
         }
 
     </View>

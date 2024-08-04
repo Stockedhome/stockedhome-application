@@ -172,6 +172,14 @@ const theme = makeTheme({
         a: {
             color: 'accent',
         },
+        buttonText: {
+            color: '#ffffff',
+            fontSize: 18,
+            fontWeight: 'bold',
+            textAlign: 'center',
+            marginTop: 0,
+            marginBottom: 0,
+        }
     },
     forms: {
         input: {
@@ -190,8 +198,9 @@ const theme = makeTheme({
         default: {
             backgroundColor: 'accentDark',
             borderColor: 'accent',
-            color: '#ffffff',
-            fontSize: 18,
+
+            alignItems: 'center',
+            justifyContent: 'center',
 
             //'&:hover': {
             //    backgroundColor: 'highlight', // TODO: Find a way to actually do this

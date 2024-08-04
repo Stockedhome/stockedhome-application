@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useConfig } from 'interface/provider/config-provider';
 import { useMobileConfigContext } from '../mobile-config';
 import { loadConfigClient, ConfigInvalidityReason, getConfigAPIUrl, stringifyConfigInvalidityReason } from 'lib/config/loader-client';
-import { Button } from 'interface/components/Button';
+import { Button, ButtonText } from 'interface/components/Button';
 
 
 export default function ChooseConfig() {
@@ -127,7 +127,7 @@ export default function ChooseConfig() {
 
             nav.removeListener('beforeRemove', beforeRemoveListener)
             nav.goBack();
-        }}><Text>OK</Text></Button>
+        }}><ButtonText>OK</ButtonText></Button>
 
     </View></TopLevelScreenView>
 }

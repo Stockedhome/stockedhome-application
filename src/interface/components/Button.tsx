@@ -47,3 +47,18 @@ export const Button = React.forwardRef(function Button(
         </StyledPressable>
     );
 });
+
+import { P as ExpoP } from '@expo/html-elements';
+import { createThemedComponent } from 'dripsy';
+import { defaultFontStyle } from 'dripsy/build/core/components/defaultStyle'
+
+const ButtonText_ = createThemedComponent(ExpoP, {
+    themeKey: 'text',
+    defaultVariant: 'buttonText',
+    defaultStyle: defaultFontStyle,
+});
+
+
+export function ButtonText({ children, ...props }: ComponentProps<typeof ButtonText_>) {
+    return <ButtonText_ {...props}>{children}</ButtonText_>;
+}
