@@ -125,6 +125,9 @@ const theme = makeTheme({
         icon: {
             width: 32,
             height: 32,
+        },
+        default: {
+            
         }
     },
     text: {
@@ -175,10 +178,12 @@ const theme = makeTheme({
         buttonText: {
             color: '#ffffff',
             fontSize: 18,
-            fontWeight: 'bold',
+
             textAlign: 'center',
             marginTop: 0,
             marginBottom: 0,
+
+            fontWeight: '500',
         }
     },
     forms: {
@@ -206,15 +211,13 @@ const theme = makeTheme({
             //    backgroundColor: 'highlight', // TODO: Find a way to actually do this
             //},
 
-            fontWeight: 'heading',
-
             borderRadius: 4,
             borderWidth: 2,
 
-            paddingTop: 4,
-            paddingBottom: 4,
-            paddingLeft: 10,
-            paddingRight: 10,
+            paddingTop: 5,
+            paddingBottom: 5,
+            paddingLeft: 16,
+            paddingRight: 16,
 
 
             marginBottom: 10,

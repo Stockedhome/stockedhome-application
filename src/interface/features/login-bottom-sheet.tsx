@@ -42,7 +42,9 @@ export function useLogInScreen() {
     return React.useContext(logInScreenContext);
 }
 
-export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible }: { hideLogInScreen(): void, isLogInScreenVisible: boolean }) {
+export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible, standalone }: { hideLogInScreen(): void, isLogInScreenVisible: boolean, standalone?: false }): React.ReactElement;
+export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible, standalone }: { hideLogInScreen?(): void, isLogInScreenVisible?: true, standalone: true }): React.ReactElement;
+export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible = true, standalone }: { hideLogInScreen?(): void, isLogInScreenVisible?: boolean, standalone?: boolean }): React.ReactElement {
     const sx = useSx();
     const auth = useAuthentication()
 
@@ -60,17 +62,19 @@ export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible }: 
         auth.requestNewAuth(username).catch(e => setError(e.message));
     }, [auth, username]);
 
-    return <BottomSheetOrModal hide={hideLogInScreen} isVisible={isLogInScreenVisible}>
-            <H1 sx={{marginTop: 0}}>Log In</H1>
+    const children = <>
+        <H1 sx={{marginTop: 0}}>Log In</H1>
 
-            <Row>
-                <BottomSheetTextInput placeholder="Username" value={username} onChangeText={setUsername} sx={{minWidth: [null, null, 400]}} />
-                <Button onPress={logIn}><ButtonText>Log In</ButtonText></Button>
-            </Row>
+        <Row>
+            <BottomSheetTextInput placeholder="Username" value={username} onChangeText={setUsername} sx={{minWidth: [null, null, 400]}} />
+            <Button onPress={logIn}><ButtonText>Log In</ButtonText></Button>
+        </Row>
 
 
-            {error && <P>{error}</P>}
+        {error && <P>{error}</P>}
 
-            <Button onPress={hideLogInScreen}><ButtonText>Close</ButtonText></Button>
-    </BottomSheetOrModal>;
+        {!standalone && <Button onPress={hideLogInScreen}><ButtonText>Close</ButtonText></Button>}
+    </>
+
+    return standalone ? children : <BottomSheetOrModal hide={hideLogInScreen!} isVisible={isLogInScreenVisible}>{children}</BottomSheetOrModal>;
 }

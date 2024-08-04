@@ -9,7 +9,7 @@ import { metadata as rootMetadata } from '../layout';
 export const metadata: Metadata = {
     title: {
         default: '%% ERROR %%',
-        template: '%s | Stockedhome Web App',
+        template: '%s | Stockedhome Web',
     },
 
     description: 'Stockedhome is an app for managing your home inventory.',

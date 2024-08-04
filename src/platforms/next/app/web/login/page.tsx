@@ -1,5 +1,12 @@
-import { redirect } from "next/navigation";
+import { TopLevelScreenView } from "interface/components/TopLevelScreenView";
+import { LoginPageClient } from "./LoginPage";
 
-export default function loginPageStub() {
-    redirect('/web');
+export const metadata = {
+    title: 'Log In',
+}
+
+export default function LoginPage() {
+    return <TopLevelScreenView>
+        <LoginPageClient />
+    </TopLevelScreenView>;
 }

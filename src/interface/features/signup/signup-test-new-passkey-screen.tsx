@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P, SafeAreaView, Text } from 'dripsy'
+import { View, P } from 'dripsy'
 import React from 'react'
 import { Button, ButtonText } from '../../components/Button';
 import { useRouter } from 'solito/app/navigation';

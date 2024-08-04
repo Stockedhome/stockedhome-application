@@ -1,8 +1,9 @@
 'use client';
 
-import { useSx, SafeAreaView } from 'dripsy';
+import { useSx } from 'dripsy';
 import { BottomSheetView, BottomSheetModal } from '@gorhom/bottom-sheet';
 import React from 'react';
+import { SafeAreaView } from './SafeAreaView';
 
 export function BottomSheetOrModal({ hide, isVisible, children }: { hide(): void, isVisible: boolean, children: React.ReactNode }) {
     const sx = useSx();

@@ -1,7 +1,10 @@
-import { SafeAreaView, ScrollView, View, css } from "dripsy";
+'use client';
+
+import { ScrollView, View } from "dripsy";
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { LogInScreenProvider } from "../features/login-bottom-sheet";
 import { GestureHandlerRootView } from "./GestureHandlerRootView";
+import { SafeAreaView } from "./SafeAreaView";
 
 export function TopLevelScreenView({ children, scrollable }: React.PropsWithChildren<{ scrollable?: boolean }>) {
     //  // ref

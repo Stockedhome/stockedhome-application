@@ -1,6 +1,6 @@
 'use client';
 
-import { View, P, SafeAreaView } from 'dripsy'
+import { View, P } from 'dripsy'
 import React from 'react'
 import { Button, ButtonText } from '../../components/Button';
 import { createNewWebAuthnCredential } from 'lib/webauthn';
