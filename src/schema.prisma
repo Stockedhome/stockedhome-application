@@ -138,7 +138,7 @@ model AuthPublicKey {
     /// Any pending keypair requests this key has signed
     authorizedKeypairRequests  NewKeypairRequest[]
 
-    @@unique([id, userId])
+    @@id([id, userId])
 
 }
 

@@ -1,3 +1,4 @@
+CREATE UNIQUE INDEX "User_username_insensitive_idx" ON "User" (lower("username"))
 
 --
 -- NOTE ON PRUNING:

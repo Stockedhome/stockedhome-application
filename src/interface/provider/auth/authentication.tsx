@@ -66,6 +66,8 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
             const user = await trpcUtils.authenticated.users.me.fetch(undefined, { signal })
             if (signal?.aborted) return;
             setUser(user)
+            setUsername_(user.username);
+            setHasFetchedForThisUser(true)
         } catch (e) {
             if (!isTRPCClientError(e)) {
                 throw e;
@@ -85,10 +87,7 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
         if (!username || hasFetchedForThisUser) return setIsTryingToAuthenticate(false)
 
         const controller = new AbortController();
-        refetchUser(controller.signal).then(() => {
-            setHasFetchedForThisUser(true)
-        })
-
+        refetchUser(controller.signal)
         return () => { controller.abort() }
     }, [username, hasFetchedForThisUser, refetchUserQueued, trpcUtils, refetchUser])
 

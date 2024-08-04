@@ -329,11 +329,10 @@ export const authRouter = createRouter({
                 const user = await db.user.create({
                     data: {
                         username: input.username,
-                        email: input.email,
+                        email: input.email.toLowerCase(),
                         passwordSalt: Buffer.from(passwordSalt),
                         passwordHash: Buffer.from(passwordHash),
                         pruneAt,
-
                         newKeypairRequests: {
                             create: {
                                 sendingIP: getIp(ctx.req, ctx.config),
@@ -444,8 +443,13 @@ export const authRouter = createRouter({
             })
         }))
         .query(async ({ctx, input}) => {
-            const dbData_ = await db.user.findUnique({
-                where: { username: input.username },
+            const dbData_ = await db.user.findFirst({
+                where: {
+                    username: {
+                        equals: input.username,
+                        mode: 'insensitive',
+                    }
+                },
                 select: {
                     id: true,
                     publicKeys: {select:{

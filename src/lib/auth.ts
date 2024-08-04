@@ -1,4 +1,4 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { db } from "./db";
 import { userVerification } from "./trpc/auth";
 import type { AuthenticatorTransportFuture } from "@simplewebauthn/types";
@@ -6,8 +6,6 @@ import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import type { TRPCGlobalContext } from "./trpc/_trpc";
 import { z } from "zod";
 import base64_ from '@hexagon/base64';
-import type { NextRequest } from "next/server";
-import type { AuthSessionResult } from "expo-auth-session";
 import type { Prisma } from "@prisma/client";
 const base64 = base64_.base64;
 
@@ -89,7 +87,7 @@ export function getSessionTokenFromRequest(): SessionToken | SessionValidationFa
     return validated.data;
 }
 
-export function getExpectedOrigin(ctx: TRPCGlobalContext, clientDataJsonRAW: string): string | string[] {
+export function getExpectedOrigin(ctx: Pick<TRPCGlobalContext, 'config'>, clientDataJsonRAW: string): string | string[] {
     const clientDataBuffer = base64.toArrayBuffer(clientDataJsonRAW);
     const clientDataUTF8 = new TextDecoder('utf8').decode(clientDataBuffer);
     const clientDataJson = JSON.parse(clientDataUTF8);
@@ -110,9 +108,9 @@ const authSessionSelect = {
     signedWithKeyId: true,
 } as const satisfies Prisma.AuthSessionSelect
 
-export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | undefined, getUser: true): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}>>
-export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken?: SessionToken | undefined, getUser?: false): Promise<SessionValidationFailureReason | Date>
-export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest(), getSession?: boolean): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}> | Date> {
+export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken: SessionToken | undefined, getUser: true): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}>>
+export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken?: SessionToken | undefined, getUser?: false): Promise<SessionValidationFailureReason | Date>
+export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest(), getSession?: boolean): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}> | Date> {
     try {
         if (typeof sessionToken === 'string') return sessionToken;
         const {authResponse, authSessionId} = sessionToken;
@@ -137,7 +135,9 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
         const keyData = await db.authPublicKey.findUnique({
             where: { id_userId: { id: authResponse.rawId, userId: sessionData.userId } },
             select: {
-                userId: true,
+                user: { select: {
+                    pruneAt: true,
+                }},
                 sessionCounter: true,
                 id: true,
                 publicKey: true,
@@ -170,6 +170,16 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
 
         if (!verification.verified) return SessionValidationFailureReason.InvalidAuthResponse;
 
+        if (keyData.user.pruneAt) {
+            await db.user.update({
+                where: { id: sessionData.userId },
+                data: { pruneAt: null },
+            }).catch(e => {
+                console.error(e);
+                return SessionValidationFailureReason.DatabaseError;
+            });
+        }
+
         if (sessionData.updatePruneAtAt && sessionData.updatePruneAtAt.getTime() < Date.now()) {
             return getSession ? sessionData : sessionData.pruneAt;
         }
@@ -191,16 +201,21 @@ export async function authenticateUser(ctx: TRPCGlobalContext, sessionToken: Ses
             return SessionValidationFailureReason.DatabaseError;
         }
 
-        cookies().set({
-            name: STOCKEDHOME_COOKIE_NAME,
-            value: JSON.stringify({ authSessionId, authResponse }),
-            domain: ctx.config.canonicalRoot.hostname,
-            expires: expiration,
-            httpOnly: true,
-            partitioned: true,
-            sameSite: 'strict',
-            secure: true,
-        });
+        try {
+            cookies().set({
+                name: STOCKEDHOME_COOKIE_NAME,
+                value: JSON.stringify({ authSessionId, authResponse }),
+                domain: ctx.config.canonicalRoot.hostname,
+                expires: expiration,
+                httpOnly: true,
+                partitioned: true,
+                sameSite: 'strict',
+                secure: true,
+            });
+        } catch {
+            // will fail if we're rendering a page through Next.js;
+            // the client will fetch auth data anyway which will refresh the cookie
+        }
 
         return getSession ? sessionData : expiration;
     } catch (e) {

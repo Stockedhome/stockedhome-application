@@ -20,7 +20,7 @@ function HomeScreenInternal() {
     const { showLogInScreen } = useLogInScreen();
 
     return <>
-        <H1 sx={{marginTop: 0}}>Stockedhome <Text sx={{fontWeight: 'normal'}}>(Authentication)</Text></H1>
+        <H1 sx={{marginTop: 0}}>Stockedhome  <Text sx={{fontWeight: 400}}>(Authentication)</Text></H1>
 
         <View sx={{ maxWidth: 600 }}>
             <P sx={{ textAlign: 'center' }}>
@@ -38,11 +38,11 @@ function HomeScreenInternal() {
                     <Button sx={{marginBottom: 0}} onPress={auth.logOut}><ButtonText>Log Out</ButtonText></Button>
                 </>
                 : <>
-                    <TextLink href="/web/signup" textProps={{style: sx({ color: 'primary', fontWeight: 'bold' })}}>
+                    <TextLink href="/web/signup" textProps={{style: sx({ color: 'primary', fontWeight: '600' })}}>
                         Sign Up for Stockedhome
                     </TextLink>
                     <Pressable onPress={showLogInScreen}>
-                        <P sx={{ color: 'primary', fontWeight: 'bold' }}>Log In</P>
+                        <P sx={{ color: 'primary', fontWeight: '600' }}>Log In</P>
                     </Pressable>
                 </>
             }
@@ -50,7 +50,7 @@ function HomeScreenInternal() {
 
         <View sx={{ height: 24 }} />
 
-        <TextLink href="https://github.com/Stockedhome/stockedhome-application" textProps={{style: sx({ color: 'primary', fontWeight: 'bold' })}}>
+        <TextLink href="https://github.com/Stockedhome/stockedhome-application" textProps={{style: sx({ color: 'primary', fontWeight: '600' })}}>
             GitHub Repo
         </TextLink>
     </>

@@ -79,7 +79,7 @@ function GettingStartedScreenInternal() {
             </P>
         </View>
 
-        <TextLink href="/web" textProps={{style: sx({ color: 'primary', fontWeight: 'bold', marginTop: 32 })}}>
+        <TextLink href="/web" textProps={{style: sx({ color: 'primary', fontWeight: '600', marginTop: 32 })}}>
             Return to Home Screen
         </TextLink>
 

@@ -158,23 +158,23 @@ const theme = makeTheme({
             fontWeight: '500',
         },
         bold: {
-            fontWeight: 'bold',
+            fontWeight: '700',
         },
         h1: {
             fontSize: 32,
-            fontWeight: 'bold',
+            fontWeight: '600',
             color: 'textBright',
             marginBottom: 16,
         },
         h2: {
             fontSize: 26,
-            fontWeight: 'bold',
+            fontWeight: '600',
             color: 'textBright',
             marginBottom: 14,
         },
         h3: {
             fontSize: 20,
-            fontWeight: 'bold',
+            fontWeight: '600',
             color: 'textBright',
             marginBottom: 12,
         },
@@ -346,13 +346,9 @@ const theme = makeTheme({
 
     customFonts: {
         rubik: {
-            light: 'Rubik_400Regular',
             400: 'Rubik_400Regular',
-            default: 'Rubik_500Medium',
-            normal: 'Rubik_500Medium',
             500: 'Rubik_500Medium',
             600: 'Rubik_600SemiBold',
-            bold: 'Rubik_600SemiBold',
             700: 'Rubik_600SemiBold',
             800: 'Rubik_900Black',
             900: 'Rubik_900Black',

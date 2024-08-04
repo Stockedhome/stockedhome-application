@@ -7,8 +7,13 @@ export async function getServerSideReasonForInvalidUsername(username: string): P
     if (clientSideReason)
         return clientSideReason;
 
-    const userRecord = await db.user.findUnique({
-        where: { username: username },
+    const userRecord = await db.user.findFirst({
+        where: {
+            username: {
+                equals: username,
+                mode: 'insensitive',
+            }
+        },
         select: { id: true, pruneAt: true },
     });
 

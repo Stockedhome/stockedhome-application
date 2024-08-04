@@ -32,11 +32,16 @@ function SignUpScreenInternal() {
     const auth = useAuthentication();
     const router = useRouter()
 
-    const [hasCheckedUser, setHasCheckedUser] = React.useState(false);
+    // null if hasn't checked for auth, false if user is logged in, true if user is not logged in
+    const [checkedUserResult, setCheckedUserResult] = React.useState<boolean | null>(null);
     React.useEffect(() => {
-        if (hasCheckedUser || auth.loading) return;
-        if (auth.user) router.push('/web/getting-started');
-        setHasCheckedUser(true);
+        if (checkedUserResult !== null || auth.loading) return;
+        if (auth.user) {
+            setCheckedUserResult(false);
+            router.push('/web/getting-started');
+        } else {
+            setCheckedUserResult(true);
+        }
     }, [auth.user, auth.loading])
 
     const clientGeneratedRandom = React.useMemo(() => {
@@ -51,7 +56,7 @@ function SignUpScreenInternal() {
 
     const [signupStep, setSignupStep] = React.useState<'new-account' | 'new-passkey' | 'test-passkey'>('new-account');
 
-    if (auth.loading || auth.user) return <>
+    if (!checkedUserResult) return <>
         <P>Hold on—you might already be logged in!</P>
         <ActivityIndicator size={48} />
     </>;

@@ -1,7 +1,7 @@
 'use client';
 
-import { View, P, TextInput, H3, ActivityIndicator, Row, H1, Text } from 'dripsy'
-import type { TextInput as RNTextInput } from 'react-native'
+import { View, P, TextInput, H3, ActivityIndicator, Row, H1 } from 'dripsy'
+import { Text, type TextInput as RNTextInput } from 'react-native'
 import React from 'react'
 import { useTRPC } from '../../provider/tRPC-provider';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, PasswordInvalidityReason, getClientSideReasonForInvalidPassword } from 'lib/trpc/auth/checks/passwords/client';

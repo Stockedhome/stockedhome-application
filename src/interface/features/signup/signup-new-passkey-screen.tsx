@@ -52,7 +52,7 @@ export function SignUpNewPasskeyScreen({
     }, [creatingPasskey])
 
     return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center', maxWidth: 900, mx: 'auto' }}>
-        <P sx={{ textAlign: 'center', mb: 16, fontWeight: 'bold' }}>
+        <P sx={{ textAlign: 'center', mb: 16, fontWeight: '600' }}>
             Welcome, {username}! 🎉
         </P>
 
