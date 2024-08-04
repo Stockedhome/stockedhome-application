@@ -59,7 +59,7 @@ export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible = t
     const [error, setError] = React.useState<string | null>(null);
 
     const logIn = React.useCallback(() => {
-        auth.requestNewAuth(username).catch(e => setError(e.message));
+        auth.requestNewAuth(username).then(hideLogInScreen).catch(e => setError(e.message));
     }, [auth, username]);
 
     const children = <>
