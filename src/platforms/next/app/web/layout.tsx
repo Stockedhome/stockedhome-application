@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
     openGraph: {
         ...rootMetadata.openGraph,
-        siteName: 'Stockedhome (Web App)',
+        siteName: 'Stockedhome Web',
     },
 
     generator: 'Next.js & React Native',

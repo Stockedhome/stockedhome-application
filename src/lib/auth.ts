@@ -104,18 +104,32 @@ const authSessionSelect = {
     challenge: true,
     pruneAt: true,
     finalExpiration: true,
-    updatePruneAtAt: true,
-    signedWithKeyId: true,
+    signedWithKey: {select: {
+        user: { select: {
+            pruneAt: true,
+        }},
+        sessionCounter: true,
+        id: true,
+        publicKey: true,
+        clientTransports: true,
+    }}
 } as const satisfies Prisma.AuthSessionSelect
 
-export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken: SessionToken | undefined, getUser: true): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}>>
-export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken?: SessionToken | undefined, getUser?: false): Promise<SessionValidationFailureReason | Date>
-export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest(), getSession?: boolean): Promise<SessionValidationFailureReason | Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}> | Date> {
+export interface AuthenticateUserResult {
+    authSessionId: string;
+    authResponse: SessionToken['authResponse'];
+    authSession: Prisma.AuthSessionGetPayload<{select: typeof authSessionSelect}>;
+}
+
+const AUTH_SESSION_EXPIRES_AFTER_MILLIS = 32 * 60 * 60 * 1000;
+const AUTH_SESSION_RENEW_AT_MILLIS_TIL_EXPIRATION = 24 * 60 * 60 * 1000;
+
+export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest()): Promise<SessionValidationFailureReason | AuthenticateUserResult> {
     try {
         if (typeof sessionToken === 'string') return sessionToken;
         const {authResponse, authSessionId} = sessionToken;
 
-        let sessionData = await db.authSession.findUnique({
+        const sessionData = await db.authSession.findUnique({
             where: { id: authSessionId },
             select: authSessionSelect
         }).catch(e => {
@@ -126,32 +140,33 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
         if (!sessionData) return SessionValidationFailureReason.NoSessionById;
         if (typeof sessionData === 'string') return sessionData;
 
-        if (sessionData.signedWithKeyId) {
-            if (sessionData.signedWithKeyId !== authResponse.rawId) {
+        if (sessionData.pruneAt.getTime() < Date.now()) {
+            await db.authSession.delete({ where: { id: authSessionId } }).catch(e => { console.error(e); });
+            return SessionValidationFailureReason.NoSessionById;
+        }
+
+        if (sessionData.signedWithKey) {
+            if (sessionData.signedWithKey.id !== authResponse.rawId) {
                 return SessionValidationFailureReason.SignedByDifferentKey;
             }
         }
 
-        const keyData = await db.authPublicKey.findUnique({
-            where: { id_userId: { id: authResponse.rawId, userId: sessionData.userId } },
-            select: {
-                user: { select: {
-                    pruneAt: true,
-                }},
-                sessionCounter: true,
-                id: true,
-                publicKey: true,
-                clientTransports: true,
-            }
-        }).catch(e => {
-            console.error(e);
-            return SessionValidationFailureReason.DatabaseError;
-        });
+        if (!sessionData.signedWithKey) {
+            const newKey = await db.authPublicKey.findUnique({
+                where: { id_userId: { id: authResponse.rawId, userId: sessionData.userId } },
+                select: authSessionSelect['signedWithKey']['select']
+            }).catch(e => {
+                console.error(e);
+                return SessionValidationFailureReason.DatabaseError;
+            });
 
-        if (!keyData) return SessionValidationFailureReason.NoPublicKey;
-        if (typeof keyData === 'string') return keyData;
+            if (!newKey) return SessionValidationFailureReason.NoPublicKey;
+            if (typeof newKey === 'string') return newKey;
 
+            sessionData.signedWithKey = newKey;
+        }
 
+        const keyData = sessionData.signedWithKey;
 
         const verification = await verifyAuthenticationResponse({
             response: authResponse,
@@ -180,22 +195,28 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
             });
         }
 
-        if (sessionData.updatePruneAtAt && sessionData.updatePruneAtAt.getTime() < Date.now()) {
-            return getSession ? sessionData : sessionData.pruneAt;
+        if (sessionData.pruneAt && sessionData.pruneAt.getTime() !== sessionData.finalExpiration.getTime() && sessionData.pruneAt.getTime() < (Date.now() - AUTH_SESSION_RENEW_AT_MILLIS_TIL_EXPIRATION)) {
+            return {
+                authSessionId,
+                authResponse,
+                authSession: sessionData,
+            }
         }
 
-        const expiration = new Date(Math.min(Date.now() + 1000 * 60 * 60 * 32, sessionData.finalExpiration.getTime())); // 32 hours from now or the finalExpiration date--whichever is sooner
+        const expiration = new Date(Math.min(Date.now() + AUTH_SESSION_EXPIRES_AFTER_MILLIS, sessionData.finalExpiration.getTime())); // 32 hours from now or the finalExpiration date--whichever is sooner
 
         try {
-            sessionData = await db.authSession.update({
+            Object.assign(sessionData, await db.authSession.update({
                 where: { id: authSessionId },
                 data: {
                     signedWithKeyId: keyData.id,
                     pruneAt: expiration,
-                    updatePruneAtAt: new Date(Date.now() + 1000 * 60 * 60 * 8), // in 8 hours
                 },
-                select: authSessionSelect
-            });
+                select: {
+                    signedWithKeyId: true,
+                    pruneAt: true,
+                }
+            }));
         } catch (e) {
             console.error(e);
             return SessionValidationFailureReason.DatabaseError;
@@ -217,7 +238,11 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
             // the client will fetch auth data anyway which will refresh the cookie
         }
 
-        return getSession ? sessionData : expiration;
+        return {
+            authSessionId,
+            authResponse,
+            authSession: sessionData,
+        }
     } catch (e) {
         console.error(e);
         return SessionValidationFailureReason.UnknownError;

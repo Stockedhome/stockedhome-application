@@ -3,8 +3,12 @@
 import { LogInScreenComponent } from "interface/features/login-bottom-sheet";
 import { Image } from "interface/components/Image";
 import { View } from "dripsy";
+import { useAuthentication } from "interface/provider/auth/authentication";
+import { redirect } from "next/navigation";
 
 export function LoginPageClient() {
+    const auth = useAuthentication();
+    if (auth.user) redirect('/web/');
     return <>
         <LogInScreenComponent standalone />
 

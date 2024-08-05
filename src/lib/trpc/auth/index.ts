@@ -520,7 +520,7 @@ export const authRouter = createRouter({
                 return {
                     success: true,
                     error: undefined,
-                    expiresAt: expirationOrError,
+                    expiresAt: expirationOrError.authSession.pruneAt,
                 }
             }
         }),
