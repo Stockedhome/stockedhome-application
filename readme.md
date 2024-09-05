@@ -11,6 +11,35 @@ This repository houses the frontend and backend of Stockedhome, built with Next.
 * `src/interface` - UI code that may be shared by both platforms
 * `src/forks` - Forks of third-party libraries used in Stockedhome (included as submodules)
 
+# Setting Up Your Workspace
+
+### Prerequisite Tools:
+* [Node.js](https://nodejs.org/en/)
+* [pnpm](https://pnpm.io/)
+* For Windows [WSL2](https://docs.microsoft.com/en-us/windows/wsl/install)
+* [Docker Desktop](https://www.docker.com/products/docker-desktop)
+  * Alternatively, if you're on Linux, you can install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) separately
+* [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
+
+Recommended OS: Linux, though you can probably get away with Windows. Unsure about MacOS because I don't own a Mac.
+
+### Getting Started
+1. Clone the repository
+2. Run `pnpm install` in the root of the repository
+
+### Configuring the Application
+
+A sample `.env.template` file is provided in the root of the repository. Copy this file to `.env` and fill in the necessary values. The `.env` file is used during build for all platforms and during server runtime for the Next.js platform.
+
+Additionally, further configuration can be found in the `config` folder. You may wish to adjust `config.dev.yaml` to your specific purposes.
+
+### Running the Application (Dev Mode)
+No matter what, you will always need the Next.js web server running. To start it, run `pnpm run dev:next` in the root of the repository.
+
+If you're running the web app, you can connect to the web server, which defaults to `http://localhost:3000`.
+
+If you're running the mobile app, you should run the `pnpm run dev-expo:` with your phone's OS following (e.g. `pnpm run dev-expo:ios` or `pnpm run dev-expo:android`) which will build the development client (native code) for your device and start the dev server (for JavaScript code) automatically. If your phone already has the development client loaded, you can run `pnpm run dev-expo:dev` to start the development server.
+
 # Stockedhome In Detail
 
 ## Do You [Dogfood](https://en.wikipedia.org/wiki/Eating_your_own_dog_food)?

@@ -23,25 +23,17 @@ if (!fs.existsSync(path.join(expoRoot, './.env'))) {
  */
 const { getDefaultConfig } = require('expo/metro-config');
 
-const interface = path.resolve(projectRoot, 'src/interface');
-const lib = path.resolve(projectRoot, 'src/lib');
-const solito = path.resolve(projectRoot, 'src/forks/solito');
-
 const config = getDefaultConfig(expoRoot);
 
 // 1. Watch all files within the monorepo
 config.watchFolders = [projectRoot];
+
 // 2. Let Metro know where to resolve packages and in what order
 config.resolver.nodeModulesPaths = [
+    fs.readdirSync(projectRoot).map(dir => path.resolve(projectRoot, '.pnpm', dir, 'node_modules')),
     path.resolve(expoRoot, 'node_modules'),
-    path.resolve(interface, 'node_modules'),
     path.resolve(projectRoot, 'node_modules'),
-];
-config.resolver.extraNodeModules = {
-    interface,
-    lib,
-    solito
-};
+].flat();
 
 config.resolver.assetExts = [
     ...config.resolver.assetExts ?? [],
@@ -49,7 +41,10 @@ config.resolver.assetExts = [
     'index.ts',
     'index.tsx',
 ];
-// 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
-config.resolver.disableHierarchicalLookup = true;
+
+// 3. Make sure we're doing stuff right for PNPM
+config.resolver.disableHierarchicalLookup = false;
+config.resolver.unstable_enableSymlinks = true;
+//config.resolver.unstable_enablePackageExports = true;
 
 module.exports = config;

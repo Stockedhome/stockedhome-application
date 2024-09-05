@@ -1,1 +1,1 @@
-W:/GitRepos/stockedhome/application/config/volumes/db/init/data.sql
+../supabase_prod/volumes/db/init/schema.sql

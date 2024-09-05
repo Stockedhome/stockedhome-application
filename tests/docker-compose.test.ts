@@ -86,7 +86,7 @@ if (downloadDockerCompose) {
     supabaseDockerCompose = await fs.readFile('tests/cache/docker-compose/docker-compose.json', 'utf8').then(text => JSON.parse(text))
 }
 
-stockedhomeDockerCompose = await fs.readFile('config/docker-compose.yaml', 'utf8').then(rawYaml => yaml.load(rawYaml) as DockerCompose.ComposeSpecification)
+stockedhomeDockerCompose = await fs.readFile('supabase_prod/docker-compose.yaml', 'utf8').then(rawYaml => yaml.load(rawYaml) as DockerCompose.ComposeSpecification)
 
 const IGNORED_SUPABASE_SERVICES = [ 'auth', 'functions' ]
 

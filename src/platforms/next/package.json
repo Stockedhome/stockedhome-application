@@ -15,7 +15,7 @@
     "interface": "link:../../interface",
     "json-loader": "^0.5.7",
     "lib": "link:../../lib",
-    "next": "link:../../node_modules/next",
+    "next": "*",
     "next-compose-plugins": "^2.2.1",
     "next-fonts": "^1.5.1",
     "next-images": "^1.8.5",

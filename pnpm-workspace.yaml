@@ -6,3 +6,4 @@ packages:
 
    # We don't care about devDependencies for these forks:
   - '!src/forks/solito'
+  - '!src/forks/solito'

@@ -2,20 +2,20 @@
   "name": "stockedhome-application",
   "private": true,
   "devDependencies": {
-    "@react-native/assets-registry": "link:src/forks/assets-registry",
-    "@types/react": "~18.3.3",
     "eslint": "^9.4.0",
     "turbo": "^1.13.3",
     "typescript": "^5.3.3"
   },
   "prisma": {
-    "schema": "src/schema.prisma"
+    "schema": "src/db/schema.prisma"
   },
   "scripts": {
     "dev-expo:android": "cd src/platforms/expo && pnpm run android",
     "dev-expo:ios": "cd src/platforms/expo && pnpm run ios",
+    "dev-expo:dev": "cd src/platforms/expo && pnpm run dev",
+    "predev-next": "supabase start --ignore-health-check",
     "dev-next": "next dev src/platforms/next",
-    "codegen": "pnpm exec prisma generate && tsx codegen/index.mjs",
+    "codegen": "pwsh -File ./codegen/database-stuff.ps1 && tsx codegen/index.mjs",
     "prepare": "pnpm run codegen",
     "prebuild-next": "pnpm run codegen",
     "build-next": "next build src/platforms/next",
@@ -34,6 +34,8 @@
     "**/expo-router/**"
   ],
   "dependencies": {
+    "@babel/core": "7.24.7",
+    "@babel/preset-env": "7.24.7",
     "@babel/preset-flow": "^7.24.6",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
@@ -41,6 +43,7 @@
     "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@gorhom/bottom-sheet": "^4.6.4",
     "@prisma/client": "5.15.1",
+    "@react-native/assets-registry": "link:src/forks/assets-registry",
     "@tanstack/react-query": "^5.45.1",
     "@trpc/client": "11.0.0-rc.413",
     "@trpc/next": "11.0.0-rc.413",
@@ -50,10 +53,10 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/nearley": "^2.11.5",
     "checkeasy": "^1.1.0",
+    "copy-anything": "^4.0.2",
     "deep-email-validator": "^0.1.21",
     "expo": "~51.0.22",
     "expo-auth-session": "^5.5.2",
-    "expo-module-scripts": "*",
     "flowtype-loader": "^0.2.2",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -61,7 +64,7 @@
     "octokit": "^4.0.2",
     "openapi-typescript-codegen": "^0.29.0",
     "prisma": "^5.15.1",
-    "react": "18.2.0",
+    "react": "*",
     "react-dom": "18.2.0",
     "react-native": "0.74.3",
     "react-native-gesture-handler": "~2.16.2",
@@ -71,6 +74,7 @@
     "react-native-svg": "^15.4.0",
     "react-native-web": "~0.19.12",
     "smtp-address-parser": "1.1.0",
+    "supabase": "^1.191.3",
     "superjson": "^2.2.1",
     "tsx": "^4.15.7",
     "vitest": "^1.6.0",

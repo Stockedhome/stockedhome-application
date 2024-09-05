@@ -7,13 +7,13 @@
     "@simplewebauthn/browser": "^10.0.0",
     "@simplewebauthn/server": "^10.0.0",
     "@simplewebauthn/typescript-types": "^8.3.4",
+    "@stockedhome/react-native-passkeys": "link:../forks/react-native-passkeys",
     "@tanstack/react-query": "*",
     "@trpc/client": "*",
     "@trpc/next": "*",
     "@trpc/react-query": "*",
     "@trpc/server": "*",
-    "zod": "*",
-    "react-native-passkeys": "^0.2.2"
+    "zod": "*"
   },
   "sideEffects": false
 }
