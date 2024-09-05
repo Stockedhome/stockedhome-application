@@ -7,8 +7,6 @@ export const dynamic = 'force-static'
 
 export function GET(req: NextRequest) {
 
-    console.log(req, Object.fromEntries(req.headers.entries()))
-
     // https://developer.android.com/training/app-links/verify-android-applinks
 
     const assetLinksJson = [

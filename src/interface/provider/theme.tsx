@@ -5,9 +5,7 @@ import { DripsyProvider, makeTheme } from 'dripsy';
 import { useFonts } from 'expo-font';
 import { Rubik_400Regular, Rubik_400Regular_Italic, Rubik_500Medium, Rubik_500Medium_Italic, Rubik_600SemiBold, Rubik_600SemiBold_Italic, Rubik_900Black, Rubik_900Black_Italic } from '@expo-google-fonts/rubik';
 import { Platform, Text as RNText } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
-
-SplashScreen.preventAutoHideAsync();
+import { useControlSplashScreen } from './splash-screen';
 
 export function Fonts({ children }: React.PropsWithChildren<{}>) {
 
@@ -22,18 +20,6 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
         Rubik_900Black_Italic,
     });
 
-    const [splashScreenState, setSplashScreenState] = React.useState<'loading' | 'hide-in-three-renders' | 'hide-in-two-renders' | 'hide-in-one-render' | 'hidden'>('loading');
-    if (splashScreenState === 'hide-in-three-renders') {
-        queueMicrotask(() => setSplashScreenState('hide-in-two-renders'));
-    } else if (splashScreenState === 'hide-in-two-renders') {
-        queueMicrotask(() => setSplashScreenState('hide-in-one-render'));
-    } else if (splashScreenState === 'hide-in-one-render') {
-        queueMicrotask(() => {
-            SplashScreen.hideAsync();
-            setSplashScreenState('hidden');
-        });
-    }
-
     React.useEffect(() => {
         if (error) {
             console.error('Error loading fonts:', error);
@@ -44,27 +30,9 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
         }
     }, [loaded, error]);
 
-    if (error) {
-        console.error('Error loading fonts:', error);
-        if (Platform.OS === 'android' || Platform.OS === 'ios') {
-            SplashScreen.hideAsync();
-            return <RNText>Error loading fonts: {error.stack || error.message}</RNText>;
-        } else {
-            return <>{children}</>;
-        }
-    }
+    useControlSplashScreen(loaded || !!error, 'Font Loader');
 
-    if (loaded) {
-        if (splashScreenState === 'loading') setSplashScreenState('hide-in-three-renders');
-        return <>{children}</>;
-    }
-
-
-    if (Platform.OS === 'android' || Platform.OS === 'ios') {
-        return <RNText>Loading fonts...</RNText>;
-    } else {
-        return <>{children}</>;
-    }
+    return <>{children}</>;
 }
 
 const theme = makeTheme({

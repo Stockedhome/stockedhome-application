@@ -31,16 +31,25 @@ export function SignUpTestNewPasskeyScreen({
         })
     }, [auth, username])
 
+    // TODO: Getting a "needs to be in a <Text> component" somewhere when an error is thrown on this page specifically
+
     if (error) {
+        console.error('Testing new passkey failed with error:', error)
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ color: 'red' }}>{error}</P>
-            <Button onPress={()=>{logIn}}><ButtonText>Try Again</ButtonText></Button>
+
+            <Button onPress={()=>{logIn}}>
+                <ButtonText>Try Again</ButtonText>
+            </Button>
         </View>
     }
 
     if (auth.loading || auth.user) {
+        if (auth.loading) console.log('Waiting for auth to load...')
+        if (auth.user) console.log('User is signed in, redirecting to getting started screen...')
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <P>Signing in...</P> <ActivityIndicator size={48} />
+            <P>Signing in...</P>
+            <ActivityIndicator size={48} />
         </View>
     }
 

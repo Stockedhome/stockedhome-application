@@ -7,46 +7,15 @@ import type { TRPCGlobalContext } from "./trpc/_trpc";
 import { z } from "zod";
 import base64_ from '@hexagon/base64';
 import type { Prisma } from "@prisma/client";
+import { authenticationResponseJSONSchema } from "@stockedhome/react-native-passkeys/src/ReactNativePasskeys.types";
+import { castToSimpleWebAuthnAuthenticationResponse } from "@stockedhome/react-native-passkeys/src/casts";
 const base64 = base64_.base64;
 
 export const STOCKEDHOME_COOKIE_NAME = 'stockedhome-session-token';
 
-export const authResponseValidator = z.object({
-    //id: Base64URLString;
-    id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-    //rawId: Base64URLString;
-    rawId: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-    //response: AuthenticatorAssertionResponseJSON;
-    response: z.object({
-        //clientDataJSON: Base64URLString;
-        clientDataJSON: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-        //authenticatorData: Base64URLString;
-        authenticatorData: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-        //signature: Base64URLString;
-        signature: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-        //userHandle?: Base64URLString;
-        userHandle: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }).optional(),
-    }),
-    //authenticatorAttachment?: AuthenticatorAttachment;
-    authenticatorAttachment: z.enum(['platform', 'cross-platform']).optional(),
-    //clientExtensionResults: AuthenticationExtensionsClientOutputs;
-    clientExtensionResults: z.object({
-        //appid?: boolean;
-        appid: z.boolean().optional(),
-        //credProps?: CredentialPropertiesOutput;
-        credProps: z.object({
-            //rk?: boolean;
-            rk: z.boolean().optional(),
-        }).optional(),
-        //hmacCreateSecret?: boolean;
-        hmacCreateSecret: z.boolean().optional(),
-    }),
-    type: z.enum(['public-key']),
-})
-
 export const sessionTokenValidator = z.object({
     authSessionId: z.string(),
-    authResponse: authResponseValidator,
+    authResponse: authenticationResponseJSONSchema,
 })
 
 export type SessionToken = z.infer<typeof sessionTokenValidator>;
@@ -169,7 +138,7 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
         const keyData = sessionData.signedWithKey;
 
         const verification = await verifyAuthenticationResponse({
-            response: authResponse,
+            response: castToSimpleWebAuthnAuthenticationResponse(authResponse),
             expectedChallenge: sessionData.challenge!,
             expectedOrigin: getExpectedOrigin(ctx, authResponse.response.clientDataJSON),
             expectedRPID: ctx.config.canonicalRoot.hostname,

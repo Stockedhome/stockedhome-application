@@ -2,6 +2,7 @@
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ConfigProvider } from "interface/provider/config-provider";
+import { useControlSplashScreen } from "interface/provider/splash-screen";
 import { loadConfigClient } from "lib/config/loader-client";
 import type { Config } from "lib/config/schema";
 import React from "react";
@@ -61,6 +62,8 @@ export function ConfigAndTRPCProviderMobileEdition({ children }: { children: Rea
             setDirectUserToChooseConfigState('has-directed');
         }
     }, [directUserToChooseConfigState]);
+
+    useControlSplashScreen(directUserToChooseConfigState !== 'undecided', 'Mobile Config Provider');
 
     const Provider = configContextMobileWrapper.Provider as ((...args: Parameters<typeof configContextMobileWrapper.Provider>) => Exclude<React.ReactPortal, bigint>) // thanks, TS
     return <Provider value={{ setPrimaryConfig }}>

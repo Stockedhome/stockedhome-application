@@ -83,6 +83,6 @@ function GettingStartedScreenInternal() {
             Return to Home Screen
         </TextLink>
 
-        <Image src="/assets/logo-transparent.256.png" alt='Stockedhome logo' sx={{ width: 200, height: 200, alignSelf: 'center', marginTop: 32 }} />
+        <Image src="/assets/logo-transparent.256.png" alt='Stockedhome logo' sx={{ width: 196, height: 196, alignSelf: 'center', marginTop: 32 }} quality={100} />
     </>
 }

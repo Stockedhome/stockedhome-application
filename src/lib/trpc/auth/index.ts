@@ -10,15 +10,13 @@ import {
     type GenerateAuthenticationOptionsOpts,
     verifyAuthenticationResponse,
     type VerifyAuthenticationResponseOpts,
-  } from '@simplewebauthn/server';
+} from '@simplewebauthn/server';
 
 import type { ConfigSchemaBaseWithComputations } from "../../config/schema-base";
 import { db } from "../../db";
-import { type AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import type { AuthPublicKey, User } from "@prisma/client";
 import { getServerSideReasonForInvalidPassword } from "./checks/passwords/server";
-import { StockedhomeErrorType, getStockedhomeErrorClassForCode } from "../../errors";
-import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from "./checks/emails/client";
+import { EmailInvalidityReason } from "./checks/emails/client";
 import { PasswordInvalidityReason } from "./checks/passwords/client";
 import { getServerSideReasonForInvalidEmail } from "./checks/emails/server";
 import { getServerSideReasonForInvalidUsername } from "./checks/usernames/server";
@@ -26,7 +24,12 @@ import { UsernameInvalidityReason } from "./checks/usernames/client";
 import { hashPassword } from "./password";
 import { cookies } from "next/headers";
 import base64_ from '@hexagon/base64';
-import { STOCKEDHOME_COOKIE_NAME, SessionValidationFailureReason, authResponseValidator, authenticateUser, getExpectedOrigin, getSessionTokenFromRequest } from "../../auth";
+import { STOCKEDHOME_COOKIE_NAME, SessionValidationFailureReason, authenticateUser, getExpectedOrigin, getSessionTokenFromRequest } from "../../auth";
+import { authenticationResponseJSONSchema, publicKeyCredentialCreationOptionsJSONSchema, registrationResponseJSONSchema } from "@stockedhome/react-native-passkeys/src/ReactNativePasskeys.types";
+import { castFromSimpleWebAuthnRegistrationOptions } from "@stockedhome/react-native-passkeys/build/casts";
+import type { AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
+import { castToSimpleWebAuthnAuthenticationResponse, castToSimpleWebAuthnRegistrationResponse } from "@stockedhome/react-native-passkeys/src/casts";
+
 const base64 = base64_.base64;
 
 
@@ -108,6 +111,7 @@ export const authRouter = createRouter({
             clientGeneratedRandom: z.string(),
             userId: z.string(),
         }))
+        .output(publicKeyCredentialCreationOptionsJSONSchema)
         // TODO: .output(z.union([z.object({ success: z.literal(true), options: z.any() }), z.object({ success: z.literal(false), error: z.string() })]))
         .query(async ({ctx, input}) => {
             const userId = BigInt(input.userId);
@@ -150,9 +154,7 @@ export const authRouter = createRouter({
                 data: { challenge: options.challenge },
             });
 
-            return options as typeof options & {
-                rp: { id: string },
-            }
+            return castFromSimpleWebAuthnRegistrationOptions(options);
         })
     ,
 
@@ -162,33 +164,7 @@ export const authRouter = createRouter({
             keypairRequestId: z.string(),
             clientGeneratedRandom: z.string(),
             userId: z.string(),
-            response: z.object({
-                /** This is base64!!! */
-                id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                /** This is base64!!! */
-                rawId: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                response: z.object({
-                    /** This is base64!!! */
-                    clientDataJSON: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                    /** This is base64!!! */
-                    attestationObject: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                    /** This is base64!!! */
-                    authenticatorData: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }).optional(),
-                    transports: z.array(z.string()).optional(),
-                    publicKeyAlgorithm: z.number().optional(),
-                    /** This is base64!!! */
-                    publicKey: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                }),
-                authenticatorAttachment: z.enum(['platform', 'cross-platform']).optional(),
-                clientExtensionResults: z.object({
-                    appid: z.boolean().optional(),
-                    credProps: z.object({
-                        rk: z.boolean().optional(),
-                    }).optional(),
-                    hmacCreateSecret: z.boolean().optional(),
-                }),
-                type: z.enum(['public-key']),
-            }),
+            response: registrationResponseJSONSchema,
         }))
         .output(z.union([
             z.object({
@@ -231,7 +207,7 @@ export const authRouter = createRouter({
                 if (!dbData) throw new Error('Invalid keypair request! This could be because of a bad request, an unsigned keypair request, you didn\'t call auth.getKeyRegistrationParameters first, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
 
                 const verification = await verifyRegistrationResponse({
-                    response: input.response as typeof input.response & { response: typeof input.response.response & { transports: AuthenticatorTransportFuture[] } },
+                    response: castToSimpleWebAuthnRegistrationResponse(input.response),
                     expectedChallenge: dbData.challenge!,
                     expectedOrigin: getExpectedOrigin(ctx, input.response.response.clientDataJSON),
                     expectedRPID: ctx.config.canonicalRoot.hostname,
@@ -493,7 +469,7 @@ export const authRouter = createRouter({
     submitAuthentication: publicProcedure
         .input(z.object({
             authSessionId: z.string(),
-            authResponse: authResponseValidator,
+            authResponse: authenticationResponseJSONSchema,
         }))
         .output(z.union([
             z.object({

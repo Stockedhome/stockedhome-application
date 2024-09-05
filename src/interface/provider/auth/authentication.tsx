@@ -10,6 +10,8 @@ import { TRPCClientError } from '@trpc/client';
 import { authenticateWithWebAuthn } from "lib/webauthn";
 import { useAuthExpiration, useUsername } from "./authStorage";
 import { useRouter } from "solito/app/navigation";
+import type { WebAuthnErrorInfo } from "../../../forks/react-native-passkeys/build"; // TODO: add the package
+import { useControlSplashScreen } from "../splash-screen";
 
 export function isTRPCClientError(
     cause: unknown,
@@ -19,7 +21,7 @@ export function isTRPCClientError(
 
 interface AuthenticationData {
     refetchUser(signal: AbortSignal): Promise<void>;
-    requestNewAuth(customUsername?: string): Promise<void>;
+    requestNewAuth(customUsername?: string): Promise<null | WebAuthnErrorInfo>;
     logOut(): void;
     expiresAt: Date | undefined;
     user: APIRouter['authenticated']['users']['me']['_def']['$types']['output'] | undefined,
@@ -91,14 +93,16 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
         return () => { controller.abort() }
     }, [username, hasFetchedForThisUser, refetchUserQueued, trpcUtils, refetchUser])
 
-    const requestNewAuth = React.useCallback(async (customUsername?: string) => {
+    const requestNewAuth = React.useCallback(async (customUsername?: string): Promise<null | WebAuthnErrorInfo> => {
         if (!trpcUtils || !submitAuthenticationMutation) {
-            return console.warn('Cannot request new auth without trpc!');
+            console.warn('Cannot request new auth without trpc!');
+            return null; // TODO: handle this WAY better
         }
 
         const usernameToUse = customUsername ?? username;
         if (!usernameToUse) {
-            return router.push('/web/login');
+            router.push('/web/login');
+            return null;
         }
 
         setIsTryingToAuthenticate(true);
@@ -110,6 +114,10 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
                 trpcUtils,
             });
 
+            if (Array.isArray(expiration)) {
+                return expiration;
+            }
+
             setUsername_(usernameToUse);
             setHasFetchedForThisUser(true);
             setExpiresAt(expiration);
@@ -118,13 +126,15 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
         } finally {
             setIsTryingToAuthenticate(false);
         }
+
+        return null;
     }, [username, submitAuthenticationMutation, trpcUtils]);
 
     React.useEffect(() => {
         if (expiresAt && expiresAt.getTime() < new Date().getTime() - 60_000) {
             requestNewAuth().catch(console.error);
         }
-    });
+    }, []);
 
     const logOut = React.useCallback(() => {
         setUsername(undefined);
@@ -145,8 +155,18 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
         logOut,
     }), [refetchUser, requestNewAuth, user, username, expiresAt, loading, logOut]);
 
+    const [isFirstLoad, setIsFirstLoad] = React.useState(true)
     React.useEffect(() => {
-        if (user) console.log(`Authenticated as ${user.username}`)
+        if (isFirstLoad && !loading) {
+            setIsFirstLoad(false)
+        }
+    }, [isFirstLoad, loading])
+
+    useControlSplashScreen(!isFirstLoad, 'Authentication Provider')
+
+    React.useEffect(() => {
+        if (user) console.log(`Now authenticated as ${user.username}`)
+        else console.log('Not currently authenticated')
     }, [user])
 
     return <authContext.Provider value={value}>{children}</authContext.Provider>;

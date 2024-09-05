@@ -17,8 +17,8 @@
       "package": "app.stockedhome.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#146fc7",
-        "foregroundImage": "./assets/logo-transparent.256.png",
-        "monochromeImage": "./assets/logo-notification.256.png"
+        "foregroundImage": "./assets/shared/logo-transparent-adaptive.png",
+        "monochromeImage": "./assets/shared/logo-notification-adaptive.png"
       },
       "intentFilters": [
         {
@@ -53,10 +53,10 @@
     },
     "backgroundColor": "#222",
     "userInterfaceStyle": "dark",
-    "icon": "./assets/logo-background.128.png",
+    "icon": "./assets/shared/logo-background.128.png",
     "splash": {
       "backgroundColor": "#146fc7",
-      "image": "./assets/logo-transparent.1024.png",
+      "image": "./assets/shared/logo-transparent.1024.png",
       "resizeMode": "contain"
     },
     "plugins": [

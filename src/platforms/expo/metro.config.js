@@ -26,7 +26,11 @@ const { getDefaultConfig } = require('expo/metro-config');
 const config = getDefaultConfig(expoRoot);
 
 // 1. Watch all files within the monorepo
-config.watchFolders = [projectRoot];
+config.watchFolders = [
+    path.join(projectRoot, 'src'),
+    path.join(projectRoot, 'node_modules'),
+    path.join(projectRoot, '.schemas'),
+];
 
 // 2. Let Metro know where to resolve packages and in what order
 config.resolver.nodeModulesPaths = [

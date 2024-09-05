@@ -1,9 +1,5 @@
-import { browserSupportsWebAuthn } from '@simplewebauthn/browser';
+import { isSupported } from '@stockedhome/react-native-passkeys';
 
 export function isDeviceSupported(): boolean {
-    return false;
-
-    if (!browserSupportsWebAuthn()) {
-        return false;
-    }
+    return isSupported();
 }

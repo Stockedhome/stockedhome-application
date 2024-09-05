@@ -1,6 +1,6 @@
 'use client';
 
-import { ActivityIndicator, P, Row, View, type TextInput } from "dripsy";
+import { ActivityIndicator, P, Row, View, type TextInput, type Sx } from "dripsy";
 import { FontAwesomeIcon } from "./FontAwesomeIcon";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import React, { type RefAttributes } from "react";

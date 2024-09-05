@@ -13,7 +13,7 @@ import { useAuthentication } from '../../provider/auth/authentication';
 import { Platform } from 'react-native';
 import Link from 'next/link';
 import { useRouter } from 'solito/app/navigation/use-router';
-import { ActivityIndicator, P } from 'dripsy';
+import { ActivityIndicator, P, Text } from 'dripsy';
 if (!window.crypto) window.crypto = Crypto as any;
 
 export function SignUpScreen() {
@@ -21,7 +21,7 @@ export function SignUpScreen() {
         <SignUpScreenInternal />
             {
                 Platform.select({
-                    web: ()=>(<Link style={{display: 'none'}} prefetch href="/web/getting-started">Get Started</Link>),
+                    web: ()=>(<Link style={{display: 'none'}} prefetch href="/web/getting-started"><Text>Get Started</Text></Link>),
                     default: ()=>(<></>),
                 })()
             }
@@ -60,6 +60,8 @@ function SignUpScreenInternal() {
         <P>Hold on—you might already be logged in!</P>
         <ActivityIndicator size={48} />
     </>;
+
+    //return <SignUpTestNewPasskeyScreen username={'BellCubeMobile_'} />;
 
     switch (signupStep) {
         case 'new-account':

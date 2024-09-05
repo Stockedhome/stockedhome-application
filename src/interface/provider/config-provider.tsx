@@ -26,8 +26,6 @@ export function ConfigProvider({ primaryConfig, children }: React.PropsWithChild
         isSame: !primaryConfig || !supplementaryConfig || primaryConfig.canonicalRoot.href === supplementaryConfig?.canonicalRoot.href
     }), [primaryConfig, primaryConfig?.canonicalRoot.href, supplementaryConfig, supplementaryConfig?.canonicalRoot.href]);
 
-    console.log('ConfigProvider', value);
-
     return <configContext.Provider value={value}>
         {children}
     </configContext.Provider>
