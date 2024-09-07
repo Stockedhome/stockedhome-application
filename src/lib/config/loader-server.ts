@@ -64,6 +64,10 @@ export async function loadConfigServer(): Promise<Config> {
         validatedConfig = Object.assign(configSchema.parse(configYamlParsed), {
             devMode: env.HOSTING_CONFIGURATION === HostingConfiguration.Development,
         } satisfies ComputedConfigProps);
+
+        if (validatedConfig.captcha.provider !== 'none' && !env.CAPTCHA_SECRET_KEY) {
+            throw new Error(`CAPTCHA provider is not "none", but the environment variable CAPTCHA_SECRET_KEY is not set! [https://docs.stockedhome.app/hosting/configuration/captcha]`);
+        }
     } catch (e) {
         console.log(e);
         throw new Error(`Error validating configuration file ("${configPath}")! See the logs above for more information. [https://docs.stockedhome.app/hosting/configuration#validation-errors]`);

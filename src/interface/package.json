@@ -13,7 +13,10 @@
     "moti": "latest",
     "react-native": "0.74.3",
     "react-native-safe-area-context": "*",
-    "solito": "link:../forks/solito"
+    "react-native-webview": "*",
+    "react-turnstile": "^1.1.3",
+    "solito": "link:../forks/solito",
+    "turnstile-types": "^1.2.2"
   },
   "sideEffects": false
 }

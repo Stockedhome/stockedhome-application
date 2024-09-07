@@ -1,4 +1,5 @@
 import z from "zod";
+import { env } from "../env-schema";
 
 // quick polyfill since the Hermes engine doesn't have URL.canParse()
 if (!URL.canParse) {
@@ -66,17 +67,132 @@ That way, you don't have to worry about the hassle that might cause.
 
 
     /**
-     * If true, extract the user's IP address from the X-Forwarded-For header.
+     * If true, extract the user's IP address from the X-Forwarded-For header, provided by a reverse proxy like Nginx or Cloudflare.
      *
-     * This should only be enabled if you trust the proxy to set the header correctly. Example proxies include Nginx and Cloudflare.
+     * If you do not have a reverse proxy, this should be set to false.
+     * This should only be enabled if you trust your proxy to set the header correctly.
+     *
+     * If your hosting provider provides a NextRequest.ip value, it will always be used.
+     *
+     * IF YOUR HOSTING PROVIDER DOES NOT PROVIDE A NextRequest.ip VALUE:
+     * Because Next.js does not provide a way to get the user's IP address from the connection directly,
+     * setting this to false disables IP address matching when creating a new keypair, thus lowering security.
+     * In local environments, this is not a concern. For SAAS hosting, disabling this is a noteworthy security downgrade.
      */
     trustProxy: z.boolean().describe(`
-If true, extract the user's IP address from the X-Forwarded-For header.
+If true, extract the user's IP address from the X-Forwarded-For header, provided by a reverse proxy like Nginx or Cloudflare.
 
-This should only be enabled if you trust the proxy to set the header correctly. Example proxies include Nginx and Cloudflare.
+If you do not have a reverse proxy, this should be set to false.
+This should only be enabled if you trust your proxy to set the header correctly.
+
+If your hosting provider provides a NextRequest.ip value, it will always be used.
+
+IF YOUR HOSTING PROVIDER DOES NOT PROVIDE A NextRequest.ip VALUE:
+Because Next.js does not provide a way to get the user's IP address from the connection directly,
+setting this to false disables IP address matching when creating a new keypair, thus lowering security.
+In local environments, this is not a concern. For SAAS hosting, disabling this is a noteworthy security downgrade.
 `.trim()),
 
     primaryEndpoints: z.any().optional(), // here so it doesn't get stripped when validating against this schema and not the one that requires the server-side tRPC stuff to be defined
+
+
+
+
+
+
+    /**
+     * Configuration relating to CAPCHAs in the application
+     *
+     * CAPTCHAs anti-bot measures used to reduce spam and abuse.
+     * They're used in important parts of the site, such as account creation and passkey creation.
+     *
+     * CAPTCHA is always handled by the primary server since authentication is also handled by the primary server.
+     *
+     * If your CAPTCHA provider is not `none`, make sure you provide the CAPTCHA_SECRET_KEY environment variable too!
+    */
+    captcha: z.union([
+        z.object({
+            /**
+             * The CAPTCHA provider to use
+             *
+             * * If `none`, no CAPTCHA will be used. This is fine for development and for more privacy-conscious users. This is the default.
+             * * If `cloudflare-turnstile`, the CAPTCHA will be provided by Cloudflare's Turnstile service.
+             * * (Not Yet Implemented) If `google-recaptcha`, the CAPTCHA will be provided by Google's reCAPTCHA.
+             * * (Not Yet Implemented) If `hcaptcha`, the CAPTCHA will be provided by hCaptcha.
+            */
+            provider: z.literal("none").default("none").describe(`
+The CAPTCHA provider to use
+* If \`none\`, no CAPTCHA will be used. This is fine for development and for more privacy-conscious users. This is the default.
+* If \`cloudflare-turnstile\`, the CAPTCHA will be provided by Cloudflare's Turnstile service.
+* (Not Yet Implemented) If \`google-recaptcha\`, the CAPTCHA will be provided by Google's reCAPTCHA.
+* (Not Yet Implemented) If \`hcaptcha\`, the CAPTCHA will be provided by hCaptcha.
+`.trim()),
+
+            /**
+             * A publicly-accessible site key uniquely identifying your site for the CAPTCHA provider.
+             *
+             * This can be removed if the CAPTCHA provider is 'none'.
+            */
+            siteKey: z.string().optional().describe(`
+A publicly-accessible site key uniquely identifying your site for the CAPTCHA provider.
+
+This can be removed if the CAPTCHA provider is 'none'.
+`.trim()),
+
+        }),
+
+
+        z.object({
+            /**
+             * The CAPTCHA provider to use
+             *
+             * * If `none`, no CAPTCHA will be used. This is fine for development and for more privacy-conscious users. This is the default.
+             * * If `cloudflare-turnstile`, the CAPTCHA will be provided by Cloudflare's Turnstile service.
+             * * (Not Yet Implemented) If `google-recaptcha`, the CAPTCHA will be provided by Google's reCAPTCHA.
+             * * (Not Yet Implemented) If `hcaptcha`, the CAPTCHA will be provided by hCaptcha.
+             *
+             * For more on setting up CAPTCHA, see https://docs.stockedhome.app/hosting/configuration/captcha
+            */
+            provider: z.enum([
+                "none",
+                "cloudflare-turnstile",
+                // TODO: "google-recaptcha",
+                // TODO: "hcaptcha",
+            ]).describe(`
+The CAPTCHA provider to use
+* If \`none\`, no CAPTCHA will be used. This is fine for development and for more privacy-conscious users. This is the default.
+* If \`cloudflare-turnstile\`, the CAPTCHA will be provided by Cloudflare's Turnstile service.
+* (Not Yet Implemented) If \`google-recaptcha\`, the CAPTCHA will be provided by Google's reCAPTCHA.
+* (Not Yet Implemented) If \`hcaptcha\`, the CAPTCHA will be provided by hCaptcha.
+
+For more on setting up CAPTCHA, see https://docs.stockedhome.app/hosting/configuration/captcha
+`.trim()),
+
+            /**
+             * A publicly-accessible token uniquely identifying your site for the CAPTCHA provider.
+             *
+             * This can be removed if the CAPTCHA provider is 'none'.
+            */
+            siteKey: z.string().describe(`
+A publicly-accessible token uniquely identifying your site for the CAPTCHA provider.
+
+This can be removed if the CAPTCHA provider is 'none'.
+`.trim()),
+
+        }),
+    ]).describe(`
+Configuration relating to CAPCHAs in the application
+
+CAPTCHAs anti-bot measures used to reduce spam and abuse.
+They're used in important parts of the site, such as account creation and passkey creation.
+
+CAPTCHA is always handled by the primary server since authentication is also handled by the primary server.
+
+If your CAPTCHA provider is not \`none\`, make sure you provide the CAPTCHA_SECRET_KEY environment variable too!
+`.trim()),
+
+
+
 
 
 })

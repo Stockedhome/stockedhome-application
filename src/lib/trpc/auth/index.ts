@@ -29,20 +29,10 @@ import { authenticationResponseJSONSchema, publicKeyCredentialCreationOptionsJSO
 import { castFromSimpleWebAuthnRegistrationOptions } from "@stockedhome/react-native-passkeys/build/casts";
 import type { AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import { castToSimpleWebAuthnAuthenticationResponse, castToSimpleWebAuthnRegistrationResponse } from "@stockedhome/react-native-passkeys/src/casts";
+import { getIpOrIpChain } from "../../ip-address";
+import { validateCaptchaResponse } from "../../captcha";
 
 const base64 = base64_.base64;
-
-
-function getIp(req: NextRequest, config: ConfigSchemaBaseWithComputations) {
-    if (req.ip) return req.ip;
-
-    if (!config.trustProxy) return 'PROXY_NOT_TRUSTED';
-
-    const ip = req.headers.get('x-forwarded-for')
-    if (!ip) throw new Error("You trusted your proxy, but it did not provide an IP address! This means your proxy is either misconfigured or you aren't actually behind a proxy. [https://docs.stockedhome.app/hosting/configuration/ip-address#proxies]");
-
-    return ip;
-}
 
 interface DeviceIdentifier {
     /** User agent string */
@@ -123,7 +113,7 @@ export const authRouter = createRouter({
                         { signedWithKeyId: { not: null } },
                         { user: { publicKeys: {none: {}} } },
                     ],
-                    sendingIP: getIp(ctx.req, ctx.config),
+                    sendingIP: getIpOrIpChain(ctx.req, ctx.config),
                     identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
                 },
                 select: {
@@ -191,7 +181,7 @@ export const authRouter = createRouter({
                             { signedWithKeyId: { not: null } },
                             { user: { publicKeys: {none: {}} } },
                         ],
-                        sendingIP: getIp(ctx.req, ctx.config),
+                        sendingIP: getIpOrIpChain(ctx.req, ctx.config),
                         identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
                         challenge: { not: null },
                     },
@@ -269,6 +259,7 @@ export const authRouter = createRouter({
             username: z.string(),
             password: z.string(),
             email: z.string(),
+            captchaToken: z.string(),
             clientGeneratedRandom: z.string(),
         }))
         .output(z.union([
@@ -287,6 +278,10 @@ export const authRouter = createRouter({
         ]))
         .mutation(async ({ctx, input}) => {
             try {
+                if (!(await validateCaptchaResponse(input.captchaToken, ctx.req, ctx.config))) {
+                    throw new Error('Invalid CAPTCHA token! Please try again.');
+                }
+
                 const reasonForInvalidUsername = await getServerSideReasonForInvalidUsername(input.username);
                 if (reasonForInvalidUsername) throw new Error(`Invalid username (${reasonForInvalidUsername}); please use the auth.checks.validUsername route to check usernames before trying to sign up!`);
 
@@ -311,7 +306,7 @@ export const authRouter = createRouter({
                         pruneAt,
                         newKeypairRequests: {
                             create: {
-                                sendingIP: getIp(ctx.req, ctx.config),
+                                sendingIP: getIpOrIpChain(ctx.req, ctx.config),
                                 identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
                                 pruneAt,
                             },

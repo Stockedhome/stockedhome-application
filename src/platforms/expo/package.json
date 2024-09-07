@@ -26,6 +26,7 @@
     "react-native-screens": "*",
     "react-native-svg": "15.2.0",
     "react-native-web": "*",
+    "react-native-webview": "^13.12.1",
     "solito": "link:../../forks/solito"
   },
   "devDependencies": {

@@ -10,6 +10,7 @@ import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/t
 import { Button, ButtonText } from '../../components/Button';
 import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/checks/usernames/client';
 import { Form } from '../../components/Form';
+import { CAPTCHA } from '../../components/capcha';
 
 // TODO: Require validation before submitting
 
@@ -103,13 +104,15 @@ export function SignUpNewAccountScreen({
     const passwordStorageRef = React.useRef<string>('')
     const password = passwordStorageRef.current
 
+    const [captchaToken, setCaptchaToken] = React.useState<string | null>(null)
+
     const [submitting, setSubmitting] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
 
     const submit = React.useCallback(async () => {
         if (submitting) return
-        if (!isEmailValid || !isUsernameValid || !isPasswordValid) {
+        if (!isEmailValid || !isUsernameValid || !isPasswordValid || !captchaToken) {
             return;
         }
 
@@ -120,6 +123,7 @@ export function SignUpNewAccountScreen({
             email: email!,
             password: password!,
             username: username!,
+            captchaToken,
         });
 
         if (!signupData.success) {
@@ -132,7 +136,7 @@ export function SignUpNewAccountScreen({
         setKeypairRequestId(signupData.keypairRequestId)
         setUsernameInParent(username!)
         setSignupStep('new-passkey')
-    }, [email, username, password, submitting, isEmailValid, isUsernameValid, isPasswordValid])
+    }, [email, username, password, captchaToken, submitting, isEmailValid, isUsernameValid, isPasswordValid])
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -286,8 +290,10 @@ export function SignUpNewAccountScreen({
             />
         </Form>
 
+        <CAPTCHA setToken={setCaptchaToken} setError={setError} actionIdentifier='signup' />
+
         <View sx={{ height: 16 }} />
-        <Button onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid}><ButtonText>Sign Up</ButtonText></Button>
+        <Button onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid || !captchaToken}><ButtonText>Sign Up</ButtonText></Button>
 
     </View>
 }

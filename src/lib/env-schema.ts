@@ -88,6 +88,24 @@ Valid values are:
 
 For information on how Stockedhome loads configuration, see https://docs.stockedhome.app/hosting/configuration/intro#how-stockhome-loads-configuration
 `.trim()),
+
+    /**
+     * Secret Key provided by your CAPTCHA service of choice.
+     *
+     * Not needed if the CAPTCHA provider is set to `none`.
+     *
+     * See the captcha section in the config YAML file for more information.
+     */
+    CAPTCHA_SECRET_KEY: z.string().optional().describe(`
+Secret Key provided by your CAPTCHA service of choice.
+
+Not needed if the CAPTCHA provider is set to \`none\`.
+
+See the captcha section in the config YAML file for more information.
+`.trim()),
+
+
+
 }).merge(z.object({}))
 
 type EnvBase = z.infer<typeof envSchema>;
