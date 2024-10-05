@@ -3,14 +3,22 @@ param (
 )
 
 $Platform = ""
+$doClean = $false
 
 Write-Host ""
 Write-Host "What mobile OS are you building for? (A for Android, I for IOS, D for a plain dev server)" -ForegroundColor Cyan
+Write-Host "If you would like to clear the Expo cache, press C before selecting your platform" -ForegroundColor Cyan
 Write-Host ""
+
 
 while ($Platform -ne "android" -and $Platform -ne "ios" -and $Platform -ne "dev") {
     $key = [Console]::ReadKey($true)
-    if ($key.KeyChar -eq "a") {
+    if ($key.KeyChar -eq "c") {
+        if ($doClean -eq $false) {
+            Write-Host "Will clear Expo cache. Now select a platform..." -ForegroundColor Yellow
+            $doClean = $true
+        }
+    } elseif ($key.KeyChar -eq "a") {
         $Platform = "android"
     } elseif ($key.KeyChar -eq "i") {
         $Platform = "ios"
@@ -25,4 +33,8 @@ if ($Platform -eq "dev") {
     Write-Host "Building for $Platform and then starting dev server" -ForegroundColor Cyan
 }
 
-Invoke-Expression "${Command}:${Platform}"
+if ($doClean -eq $true) {
+    Invoke-Expression "${Command}:${Platform} --clear"
+} else {
+    Invoke-Expression "${Command}:${Platform}"
+}

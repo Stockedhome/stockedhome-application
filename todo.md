@@ -59,3 +59,7 @@
 ## Before Release
 * [ ] Make route configs not optional
 * [ ] Recreate config templates
+
+
+## Down The Line
+* Localization (the app is designed English-only at the moment)

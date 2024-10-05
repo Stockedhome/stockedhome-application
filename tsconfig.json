@@ -4,8 +4,17 @@
     "noUncheckedIndexedAccess": true,
     "target": "ES2018",
     "module": "ESNext",
+    "moduleResolution": "Bundler",
     "allowJs": true,
     "strict": true,
+    "noErrorTruncation": true,
+    "resolvePackageJsonExports": true,
   },
-  "extends": "./node_modules/expo/tsconfig.base.json"
+  "extends": "./node_modules/expo/tsconfig.base.json",
+  "exclude": [
+    "node_modules",
+    "**/*.js",
+    "./src/platforms/expo/android",
+    "./src/platforms/expo/ios",
+  ]
 }

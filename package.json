@@ -81,5 +81,10 @@
     "vitest": "^1.6.0",
     "zod": "^3.23.8",
     "zod-to-json-schema": "^3.23.1"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@hexagon/base64": "patches/@hexagon__base64.patch"
+    }
   }
 }

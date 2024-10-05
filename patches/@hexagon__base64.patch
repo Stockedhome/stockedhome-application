@@ -1,0 +1,40 @@
+This patch ONLY affects type definitions. It does not change the runtime behavior of the library.
+
+diff --git a/package.json b/package.json
+index cb62241befa0d0e76ebf64194683b2c4d3e9c035..0d15de68681ac20cb9524ef659aa9239acfae317 100644
+--- a/package.json
++++ b/package.json
+@@ -56,8 +56,7 @@
+   "exports": {
+     ".": {
+       "import": "./src/base64.js",
+-      "require": "./dist/base64.cjs",
+-      "browser": "./dist/base64.min.js"
++      "require": "./dist/base64.cjs"
+     }
+   },
+   "devDependencies": {
+diff --git a/types/base64.d.ts b/src/base64.d.ts
+similarity index 98%
+rename from types/base64.d.ts
+rename to src/base64.d.ts
+index 17f83436f97b8a310d6158ffe0a2c018a5e17cf5..8816d3d6b7deb7591c8890e9f4b30f9a7c5799c7 100644
+--- a/types/base64.d.ts
++++ b/src/base64.d.ts
+@@ -1,4 +1,5 @@
+ export default base64;
++export as namespace base64;
+ export namespace base64 {
+     /**
+      * Convenience function for converting a base64 encoded string to an ArrayBuffer instance
+diff --git a/types/base64.single.d.ts b/src/base64.single.d.ts
+similarity index 67%
+rename from types/base64.single.d.ts
+rename to src/base64.single.d.ts
+index 6f08cbf8d658305c9327e7b79e35ff3c389557b3..a3a7860c213d4ad20afe7957bcfbc2d3da635a98 100644
+--- a/types/base64.single.d.ts
++++ b/src/base64.single.d.ts
+@@ -1,2 +1,3 @@
+ export default base64;
++export as namespace base64;
+ import base64 from "./base64.js";

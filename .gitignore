@@ -8,6 +8,10 @@ src/apis/
 src/lib/trpc/auth/checks/passwords/common-passwords/
 config/_schema.json
 supabase_prod/volumes/db/init/
+src/interface/components/icons/material-symbols/MaterialSymbolsOutlined.ttf
+src/interface/components/icons/material-symbols/MaterialSymbolsOutlined.json
+src/interface/components/icons/material-symbols/.commit-sha
+database.types.ts
 
 # Test Caching! (caching resources used in tests, not caching test results)
 tests/cache
