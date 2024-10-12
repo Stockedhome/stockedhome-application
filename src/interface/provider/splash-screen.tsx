@@ -40,21 +40,16 @@ export function SplashScreenProvider({ children }: React.PropsWithChildren<{}>) 
         setValues(old => ({ ...old, [id]: {value: newValue, humanReadableName} }));
     }, [values]);
 
-
-    // Log current values for debugging purposes
-    React.useEffect(() => {
-        console.debug('SplashScreenProvider: Current readiness values:', values);
-    }, [values]);
-
-
     const value = React.useMemo(() => {
         const valuesInValues = Object.values(values);
-        return {
+        const value = {
             changeValue,
             hasValues: valuesInValues.length > 0,
-            isReady: valuesInValues.length > 0 && Object.values(values).every(v => v),
+            isReady: valuesInValues.length > 0 && Object.values(values).every(v => v.value),
             values,
         }
+        console.debug('SplashScreenProvider: Current readiness data:', JSON.stringify(value, null, 4));
+        return value
     }, [values]);
 
     // Force a few renders before hiding the splash screen to prevent flickering
@@ -63,17 +58,19 @@ export function SplashScreenProvider({ children }: React.PropsWithChildren<{}>) 
 
     React.useEffect(() => {
         if (!value.isReady) {
-            if (rendersUntilHide !== 3) return setRendersUntilHide(3);
+            if (rendersUntilHide !== 5) setRendersUntilHide(5);
+            return
         }
 
         if (rendersUntilHide <= 0) {
+            console.log('==========================================\n' + 'Hiding splash screen now.\n' + '==========================================');
             SplashScreen.hideAsync();
             return;
         }
 
         console.debug(`SplashScreenProvider: Waiting ${rendersUntilHide} more renders before hiding the splash screen.`);
 
-        requestAnimationFrame(decrementRendersUntilHide);
+        setTimeout(decrementRendersUntilHide);
     }, [value.isReady, rendersUntilHide]);
 
 
@@ -86,6 +83,16 @@ export function SplashScreenProvider({ children }: React.PropsWithChildren<{}>) 
         }, 500);
         return () => clearTimeout(timeout);
     }, [value.hasValues]);
+
+    // Another warning, this time so we get confirmation that the splash screen code has run but never got to hide the screen
+    React.useEffect(() => {
+        if (value.isReady) return;
+
+        const timeout = setTimeout(() => {
+            console.error(`SplashScreenProvider: Splash screen is still visible after 8 seconds. This strongly indicates a bug.`);
+        }, 8000);
+        return () => clearTimeout(timeout);
+    }, [value.isReady])
 
     return <splashScreenContext.Provider value={value}>
         {children}

@@ -1,15 +1,16 @@
 import { cookies } from "next/headers";
 import { db } from "./db";
-import { userVerification } from "./trpc/auth";
 import type { AuthenticatorTransportFuture } from "@simplewebauthn/types";
 import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import type { TRPCGlobalContext } from "./trpc/_trpc";
 import { z } from "zod";
-import base64_ from '@hexagon/base64';
+import base64 from '@hexagon/base64';
 import type { Prisma } from "@prisma/client";
-import { authenticationResponseJSONSchema } from "@stockedhome/react-native-passkeys/src/ReactNativePasskeys.types";
-import { castToSimpleWebAuthnAuthenticationResponse } from "@stockedhome/react-native-passkeys/src/casts";
-const base64 = base64_.base64;
+import { authenticationResponseJSONSchema } from "@stockedhome/react-native-passkeys/ReactNativePasskeys.types";
+import { castToSimpleWebAuthnAuthenticationResponse } from "@stockedhome/react-native-passkeys/casts";
+
+// If an attacker has physical access to your device, them accessing your grocery list is the least of your concerns
+export const userVerification = 'discouraged' as const satisfies UserVerificationRequirement
 
 export const STOCKEDHOME_COOKIE_NAME = 'stockedhome-session-token';
 
@@ -78,7 +79,8 @@ const authSessionSelect = {
             pruneAt: true,
         }},
         sessionCounter: true,
-        id: true,
+        backendId: true,
+        clientId: true,
         publicKey: true,
         clientTransports: true,
     }}
@@ -115,14 +117,14 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
         }
 
         if (sessionData.signedWithKey) {
-            if (sessionData.signedWithKey.id !== authResponse.rawId) {
+            if (sessionData.signedWithKey.clientId !== authResponse.rawId) {
                 return SessionValidationFailureReason.SignedByDifferentKey;
             }
         }
 
         if (!sessionData.signedWithKey) {
-            const newKey = await db.authPublicKey.findUnique({
-                where: { id_userId: { id: authResponse.rawId, userId: sessionData.userId } },
+            const newKey = await db.authPasskey.findUnique({
+                where: { clientId_userId: { clientId: authResponse.rawId, userId: sessionData.userId } },
                 select: authSessionSelect['signedWithKey']['select']
             }).catch(e => {
                 console.error(e);
@@ -146,7 +148,7 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
             requireUserVerification: (userVerification as UserVerificationRequirement) === 'required',
             authenticator: {
                 counter: keyData.sessionCounter || 0,
-                credentialID: keyData.id,
+                credentialID: keyData.clientId,
                 credentialPublicKey: Uint8Array.from(keyData.publicKey),
                 transports: keyData.clientTransports as AuthenticatorTransportFuture[],
             },
@@ -178,7 +180,7 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
             Object.assign(sessionData, await db.authSession.update({
                 where: { id: authSessionId },
                 data: {
-                    signedWithKeyId: keyData.id,
+                    signedWithKeyId: keyData.backendId,
                     pruneAt: expiration,
                 },
                 select: {

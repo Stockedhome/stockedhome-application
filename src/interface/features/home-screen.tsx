@@ -2,16 +2,16 @@
 
 import { View, H1, P, Row, Text, A, useSx } from 'dripsy';
 import { TextLink } from 'solito/link';
-import { TopLevelScreenView } from '../components/TopLevelScreenView';
+import { OptionallyScrollable } from '../components/TopLevelScreenView';
 import { useAuthentication } from '../provider/auth/authentication';
 import { Button, ButtonText } from '../components/Button';
-import { useLogInScreen } from './login-bottom-sheet';
+import { useLogInScreen } from './login-dialog';
 import { Platform, Pressable } from 'react-native';
 
 export function HomeScreen() {
-    return <TopLevelScreenView>
+    return <OptionallyScrollable>
         <HomeScreenInternal />
-    </TopLevelScreenView>
+    </OptionallyScrollable>
 }
 
 function HomeScreenInternal() {

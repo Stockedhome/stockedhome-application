@@ -1,5 +1,4 @@
 {
-  "version": "0.0.0",
   "name": "lib",
   "main": "index.ts",
   "description": "Handled the business logic of the application.",
@@ -7,12 +6,17 @@
     "@simplewebauthn/browser": "^10.0.0",
     "@simplewebauthn/server": "^10.0.0",
     "@simplewebauthn/typescript-types": "^8.3.4",
-    "@stockedhome/react-native-passkeys": "link:../forks/react-native-passkeys",
+    "@stockedhome/react-native-passkeys": "file:../forks/react-native-passkeys",
+    "@supabase/supabase-js": "^2.45.4"
+  },
+  "peerDependencies": {
     "@tanstack/react-query": "*",
     "@trpc/client": "*",
     "@trpc/next": "*",
     "@trpc/react-query": "*",
     "@trpc/server": "*",
+    "@types/node": "20.13.0",
+    "server-only": "^0.0.1",
     "zod": "*"
   },
   "sideEffects": false

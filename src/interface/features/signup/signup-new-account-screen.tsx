@@ -4,15 +4,13 @@ import { View, P, TextInput, H3, ActivityIndicator, Row, H1 } from 'dripsy'
 import { Text, type TextInput as RNTextInput } from 'react-native'
 import React from 'react'
 import { useTRPC } from '../../provider/tRPC-provider';
-import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, PasswordInvalidityReason, getClientSideReasonForInvalidPassword } from 'lib/trpc/auth/checks/passwords/client';
-import { NULL_BUT_DO_NOT_VALIDATE_ASYNC, ValidatedInput } from '../../components/ValidatedInput';
-import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/trpc/auth/checks/emails/client';
+import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, PasswordInvalidityReason, getClientSideReasonForInvalidPassword } from 'lib/trpc/auth/signup-checks/passwords/client';
+import { NULL_BUT_DO_NOT_VALIDATE_ASYNC, StockedhomeValidatedInput } from '../../components/ValidatedInput';
+import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/trpc/auth/signup-checks/emails/client';
 import { Button, ButtonText } from '../../components/Button';
-import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/checks/usernames/client';
+import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/signup-checks/usernames/client';
 import { Form } from '../../components/Form';
 import { CAPTCHA } from '../../components/capcha';
-
-// TODO: Require validation before submitting
 
 export function stringifyPasswordInvalidityReason(reason: PasswordInvalidityReason): Exclude<React.ReactNode, undefined> {
     switch (reason) {
@@ -87,22 +85,22 @@ export function SignUpNewAccountScreen({
 
     const trpcUtils = trpc.useUtils()
 
-    const signUp = trpc.auth.signUp.useMutation()
+    const signUp = trpc.auth.signup.signUp.useMutation()
 
     const emailInputRef = React.useRef<RNTextInput>(null)
     const [isEmailValid, setIsEmailValid] = React.useState(false);
     const emailStorageRef = React.useRef<string>('')
-    const email = emailStorageRef.current
+    //const email = emailStorageRef.current
 
     const usernameInputRef = React.useRef<RNTextInput>(null)
     const [isUsernameValid, setIsUsernameValid] = React.useState(false);
     const usernameStorageRef = React.useRef<string>('')
-    const username = usernameStorageRef.current
+    //const username = usernameStorageRef.current
 
     const passwordInputRef = React.useRef<RNTextInput>(null)
     const [isPasswordValid, setIsPasswordValid] = React.useState(false);
     const passwordStorageRef = React.useRef<string>('')
-    const password = passwordStorageRef.current
+    //const password = passwordStorageRef.current
 
     const [captchaToken, setCaptchaToken] = React.useState<string | null>(null)
 
@@ -118,11 +116,19 @@ export function SignUpNewAccountScreen({
 
         setSubmitting(true)
 
+        console.log({
+            clientGeneratedRandom,
+            email: emailStorageRef.current,
+            password: passwordStorageRef.current,
+            username: usernameStorageRef.current,
+            captchaToken,
+        })
+
         const signupData = await signUp.mutateAsync({
             clientGeneratedRandom,
-            email: email!,
-            password: password!,
-            username: username!,
+            email: emailStorageRef.current,
+            password: passwordStorageRef.current,
+            username: usernameStorageRef.current,
             captchaToken,
         });
 
@@ -134,9 +140,9 @@ export function SignUpNewAccountScreen({
 
         setUserId(signupData.userId)
         setKeypairRequestId(signupData.keypairRequestId)
-        setUsernameInParent(username!)
+        setUsernameInParent(usernameStorageRef.current)
         setSignupStep('new-passkey')
-    }, [email, username, password, captchaToken, submitting, isEmailValid, isUsernameValid, isPasswordValid])
+    }, [emailStorageRef, passwordStorageRef, usernameStorageRef, captchaToken, submitting, isEmailValid, isUsernameValid, isPasswordValid])
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -147,7 +153,7 @@ export function SignUpNewAccountScreen({
 
     if (submitting) {
         return <Row sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <P sx={{ mb: 16 }}>Signing up as {username}...</P>
+            <P sx={{ mb: 16 }}>Signing up as {usernameStorageRef.current}...</P>
             <View sx={{ width: 16 }} />
             <ActivityIndicator size={32} color='highlight' />
         </Row>
@@ -159,7 +165,7 @@ export function SignUpNewAccountScreen({
             <Text>for Stockedhome</Text>
         </H1>
         <Form>
-            <ValidatedInput
+            <StockedhomeValidatedInput
                 InputComponent={TextInput}
                 defaultValue=''
                 emptyValue=''
@@ -178,13 +184,13 @@ export function SignUpNewAccountScreen({
                     const clientInvalidityReason = getClientSideReasonForInvalidEmail(email)
                     if (clientInvalidityReason) return clientInvalidityReason
 
-                    const cachedServerInvalidityReason = trpcUtils.auth.checks.validEmail.getData({email})
+                    const cachedServerInvalidityReason = trpcUtils.auth.signup.checks.validEmail.getData({email})
                     if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
                     else if (cachedServerInvalidityReason === undefined) return null
                     else return cachedServerInvalidityReason
                 }}
                 asyncValidator={async (email: string, abortController: AbortController) => {
-                    const invalidityReason = await trpcUtils.auth.checks.validEmail.ensureData({email}, { signal: abortController.signal })
+                    const invalidityReason = await trpcUtils.auth.signup.checks.validEmail.ensureData({email}, { signal: abortController.signal, staleTime: 60_000 })
                     if (invalidityReason === true) return null;
                     else return invalidityReason
                 }}
@@ -202,7 +208,7 @@ export function SignUpNewAccountScreen({
                 }}
             />
 
-            <ValidatedInput
+            <StockedhomeValidatedInput
                 InputComponent={TextInput}
                 defaultValue=''
                 emptyValue=''
@@ -210,6 +216,9 @@ export function SignUpNewAccountScreen({
                 description={<>
                     <P sx={{color: 'textSecondary'}}>
                         Your username is how other people will see you on Stockedhome.
+                    </P>
+                    <P sx={{color: 'textMuted', marginTop: -4}}>
+                        Usernames must be at least {MIN_USERNAME_LENGTH} characters long and contain at least {MIN_USERNAME_UNIQUE_CHARACTERS} unique characters.
                     </P>
                 </>}
                 invalidityReasonEnum={UsernameInvalidityReason}
@@ -221,13 +230,14 @@ export function SignUpNewAccountScreen({
                     const clientInvalidityReason = getClientSideReasonForInvalidUsername(username)
                     if (clientInvalidityReason) return clientInvalidityReason
 
-                    const cachedServerInvalidityReason = trpcUtils.auth.checks.validUsername.getData({username})
+                    const cachedServerInvalidityReason = trpcUtils.auth.signup.checks.validUsername.getData({username})
                     if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
                     else if (cachedServerInvalidityReason === undefined) return null
                     else return cachedServerInvalidityReason
                 }}
-                asyncValidator={async (username: string) => {
-                    const invalidityReason = await trpcUtils.auth.checks.validUsername.ensureData({username})
+                asyncValidator={async (username: string, abortController) => {
+                    const invalidityReason = await trpcUtils.auth.signup.checks.validUsername.ensureData({username}, { signal: abortController.signal, staleTime: 30_000 })
+                    console.log(username, invalidityReason)
                     if (invalidityReason === true) return null;
                     else return invalidityReason
                 }}
@@ -245,7 +255,7 @@ export function SignUpNewAccountScreen({
                 }}
             />
 
-            <ValidatedInput
+            <StockedhomeValidatedInput
                 InputComponent={TextInput}
                 defaultValue=''
                 emptyValue=''
@@ -255,7 +265,7 @@ export function SignUpNewAccountScreen({
                         You'll use your password any time you want to create a Passkey (device-specific login credential); more on that later.
                     </P>
                     <P sx={{color: 'textMuted', marginTop: -4}}>
-                        Passwords must be at least {MIN_PASSWORD_LENGTH} characters long.
+                        Passwords must be at least {MIN_PASSWORD_LENGTH} characters long and not in any "common password" lists.
                     </P>
                 </>}
                 invalidityReasonEnum={PasswordInvalidityReason}
@@ -267,13 +277,13 @@ export function SignUpNewAccountScreen({
                     const clientInvalidityReason = getClientSideReasonForInvalidPassword(password)
                     if (clientInvalidityReason) return clientInvalidityReason
 
-                    const cachedServerInvalidityReason = trpcUtils.auth.checks.validPassword.getData({password})
+                    const cachedServerInvalidityReason = trpcUtils.auth.signup.checks.validPassword.getData({password})
                     if (cachedServerInvalidityReason === true) return NULL_BUT_DO_NOT_VALIDATE_ASYNC
                     else if (cachedServerInvalidityReason === undefined) return null
                     else return cachedServerInvalidityReason
                 }}
                 asyncValidator={async (password: string, abortController: AbortController) => {
-                    const invalidityReason = await trpcUtils.auth.checks.validPassword.ensureData({password}, { signal: abortController.signal })
+                    const invalidityReason = await trpcUtils.auth.signup.checks.validPassword.ensureData({password}, { signal: abortController.signal })
                     if (invalidityReason === true) return null;
                     else return invalidityReason
                 }}

@@ -19,8 +19,6 @@ jobs:
 
         - name: Set Up PNPM
           uses: pnpm/action-setup@v4
-          with:
-              version: 9
 
 
         - name: Set Up Node.js 21
@@ -32,26 +30,27 @@ jobs:
 
         - name: Install dependencies
           run: pnpm install --frozen-lockfile
+          shell: pwsh
 
-
-        - name: Run Codegen
-          run: pnpm run codegen
 
         # =============================
         #    Workflow-Specific Stuff
         # =============================
 
+        # TODO: Migrate this to a Docker build rather than a regular-ol Next.js build
+
         - uses: actions/cache@v4
           with:
-            path: ${{ github.workspace }}/.next/cache
+            path: ${{ github.workspace }}/src/platfrms/next/.next/cache
             # Generate a new cache whenever packages or source files change.
-            key: nextjs-${{ hashFiles('**/pnpm-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+            key: nextjs-${{ hashFiles('src/pnpm-lock.json') }}-${{ hashFiles('src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx') }}
             # If source files changed but packages didn't, rebuild from a prior cache.
-            restore-keys: nextjs-${{ hashFiles('**/pnpm-lock.json') }}
+            restore-keys: nextjs-${{ hashFiles('src/pnpm-lock.json') }}
 
         - name: Build Next.js Site
           working-directory: src/platforms/next
-          run: pnpm build
+          run: pnpm run build
+          shell: pwsh
 
         - name: Upload Artifact
           uses: actions/upload-artifact@v4

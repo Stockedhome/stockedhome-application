@@ -3,85 +3,77 @@
 import { ActivityIndicator, P, Row, View, type TextInput, type Sx } from "dripsy";
 import { FontAwesomeIcon } from "./FontAwesomeIcon";
 import { faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
-import React, { type RefAttributes } from "react";
+import React from "react";
+import { OnChangePropKeys, StockedhomeInput, type DownstreamInputRef } from "./StockedhomeInput";
 
 export const NULL_BUT_DO_NOT_VALIDATE_ASYNC = Symbol('NULL_BUT_DO_NOT_VALIDATE_ASYNC')
 
-type OnChangePropRecord<TProps extends Record<any, any>, TValueType = any> = { [TKey in keyof TProps as NonNullable<TProps[TKey]> extends ((value: NonNullable<TValueType>) => void) ? TKey : never]: NonNullable<TProps[TKey]> extends ((value: infer TValueType) => void) ? TValueType : never }
-type OnChangePropKeys<TProps extends Record<any, any>, TValueType = any> = keyof OnChangePropRecord<TProps, TValueType>
-type PropsForComponent<TComponent extends React.ComponentType<any>> = TComponent extends React.ComponentType<infer TProps> ? TProps : never
+type EnumValue<TEnum> = TEnum[keyof TEnum]
+type ExtractGenericComponentProps<TComponent> = TComponent extends React.ComponentType<infer TProps> ? TProps : never
 
-type ExtraStuffForValidatedInput<TInputType extends React.ComponentType<any>, TOnChangeProp extends string | number | symbol, TValueType extends any, TInvalidityReason extends string> = {
-    defaultValue: TValueType,
-    inputProps?: Omit<PropsForComponent<TInputType>, 'ref'|'value'|TOnChangeProp>,
-    syncValidator?: (value: TValueType) => TInvalidityReason | null | typeof NULL_BUT_DO_NOT_VALIDATE_ASYNC,
-    asyncValidator?: (value: TValueType, abortController: AbortController) => Promise<TInvalidityReason | null>,
-    renderInvalidityReason: (reason: TInvalidityReason) => React.ReactNode,
-    title?: React.ReactNode,
-    description?: React.ReactNode,
-    onValidationStateChanged?: (isValid: boolean) => void,
-    emptyValue?: TValueType,
-    onValueChange?: (value: TValueType) => void,
-    valueRef?: React.MutableRefObject<TValueType>,
-}
+const DownstreamInputPasserKey = 'StockedhomeValidatedInput_DownstreamInputPasserKey____this_is_really_long_so_to_be_unique'
 
-
-function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value: any}>, TValueType extends PropsForComponent<TInputType>['value'], TInvalidityReasonEnum extends Record<string, string> & {UnknownError: any}, TOnChangeProp extends OnChangePropKeys<PropsForComponent<TInputType>, TValueType>>({
-    invalidityReasonEnum,
-    syncValidator,
-    asyncValidator,
-    title,
-    description,
-    onChangeProp,
-    InputComponent,
-    inputProps,
-    defaultValue,
-    renderInvalidityReason,
+function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value: any}>, TValueType extends React.ComponentProps<TInputType>['value'], TInvalidityReasonEnum extends Record<string, string> & {UnknownError: any}, TOnChangeProp extends OnChangePropKeys<React.ComponentProps<TInputType>, TValueType>>({
     onValidationStateChanged,
     emptyValue,
+    externalInvalidityReason,
+    syncValidator,
+    asyncValidator,
+    renderInvalidityReason,
+    invalidityReasonEnum,
+
+    InputComponent,
+    defaultValue,
+    description,
     onValueChange,
-    valueRef,
-}: {
+    ...shInputProps
+}: React.ComponentPropsWithoutRef<typeof StockedhomeInput<TInputType, TValueType, TOnChangeProp>> & {
+    onValidationStateChanged?: (isValid: boolean) => void,
+    emptyValue?: TValueType,
+    externalInvalidityReason?: EnumValue<TInvalidityReasonEnum>,
+    syncValidator?: (value: TValueType) => EnumValue<TInvalidityReasonEnum> | null | typeof NULL_BUT_DO_NOT_VALIDATE_ASYNC,
+    asyncValidator?: (value: TValueType, abortController: AbortController) => Promise<EnumValue<TInvalidityReasonEnum> | null>,
+    renderInvalidityReason: (reason: EnumValue<TInvalidityReasonEnum>) => React.ReactNode,
     invalidityReasonEnum: TInvalidityReasonEnum,
-    InputComponent: TInputType,
-    onChangeProp: TOnChangeProp,
-} & ExtraStuffForValidatedInput<TInputType, TOnChangeProp, TValueType, TInvalidityReasonEnum[keyof TInvalidityReasonEnum]> & (RefAttributes<PropsForComponent<typeof TextInput> extends {ref?: React.Ref<infer TRefType>} ? TRefType : PropsForComponent<typeof TextInput> extends {ref?: React.Ref<infer TRefType> | React.LegacyRef<infer TRefType>} ? TRefType : TInputType>), ref: React.Ref<TInputType>) {
+} & {ref?: DownstreamInputRef<typeof InputComponent>}, ref: DownstreamInputRef<typeof InputComponent>): React.ReactElement {
     const [invalidityReason, setInvalidReason] = React.useState<TInvalidityReasonEnum[keyof TInvalidityReasonEnum] | null>(null)
     const [isFetching, setIsFetching] = React.useState(false)
-    const [value, setValue] = React.useState<TValueType>(defaultValue)
-
-    React.useEffect(() => {
-        if (onValueChange) {
-            onValueChange(value)
-        }
-    }, [value])
-
-    React.useEffect(() => {
-        if (valueRef) {
-            valueRef.current = value
-        }
-    }, [value, valueRef])
+    const [hasValue, setHasValue] = React.useState(defaultValue !== emptyValue && defaultValue !== undefined)
 
     React.useEffect(() => {
         if (onValidationStateChanged) {
-            onValidationStateChanged(!invalidityReason && !isFetching && value !== emptyValue && value !== undefined)
+            onValidationStateChanged(!invalidityReason && !isFetching && hasValue)
         }
-    }, [invalidityReason, isFetching])
+    }, [invalidityReason, isFetching, hasValue])
 
-    React.useEffect(() => {
+
+    const valueChanceCallbackCancelRef = React.useRef<null | (() => void)>(null)
+
+    const valueChangeCallback = React.useCallback((value: TValueType) => {
+        valueChanceCallbackCancelRef.current?.()
+        onValueChange?.(value)
+
+        setHasValue(value !== emptyValue && value !== undefined)
+
         if (syncValidator) {
+
             const syncInvalidityReason = syncValidator(value)
             if (syncInvalidityReason) {
-                setIsFetching(false)
-                if (syncInvalidityReason !== NULL_BUT_DO_NOT_VALIDATE_ASYNC) {
+                if (syncInvalidityReason === NULL_BUT_DO_NOT_VALIDATE_ASYNC) {
+                    setInvalidReason(null)
+                } else {
                     setInvalidReason(syncInvalidityReason)
                 }
+                if (isFetching) setIsFetching(false)
                 return
             }
         }
 
-        if (asyncValidator) {
-            setIsFetching(true)
+        if (!asyncValidator) {
+            if (isFetching) setIsFetching(false)
+            setInvalidReason(null)
+        } else {
+            if (!isFetching) setIsFetching(true)
             setInvalidReason(null)
 
             const abortController = new AbortController()
@@ -94,34 +86,32 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
                         return
                     }
                     setInvalidReason(asyncInvalidityReason)
+                    setIsFetching(false)
                 }).catch((e) => {
                     console.error('Failed to validate input', e)
                     setInvalidReason(invalidityReasonEnum.UnknownError)
-                }).finally(() => {
                     setIsFetching(false)
                 })
             }, 300)
 
-            return () => {
+            valueChanceCallbackCancelRef.current = () => {
                 clearTimeout(debounceTimeout)
                 abortController.abort()
             }
         }
-    }, [value])
+    }, [onValueChange, asyncValidator, invalidityReasonEnum, emptyValue, syncValidator])
 
-    // NOTE: After making changes to this file, make sure the types are still valid by removing this `any`!
-    const InputComponent_ = InputComponent as any
-
-    return <View sx={{ width: '100%', justifyContent: 'space-between', height: 'auto' }}>
-        {title && <View sx={{ width: '100%', justifyContent: 'flex-start' }}>
-            {title}
-        </View>}
-
-        <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center', height: 56 }}>
-            <InputComponent_ {...(inputProps ?? {})} value={value} {...({[onChangeProp]: setValue})} ref={ref} />
-
+    const WrappedInputComponent = React.useCallback((({
+        [DownstreamInputPasserKey]: { invalidityReason, isFetching, hasValue }, ...inputProps
+    }:
+        ExtractGenericComponentProps<typeof InputComponent> & {
+            [DownstreamInputPasserKey]: { invalidityReason: TInvalidityReasonEnum[keyof TInvalidityReasonEnum] | null, isFetching: boolean, hasValue: boolean }
+        } & {ref?: DownstreamInputRef<typeof InputComponent>}, ref?: DownstreamInputRef<typeof InputComponent>
+    ) => {
+        return <Row sx={{ width: '100%', flex: 1, flexDirection: 'row', alignItems: 'center', height: 56 }}>
+            <InputComponent {...inputProps as any} ref={ref} />
             <View sx={{  width: '20%', height: 32, alignItems: 'center', marginTop: -16 }}>
-                { value !== emptyValue && value !== undefined && (
+                { hasValue && (
                     isFetching
                         ? <ActivityIndicator size={32} color='highlight' />
                         : invalidityReason
@@ -130,18 +120,35 @@ function StockedhomeValidatedInput<TInputType extends React.ComponentType<{value
                 ) }
             </View>
         </Row>
+    }), [InputComponent])
 
+    const WrappedInputComponentForwardedRef = React.useMemo(() => React.forwardRef(WrappedInputComponent as any), [WrappedInputComponent])
 
-        <View sx={{ width: '100%', justifyContent: 'flex-start', height: 'auto' }}>
-            { description }
-        </View>
+    return <StockedhomeInput
+        {...shInputProps}
+        defaultValue={defaultValue}
+        onValueChange={valueChangeCallback}
+        ref={ref}
+        description={<>
+            {description}
+            <P sx={{color: 'errorRed' }}>{
+                externalInvalidityReason !== null && externalInvalidityReason !== undefined
+                    ? renderInvalidityReason(externalInvalidityReason)
+                    : (!hasValue || !invalidityReason)
+                        ? <>&nbsp;</>
+                        : renderInvalidityReason(invalidityReason)}
+            </P>
+        </>}
 
-        {
-            value === emptyValue || value === undefined || !invalidityReason
-                ? <View sx={{ height: 32 }} />
-                : <P sx={{color: 'errorRed' }}>{renderInvalidityReason(invalidityReason)}</P>
-        }
-    </View>
+        inputProps={React.useMemo(() => ({
+            ...shInputProps.inputProps,
+
+            [DownstreamInputPasserKey]: { invalidityReason, isFetching, hasValue }
+        } as unknown as Omit<React.ComponentPropsWithoutRef<typeof InputComponent>, 'value'|TOnChangeProp>), [shInputProps.inputProps, invalidityReason, isFetching, hasValue])}
+
+        InputComponent={WrappedInputComponentForwardedRef as unknown as typeof InputComponent}
+    />
 }
 
-export const ValidatedInput = React.forwardRef(StockedhomeValidatedInput) as any as typeof StockedhomeValidatedInput
+const forwardedRefVersion = React.forwardRef(StockedhomeValidatedInput) as typeof StockedhomeValidatedInput
+export { forwardedRefVersion as StockedhomeValidatedInput }

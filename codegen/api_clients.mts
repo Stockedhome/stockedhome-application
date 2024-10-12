@@ -2,6 +2,7 @@ import { generate } from 'openapi-typescript-codegen';
 import path from 'path';
 import fs from 'fs/promises';
 import url from 'url';
+import type { JsonObject } from '@prisma/client/runtime/library';
 
 console.log('Generating API clients from OpenAPI schemas.')
 
@@ -54,7 +55,7 @@ for (const file of files) {
         continue;
     }
 
-    const remotes = JSON.parse(await fs.readFile(file, 'utf-8'));
+    const remotes = JSON.parse(await fs.readFile(file, 'utf-8')) as Record<string, any>;
     for (const apiName of Object.keys(remotes)) {
         apiClientGenPromises.push(generate(Object.assign({
             input: remotes[apiName],

@@ -3,7 +3,7 @@
 import { View, H1, P, Row, Text, A, useSx } from 'dripsy';
 import { Platform } from 'react-native';
 import { TextLink } from 'solito/link';
-import { TopLevelScreenView } from '../components/TopLevelScreenView';
+import { OptionallyScrollable } from '../components/TopLevelScreenView';
 import { FontAwesomeIcon } from '../components/FontAwesomeIcon';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
@@ -11,7 +11,7 @@ export function HomeScreen() {
     const sx = useSx();
     const deviceOrBrowserLower = Platform.OS === 'web' ? 'browser' : 'device';
     const deviceOrBrowserCapitalized = Platform.OS === 'web' ? 'Browser' : 'Device';
-    return <TopLevelScreenView>
+    return <OptionallyScrollable>
 
         <FontAwesomeIcon icon={faTriangleExclamation} size={96} color="warning" />
         <H1>{deviceOrBrowserCapitalized} Not Supported</H1>
@@ -30,5 +30,5 @@ export function HomeScreen() {
             }
         </View>
 
-    </TopLevelScreenView>;
+    </OptionallyScrollable>;
 }

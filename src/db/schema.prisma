@@ -21,6 +21,10 @@ model User {
     username   String      @unique
     createdAt  DateTime    @default(now())
 
+    /// Current profile pciture as stored in the bucket
+    profilepic String?
+
+    /// Users who have not finished setup are pruned 60 minutes after their latest setup action.
     pruneAt    DateTime?
 
     // ---------------------
@@ -33,23 +37,24 @@ model User {
     //    Auth
     // ----------
     // Asynchronous signing is used as the primary mode of authentication. See lib/jwt/README.md for more information.
-    publicKeys            AuthPublicKey[]
-    authSessions          AuthSession[]
-    newKeypairRequests    NewKeypairRequest[]
+    authPasskeys              AuthPasskey[]
+    authSessions              AuthSession[]
+    authNewPasskeyRequests    AuthNewPasskeyRequest[]
 
-    // Password is only used when requesting a new keypair (prevent auth spam)
+    // Password is only used when requesting a new passkey (prevent auth spam)
     passwordHash  Bytes
     passwordSalt  Bytes
 }
 
-/// NOTE: NewKeypairRequest records are cleared 30 minutes after creation and are deleted after an approved/denied request
-model NewKeypairRequest {
+/// NOTE: AuthNewPasskeyRequest records are cleared 30 minutes after creation and are deleted after an approved/denied request
+model AuthNewPasskeyRequest {
     id               String      @id @default(cuid())
     createdAt        DateTime    @default(now())
     user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId           BigInt
     sendingIP        String
 
+    /// AuthNewPasskeyRequest records are cleared 30 minutes after creation and are deleted after an approved/denied request
     pruneAt          DateTime
 
     /// An identifier not necessarily unique to the device but is unique enough to identify the device given a user ID and IP
@@ -60,11 +65,11 @@ model NewKeypairRequest {
 
     challenge        String?
 
-    /// Keypair requests must be signed by another device before they are approved.
+    /// Passkey requests must be signed by another device before they are approved.
     ///
     /// If `signedWithKey` is null, the request is pending. If it is not null, the request is approved.
-    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: Cascade)
-    signedWithKeyId  String?
+    authorizedByPasskey    AuthPasskey? @relation(fields: [authorizedByPasskeyId], references: [backendId], onDelete: Cascade)
+    authorizedByPasskeyId  String?
 }
 
 /// NOTE: When unsigned, the session is cleared after 15 minutes. When signed, the session is cleared 32 hours after last use.
@@ -89,21 +94,22 @@ model AuthSession {
 
     challenge        String
 
-    signedWithKey    AuthPublicKey? @relation(fields: [userId, signedWithKeyId], references: [userId, id], onDelete: Cascade)
+    signedWithKey    AuthPasskey? @relation(fields: [signedWithKeyId], references: [backendId], onDelete: Cascade)
     signedWithKeyId  String?
 }
 
 /// A public key provided by a user device. This is used to authenticate the user.
-model AuthPublicKey {
+//
+// This table currently does not work with deletion and will error at runtime. See: https://github.com/prisma/prisma/issues/25061
+model AuthPasskey {
+    backendId                  String      @id @default(cuid())
     createdAt                  DateTime    @default(now())
 
     user                       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId                     BigInt
 
     /// ID as stored on the client device
-    ///
-    /// Used when we need to tell the client to use or not to use a specific key/set of keys
-    id                String
+    clientId                String
 
     /// Transports supported by the client's device
     clientTransports           String[]
@@ -113,8 +119,8 @@ model AuthPublicKey {
     /// If a client gives us a lower number than this, we know the key's been used by someone else.
     /// In this situation, we should direct them to support.
     ///
-    /// If support determines we have been contacted by the legitimate accoutn owner,
-    /// this counter should be set to undefined so it can be overwritten when the user signs another message.
+    /// If support determines we have been contacted by the legitimate account owner,
+    /// this counter should be set to null so it can be overwritten when the user signs another message.
     sessionCounter             Int?
 
     publicKey                  Bytes
@@ -122,20 +128,22 @@ model AuthPublicKey {
     /// If this public key was generated when creating the user account for the first time, this field will be null.
     ///
     /// Otherwise, this field will be the ID of the public key used to authenticate the device that authorized the creation of this key.
-    authorizedByKey            AuthPublicKey? @relation(fields: [userId, authorizedByKeyId], references: [userId, id], name: "AuthorizedKeys", onDelete: SetNull)
+    ///
+    /// This currently does not work with deletion and will error at runtime. See: https://github.com/prisma/prisma/issues/25061
+    authorizedByKey            AuthPasskey? @relation(fields: [authorizedByKeyId], references: [backendId], name: "AuthorizedKeys", onDelete: SetNull)
     authorizedByKeyId          String?
 
     /// Any AuthPublicKey records this key has approved the creation of
-    authorizedKeys             AuthPublicKey[] @relation("AuthorizedKeys")
+    authorizedPasskeys         AuthPasskey[] @relation("AuthorizedKeys")
 
     /// Any AuthSession records this key has signed
     authorizedSessions         AuthSession[]
 
-    /// Any pending keypair requests this key has signed
-    authorizedKeypairRequests  NewKeypairRequest[]
+    /// Any pending passkey requests this key has signed
+    authorizedPasskeyRequests  AuthNewPasskeyRequest[]
 
-    @@id([id, userId])
-
+    @@unique([clientId, userId])
+    @@index([clientId, userId])
 }
 
 

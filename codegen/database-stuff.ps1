@@ -8,6 +8,11 @@ if (-not (Test-Path -Path './supabase_prod/volumes/db/init')) {
     New-Item -Path './supabase_prod/volumes/db/init' -ItemType Directory
 }
 
-Write-Output $seed_sql | Out-File -FilePath './supabase_prod/volumes/db/init/schema.sql' -Encoding utf8
+Write-Output $seed_sql | Out-File -FilePath './supabase_prod/supabase_volumes/db/init/schema.sql' -Encoding utf8
 
-Copy-Item -Path ./src/db/prod-stuff.sql -Destination ./supabase_prod/volumes/db/init/prod-stuff.sql -Force
+Copy-Item -Path ./src/db/prod-stuff.sql -Destination ./supabase_prod/supabase_volumes/db/init/prod-stuff.sql -Force
+
+pnpm exec supabase start --ignore-health-check
+pnpm exec prisma db push
+Remove-Item -Path database.types.ts -Force
+pnpm exec supabase gen types --lang=typescript --local > database.types.ts

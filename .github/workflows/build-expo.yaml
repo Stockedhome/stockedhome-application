@@ -48,8 +48,6 @@ jobs:
 
         - name: Set Up PNPM
           uses: pnpm/action-setup@v4
-          with:
-              version: 9
 
 
         - name: Set Up Node.js 21
@@ -59,12 +57,9 @@ jobs:
             cache: 'pnpm'
 
 
-        - name: Install dependencies
-          run: pnpm install --frozen-lockfile
+        #- name: Install dependencies
+        #  run: pnpm install --frozen-lockfile
 
-
-        - name: Run Codegen
-          run: pnpm run codegen
 
         # =============================
         #    Workflow-Specific Stuff
@@ -99,10 +94,14 @@ jobs:
           uses: android-actions/setup-android@v3
 
 
+        # TODO: Set up Xcode for iOS
+
+
         # ==== Build App ====
 
         - name: Build App for ${{ matrix.platform }}
           run: pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ inputs.profile }} --output=build/${{ matrix.platform }}
+          shell: pwsh
 
 
         # ==== Upload Artifact ====

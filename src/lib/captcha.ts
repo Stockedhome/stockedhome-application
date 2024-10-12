@@ -3,12 +3,14 @@ import type { ConfigSchemaBaseWithComputations } from "./config/schema-base";
 import { env } from "./env-schema";
 
 import a from 'turnstile-types';
-import { getIpOrIpChain } from "./ip-address";
+import { getIpOrIpChain } from "./device-identifiers";
 import type { NextRequest } from "next/server";
+import { warnOnce } from "next/dist/build/output/log";
 
 export async function validateCaptchaResponse(token: string, req: NextRequest, config: ConfigSchemaBaseWithComputations): Promise<boolean> {
     switch (config.captcha.provider) {
         case 'none':
+            warnOnce("No CAPTCHA provider is configured. This is not recommended for production use as it can lead to spam.");
             return true;
         case 'cloudflare-turnstile':
             return await validateTurnstileCaptchaResponse(token, req, config);
@@ -27,8 +29,8 @@ async function validateTurnstileCaptchaResponse(token: string, req: NextRequest,
 
     const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
     const result = await fetch(url, {
-      body: formData,
-      method: "POST",
+        body: formData,
+        method: "POST",
     });
 
     const outcome = await result.json();

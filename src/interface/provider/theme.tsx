@@ -36,6 +36,20 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
 }
 
 const theme = makeTheme({
+    customFonts: {
+        rubik: {
+            bold: 'Rubik_400Regular',
+            default: 'Rubik_400Regular',
+            normal: 'Rubik_400Regular',
+            400: 'Rubik_400Regular',
+            500: 'Rubik_500Medium',
+            600: 'Rubik_600SemiBold',
+            700: 'Rubik_600SemiBold',
+            800: 'Rubik_900Black',
+            900: 'Rubik_900Black',
+        },
+    },
+
     types: {
         reactNativeTypesOnly: true,
     },
@@ -171,6 +185,8 @@ const theme = makeTheme({
             borderColor: 'gray',
             color: 'text',
             height: 40,
+            fontFamily: 'root',
+            fontWeight: '500',
         },
     },
     buttons: {
@@ -312,16 +328,6 @@ const theme = makeTheme({
         }
     },
 
-    customFonts: {
-        rubik: {
-            400: 'Rubik_400Regular',
-            500: 'Rubik_500Medium',
-            600: 'Rubik_600SemiBold',
-            700: 'Rubik_600SemiBold',
-            800: 'Rubik_900Black',
-            900: 'Rubik_900Black',
-        },
-    },
     // https://www.dripsy.xyz/usage/theming/create
 });
 

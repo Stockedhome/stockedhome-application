@@ -5,10 +5,11 @@ import type { Metadata } from 'next';
 import { ConfigProvider } from 'interface/provider/config-provider';
 import { loadConfigServer } from 'lib/config/loader-server';
 import { metadata as rootMetadata } from '../layout';
+import { TopLevelScreenView } from 'interface/components/TopLevelScreenView';
 
 export const metadata: Metadata = {
     title: {
-        default: '%% ERROR %%',
+        default: '%% ERROR (/web/) %%',
         template: '%s | Stockedhome Web',
     },
 
@@ -25,10 +26,12 @@ export const metadata: Metadata = {
 const configPromise = loadConfigServer();
 
 export default async function WebAppRootLayout({ children }: { children: React.ReactNode }) {
-    return<ProvidersBeforeConfig>
+    return <ProvidersBeforeConfig>
         <ConfigProvider primaryConfig={await configPromise}>
             <ProvidersAfterConfig>
-                {children}
+                <TopLevelScreenView>
+                    {children}
+                </TopLevelScreenView>
             </ProvidersAfterConfig>
         </ConfigProvider>
     </ProvidersBeforeConfig>

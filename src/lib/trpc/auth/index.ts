@@ -23,16 +23,15 @@ import { getServerSideReasonForInvalidUsername } from "./checks/usernames/server
 import { UsernameInvalidityReason } from "./checks/usernames/client";
 import { hashPassword } from "./password";
 import { cookies } from "next/headers";
-import base64_ from '@hexagon/base64';
+import base64 from '@hexagon/base64';
 import { STOCKEDHOME_COOKIE_NAME, SessionValidationFailureReason, authenticateUser, getExpectedOrigin, getSessionTokenFromRequest } from "../../auth";
 import { authenticationResponseJSONSchema, publicKeyCredentialCreationOptionsJSONSchema, registrationResponseJSONSchema } from "@stockedhome/react-native-passkeys/src/ReactNativePasskeys.types";
-import { castFromSimpleWebAuthnRegistrationOptions } from "@stockedhome/react-native-passkeys/build/casts";
+import { castFromSimpleWebAuthnRegistrationOptions } from "@stockedhome/react-native-passkeys/casts";
 import type { AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
 import { castToSimpleWebAuthnAuthenticationResponse, castToSimpleWebAuthnRegistrationResponse } from "@stockedhome/react-native-passkeys/src/casts";
 import { getIpOrIpChain } from "../../ip-address";
 import { validateCaptchaResponse } from "../../captcha";
 
-const base64 = base64_.base64;
 
 interface DeviceIdentifier {
     /** User agent string */

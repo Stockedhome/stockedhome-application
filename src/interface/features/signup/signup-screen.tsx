@@ -1,23 +1,21 @@
 'use client';
 
-import base64_ from '@hexagon/base64';
-import React from 'react';
-import { SignUpNewAccountScreen } from './signup-new-account-screen';
-import { SignUpNewPasskeyScreen } from './signup-new-passkey-screen';
-import { SignUpTestNewPasskeyScreen } from './signup-test-new-passkey-screen';
-const base64 = base64_.base64;
-
-import * as Crypto from 'expo-crypto';
-import { TopLevelScreenView } from '../../components/TopLevelScreenView';
-import { useAuthentication } from '../../provider/auth/authentication';
-import { Platform } from 'react-native';
-import Link from 'next/link';
-import { useRouter } from 'solito/app/navigation/use-router';
+import base64 from '@hexagon/base64';
 import { ActivityIndicator, P, Text } from 'dripsy';
+import * as Crypto from 'expo-crypto';
+import Link from 'next/link';
+import React from 'react';
+import { Platform } from 'react-native';
+import { useRouter } from 'solito/app/navigation/use-router';
+import { OptionallyScrollable } from '../../components/TopLevelScreenView';
+import { useAuthentication } from '../../provider/auth/authentication';
+import { SignUpNewAccountScreen } from './signup-new-account-screen';
+import { SignUpCreateFirstPasskeyScreen } from './signup-create-first-passkey-screen';
+import { SignUpTestNewPasskeyScreen } from './signup-test-new-passkey-screen';
 if (!window.crypto) window.crypto = Crypto as any;
 
 export function SignUpScreen() {
-    return <TopLevelScreenView scrollable>
+    return <OptionallyScrollable scrollable>
         <SignUpScreenInternal />
             {
                 Platform.select({
@@ -25,7 +23,7 @@ export function SignUpScreen() {
                     default: ()=>(<></>),
                 })()
             }
-    </TopLevelScreenView>
+    </OptionallyScrollable>
 }
 
 function SignUpScreenInternal() {
@@ -67,7 +65,7 @@ function SignUpScreenInternal() {
         case 'new-account':
             return <SignUpNewAccountScreen clientGeneratedRandom={clientGeneratedRandom} setUsername={setUsername} setUserId={setUserId} setKeypairRequestId={setKeypairRequestId} setSignupStep={setSignupStep} />;
         case 'new-passkey':
-            return <SignUpNewPasskeyScreen userId={userId} keypairRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStep={setSignupStep} />;
+            return <SignUpCreateFirstPasskeyScreen userId={userId} keypairRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStep={setSignupStep} />;
         case 'test-passkey':
             return <SignUpTestNewPasskeyScreen username={username} />; // auth code generates its own random
     }

@@ -1,3 +1,3 @@
-export * from '../index';
-import df from  '../index';
-export default df;
+import { HomeScreen } from 'interface/features/home-screen'
+
+export default HomeScreen;

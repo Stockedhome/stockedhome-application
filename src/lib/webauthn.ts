@@ -9,13 +9,13 @@ export async function createNewWebAuthnCredential({
     keypairRequestId,
 }: {
     trpcUtils: ReturnType<TRPCClient['useUtils']>,
-    registerKeyMutation: ReturnType<TRPCClient['auth']['registerKey']['useMutation']>,
+    registerKeyMutation: ReturnType<TRPCClient['auth']['passkeys']['registerKey']['useMutation']>,
     clientGeneratedRandom: string,
     userId: string,
     keypairRequestId: string,
 }): Promise<WebAuthnErrorInfo | null> {
 
-    const credentialCreationOptions = await trpcUtils.auth.getKeyRegistrationParameters.fetch({
+    const credentialCreationOptions = await trpcUtils.auth.passkeys.getKeyRegistrationParameters.fetch({
         clientGeneratedRandom, userId, keypairRequestId,
     });
 
@@ -45,9 +45,9 @@ export async function authenticateWithWebAuthn({
 }: {
     trpcUtils: ReturnType<TRPCClient['useUtils']>,
     username: string,
-    submitAuthenticationMutation: ReturnType<TRPCClient['auth']['submitAuthentication']['useMutation']>,
+    submitAuthenticationMutation: ReturnType<TRPCClient['auth']['session']['submitAuthentication']['useMutation']>,
 }): Promise<WebAuthnErrorInfo | Date> { // TODO: Actually handle errors in WebAuthn authentication!
-    const {authSessionId, options} = await trpcUtils.auth.getAuthenticationParameters.fetch({
+    const {authSessionId, options} = await trpcUtils.auth.session.getAuthenticationParameters.fetch({
         username,
     });
 

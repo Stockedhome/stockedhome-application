@@ -1,4 +1,4 @@
-import type { RegistrationResponseJSON } from "@simplewebauthn/server/script/deps";
+import type { RegistrationResponseJSON } from "@simplewebauthn/types";
 import { StockedhomeError } from "../../_errorClass";
 import { StockedhomeErrorType } from "../../_errorTypeEnum";
 

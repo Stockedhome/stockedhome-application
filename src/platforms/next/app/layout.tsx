@@ -10,7 +10,7 @@ import { loadConfigServer } from 'lib/config/loader-server';
 
 export const metadata: Metadata = {
     title: {
-        default: '%% ERROR %%',
+        default: '%% ERROR (ROOT) %%',
         template: '%s | Stockedhome',
     },
     description: 'Stockedhome is an app for managing your home inventory.',
@@ -196,6 +196,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     if (typeof StyleSheet !== 'undefined' && 'getSheet' in StyleSheet && StyleSheet.getSheet && typeof StyleSheet.getSheet === 'function') {
         sheet = StyleSheet.getSheet();
     }
+
+    console.log('Rendering root layout!')
 
     return <html>
         <head>

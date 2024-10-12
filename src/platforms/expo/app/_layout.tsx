@@ -3,6 +3,7 @@ import { Stack } from 'expo-router'
 import { ConfigAndTRPCProviderMobileEdition } from './mobile-config';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import React from 'react';
+import { View } from 'dripsy';
 
 export default function Root() {
     return <ProvidersBeforeConfig>
@@ -18,5 +19,4 @@ export default function Root() {
             </ProvidersAfterConfig>
         </ConfigAndTRPCProviderMobileEdition>
     </ProvidersBeforeConfig>
-
 }

@@ -191,8 +191,31 @@ CAPTCHA is always handled by the primary server since authentication is also han
 If your CAPTCHA provider is not \`none\`, make sure you provide the CAPTCHA_SECRET_KEY environment variable too!
 `.trim()),
 
+    /**
+     * Configuration related to Supabase
+     */
+    supabase: z.object({
+        /**
+         * The Supabase API URL
+         *
+         * For development, this will typically be `http://127.0.0.1:54321`
+         *
+         * When deployed on Supabase's SAAS, this will be `https://<your-project-id>.supabase.co`
+         */
+        url: z.union([z.string().transform(value => new URL(value)), z.instanceof(URL)]).describe(`
+The Supabase API URL
+
+For development, this will typically be \`http://127.0.0.1:54321\`
+
+When deployed on Supabase's SAAS, this will be \`https://<your-project-id>.supabase.co\`
+`.trim()),
 
 
+
+
+    }).describe(`
+Configuration related to Supabase
+`.trim()),
 
 
 })
@@ -202,8 +225,41 @@ export const configSchemaComputations = z.object({
     /**
      * Whether the application is running in development mode
      */
-    devMode: z.boolean().optional().default(false).describe(`
+    devMode: z.boolean().default(false).describe(`
 Whether the application is running in development mode
+`.trim()),
+
+    /**
+     * Whether the server is being hosted under a Software As A Service deployment, as opposed to local hosting or development servers
+    */
+    isSAAS: z.boolean().default(false).describe(`
+Whether the server is being hosted under a Software As A Service deployment, as opposed to local hosting or development servers
+`.trim()),
+
+    /**
+     * Configuration related to Supabase
+     */
+    supabase: configSchemaBase.shape.supabase.merge(z.object({
+        /**
+         * The Anon Key for Supabase
+         *
+         * The Anon Key is a layer of authentication for otherwise-unauthenticated actions on your Supabase project.
+         * An access token for unauthenticated users, if that makes sense.
+         * It has very few privileges.
+         *
+         * The Anon Key is public and should be treated as such.
+         */
+        anonKey: z.string().default('').describe(`
+The Anon Key for Supabase
+
+The Anon Key is a layer of authentication for otherwise-unauthenticated actions on your Supabase project.
+An access token for unauthenticated users, if that makes sense.
+It has very few privileges.
+
+The Anon Key is public and should be treated as such.
+`.trim()),
+    })).describe(`
+Configuration related to Supabase
 `.trim()),
 
 });

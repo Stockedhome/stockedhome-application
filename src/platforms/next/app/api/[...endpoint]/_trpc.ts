@@ -9,7 +9,6 @@ export interface TRPCGlobalContext {
 }
 
 function generateTRPCInstance() {
-    console.log('Generating TRPC instance')
     return initTRPC.context<TRPCGlobalContext>().create({
         transformer: superjson,
         experimental: {

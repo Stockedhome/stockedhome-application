@@ -12,23 +12,25 @@ declare global {
 }
 
 export async function loadConfigServer(): Promise<Config> {
-    console.log('Loading configuration...');
+    console.log('Loading configuration on the server...');
     if (globalThis.___config___) {
         console.log('Configuration already loaded!')
         return globalThis.___config___;
     }
 
-    const configDir = path.resolve(env.CONFIG_DIR || './config');
+    const configDir = path.resolve(env.IS_DOCKER ? '/config' : env.CONFIG_DIR || './config');
     let configPath = path.join(configDir, `config.${env.HOSTING_CONFIGURATION}.yaml`);
 
     try {
         console.log('Checking config directory...')
-        const stat = await fs.stat(configDir)
+        const stat = await fs.stat(configDir) // TODO: This path, in the Docker container, should be standardized. Link to different docs when using the Docker container.
         if (!stat.isDirectory())
-            throw new Error(`Config directory (process.env.CONFIG_DIR, currently "${configDir}") must be a directory [https://docs.stockedhome.app/hosting/configuration/environment-variables/props/CONFIG_DIR]`);
+            if (env.IS_DOCKER) throw new Error(`Config directory (a Docker volume) must be a directory! [https://docs.stockedhome.app/hosting/configuration/docker-compose#config]`);
+            else throw new Error(`Config directory (process.env.CONFIG_DIR, currently "${configDir}") must be a directory.`);
     } catch (e) {
         console.log(e);
-        throw new Error(`Config directory (process.env.CONFIG_DIR, currently "${configDir}") not found!  [https://docs.stockedhome.app/hosting/configuration/environment-variables/props/CONFIG_DIR]`);
+        if (env.IS_DOCKER) throw new Error(`Config directory (a Docker volume) not found! [https://docs.stockedhome.app/hosting/configuration/docker-compose#config]`);
+        else throw new Error(`Config directory (process.env.CONFIG_DIR, currently "${configDir}") not found!`);
     }
 
     try {
@@ -61,8 +63,14 @@ export async function loadConfigServer(): Promise<Config> {
     try {
         console.log('Validating config file...')
         const { configSchema } = await import('./schema');
-        validatedConfig = Object.assign(configSchema.parse(configYamlParsed), {
+        const baseParsedConfig = configSchema.parse(configYamlParsed);
+        validatedConfig = Object.assign(baseParsedConfig, {
             devMode: env.HOSTING_CONFIGURATION === HostingConfiguration.Development,
+            supabase: {
+                url: baseParsedConfig.supabase.url,
+                anonKey: env.SUPABASE_PUBLISHABLE_KEY,
+            },
+            isSAAS: env.HOSTING_CONFIGURATION === HostingConfiguration.SoftwareAsAService,
         } satisfies ComputedConfigProps);
 
         if (validatedConfig.captcha.provider !== 'none' && !env.CAPTCHA_SECRET_KEY) {

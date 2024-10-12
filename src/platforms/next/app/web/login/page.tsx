@@ -1,4 +1,4 @@
-import { TopLevelScreenView } from "interface/components/TopLevelScreenView";
+import { OptionallyScrollable } from "interface/components/TopLevelScreenView";
 import { LoginPageClient } from "./LoginPage";
 
 export const metadata = {
@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 export default function LoginPage() {
-    return <TopLevelScreenView>
+    return <OptionallyScrollable>
         <LoginPageClient />
-    </TopLevelScreenView>;
+    </OptionallyScrollable>;
 }

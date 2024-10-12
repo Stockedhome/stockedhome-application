@@ -1,17 +1,15 @@
 'use client';
 
-import type { Prisma } from "@prisma/client";
-import { P } from "dripsy";
 import React from "react";
 import { useTRPC } from "../tRPC-provider";
 import type { APIRouter } from "lib/trpc/primaryRouter";
-import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 import { TRPCClientError } from '@trpc/client';
 import { authenticateWithWebAuthn } from "lib/webauthn";
 import { useAuthExpiration, useUsername } from "./authStorage";
 import { useRouter } from "solito/app/navigation";
-import type { WebAuthnErrorInfo } from "../../../forks/react-native-passkeys/build"; // TODO: add the package
+import type { WebAuthnErrorInfo } from "@stockedhome/react-native-passkeys/errors";
 import { useControlSplashScreen } from "../splash-screen";
+import type * as _ from "../../features/login-dialog";
 
 export function isTRPCClientError(
     cause: unknown,
@@ -24,7 +22,7 @@ interface AuthenticationData {
     requestNewAuth(customUsername?: string): Promise<null | WebAuthnErrorInfo>;
     logOut(): void;
     expiresAt: Date | undefined;
-    user: APIRouter['authenticated']['users']['me']['_def']['$types']['output'] | undefined,
+    user: APIRouter['user']['me']['userData']['_def']['$types']['output'] | undefined,
     username: string | undefined;
     loading: boolean;
 }
@@ -43,8 +41,8 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
     const trpc = useTRPC()
     const trpcUtils = trpc?.useUtils()
     const router = useRouter();
-    const submitAuthenticationMutation = trpc?.auth.submitAuthentication.useMutation()
-    const signOutMutation = trpc?.auth.signOut.useMutation()
+    const submitAuthenticationMutation = trpc?.auth.session.submitAuthentication.useMutation()
+    const signOutMutation = trpc?.auth.session.signOut.useMutation()
 
     const [username, setUsername_, isLoadingUsername] = useUsername() // fetches the previous username for us, if it exists
     const [expiresAt, setExpiresAt, isLoadingExpiration] = useAuthExpiration()
@@ -59,13 +57,12 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
 
     const [isTryingToAuthenticate, setIsTryingToAuthenticate] = React.useState(true)
 
-    const [refetchUserQueued, setRefetchUserQueued] = React.useState(false)
     const refetchUser = React.useCallback(async (signal?: AbortSignal) => {
-        if (!trpcUtils) return setRefetchUserQueued(true)
+        if (!trpcUtils) return;
 
         setIsTryingToAuthenticate(true)
         try {
-            const user = await trpcUtils.authenticated.users.me.fetch(undefined, { signal })
+            const user = await trpcUtils.user.me.userData.fetch(undefined, { signal })
             if (signal?.aborted) return;
             setUser(user)
             setUsername_(user.username);
@@ -86,12 +83,17 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
     }, [trpcUtils]);
 
     React.useEffect(() => {
+        console.log('Checking if we need to refetch user data...', { username, hasFetchedForThisUser })
         if (!username || hasFetchedForThisUser) return setIsTryingToAuthenticate(false)
 
         const controller = new AbortController();
         refetchUser(controller.signal)
         return () => { controller.abort() }
-    }, [username, hasFetchedForThisUser, refetchUserQueued, trpcUtils, refetchUser])
+    }, [username, hasFetchedForThisUser, refetchUser])
+
+    React.useEffect(() => {
+        setHasFetchedForThisUser(false)
+    }, [trpcUtils])
 
     const requestNewAuth = React.useCallback(async (customUsername?: string): Promise<null | WebAuthnErrorInfo> => {
         if (!trpcUtils || !submitAuthenticationMutation) {
@@ -101,7 +103,10 @@ export function AuthenticationProvider({ children }: { children: React.ReactNode
 
         const usernameToUse = customUsername ?? username;
         if (!usernameToUse) {
-            router.push('/web/login');
+            if (window.loginProvider?.isLogInScreenVisible)
+                console.warn('Tried to request a new auth while the login screen was visible AND with no username provided.');
+            else
+                window.loginProvider?.showLogInScreen();
             return null;
         }
 

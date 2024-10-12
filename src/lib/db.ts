@@ -11,7 +11,7 @@ function generateDatabaseInstance() {
     return client;
 }
 
-// add __db__ to the global object
+// add __db__ to the global object so the Next.js dev client doesn't make Prisma clients all willy-nilly
 declare global {
     var __db__: ReturnType<typeof generateDatabaseInstance>;
 }

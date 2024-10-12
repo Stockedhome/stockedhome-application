@@ -14,17 +14,22 @@ if (!fs.existsSync(path.join(nextRoot, './.env'))) {
 }
 
 /** @type {import('next').NextConfig} */
-const nextConfig = withExpo(withFonts(
-    /** @type {import('next').NextConfig} */
-    {
-        //       // ~~reanimated (and thus, Moti) doesn't work with strict mode currently...~~
-        // fixed // ~~https://github.com/nandorojo/moti/issues/224~~
-        //       // https://github.com/necolas/react-native-web/pull/2330
-        reactStrictMode: true,
+const baseConfig = {
+    //       // ~~reanimated (and thus, Moti) doesn't work with strict mode currently...~~
+    // fixed // ~~https://github.com/nandorojo/moti/issues/224~~
+    //       // https://github.com/necolas/react-native-web/pull/2330
+    reactStrictMode: true,
 
-        experimental: {
-            forceSwcTransforms: true,
-            instrumentationHook: true,
+    images: {
+        contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+        disableStaticImages: true,
+    },
+
+    output: 'standalone',
+
+    experimental: {
+        forceSwcTransforms: true,
+        instrumentationHook: true,
 //            turbo: {
 //                resolveAlias: {
 //                    // Alias direct react-native imports to react-native-web
@@ -40,32 +45,35 @@ const nextConfig = withExpo(withFonts(
 //                },
 //                resolveExtensions: [".web.tsx", ".web.ts", ".web.jsx", ".web.js", ".web.mjs", ".web.json", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".json", ".web.tsx", ".web.ts", ".web.jsx", ".web.js", ".web.mjs", ".web.json"],
 //            },
-        },
+    },
 
-    /** @param {import('webpack').Configuration} config */
-       webpack(config, options) {
-            return config;
-       },
+/** @param {import('webpack').Configuration} config */
+   webpack(config, options) {
+        return config;
+   },
 
-        transpilePackages: [
-            "react-native",
-            "react-native-web",
-            "solito",
-            "dripsy",
-            "@dripsy/core",
-            "moti",
-            "app",
-            "react-native-reanimated",
-            "@expo/html-elements",
-            "react-native-gesture-handler",
-            'expo',
-            '@react-native/assets-registry',
-        ],
+    transpilePackages: [
+        "react-native",
+        "react-native-web",
+        //"solito",
+        "dripsy",
+        "@dripsy/core",
+        "moti",
+        "app",
+        "react-native-reanimated",
+        "@expo/html-elements",
+        "react-native-gesture-handler",
+        'expo',
+        '@react-native/assets-registry',
+        "react-native-vector-icons",
+        "@expo/vector-icons",
+    ],
 
-        //resolveAlias: {
-        //    '@react-native/assets-registry': 'react-native-web/dist/exports/AssetsRegistry',
-        //},
-    }
-));
+    //resolveAlias: {
+    //    '@react-native/assets-registry': 'react-native-web/dist/exports/AssetsRegistry',
+    //},
+}
+
+const nextConfig = withExpo(withFonts(baseConfig));
 
 export default nextConfig;

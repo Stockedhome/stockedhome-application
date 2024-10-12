@@ -9,10 +9,13 @@
     "strict": true,
     "noErrorTruncation": true,
     "resolvePackageJsonExports": true,
+    "noEmit": true,
   },
   "extends": "./node_modules/expo/tsconfig.base.json",
   "exclude": [
+    "dist",
     "node_modules",
+    "__node_modules",
     "**/*.js",
     "./src/platforms/expo/android",
     "./src/platforms/expo/ios",

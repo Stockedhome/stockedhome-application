@@ -9,14 +9,6 @@ console.log('Entering Metro Bundler config 🎇');
 const expoRoot = __dirname;
 const projectRoot = path.resolve(expoRoot, '../../../');
 
-if (!fs.existsSync(path.join(expoRoot, './.env'))) {
-    if (fs.existsSync(path.join(projectRoot, './.env'))) {
-        fs.symlinkSync(path.join(projectRoot, './.env'), path.join(expoRoot, './.env'), 'file');
-        console.log('Symlinked .env from project root to expo root. You will need to restart the Expo server to pick up the changes.');
-        process.exit(1);
-    }
-}
-
 
 /**
  * @type {import('expo/metro-config')}

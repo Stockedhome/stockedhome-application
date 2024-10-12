@@ -11,23 +11,29 @@ export function useUsername() {
     const [isLoading, setIsLoading] = React.useState(true);
 
     React.useEffect(()=>{
+        //console.log('Fetching username from storage...');
         (async ()=>{
             try {
                 const username = await AsyncStorage.getItem("last_username")
                 if (!username || usernameRef.current) return;
+                //console.log('Got username from storage:', username)
                 setUsername(username)
             } finally {
+                //console.log('Done fetching username from storage.')
                 setIsLoading(false)
             }
         })()
     }, []);
 
     React.useEffect(()=>{
-        if (!isLoading) return;
+        //console.log('Checking if we need to save username to storage...', { username, isLoading })
+        if (isLoading) return;
 
         if (username) {
+            //console.log('Saving username to storage:', username)
             AsyncStorage.setItem("last_username", username)
         } else {
+            //console.log('Removing username from storage.')
             AsyncStorage.removeItem("last_username")
         }
 
@@ -56,7 +62,7 @@ export function useAuthExpiration() {
     }, []);
 
     React.useEffect(()=>{
-        if (!isLoading) return;
+        if (isLoading) return;
 
         if (expiresAt) {
             AsyncStorage.setItem("auth_expires_at", expiresAt.toISOString())

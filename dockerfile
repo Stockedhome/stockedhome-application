@@ -1,43 +1,33 @@
-FROM node:20-slim as base
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
-
-
-
-
-FROM node:20-slim as dependencies
+FROM node:20-slim AS no-static
 
 WORKDIR /
 
-COPY package.json pnpm-lock.json ./
+COPY src/platforms/next/.next/standalone ./
+COPY src/db/schema.prisma /schema.prisma
 
-RUN npm install -g pnpm
-
-# also runs codegen
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-
-
-
-
-FROM dependencies as build
+RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /
 
-COPY . .
+ENV IS_DOCKER=true
+ENV CONFIG_DIR=/config
+ENV PORT=3000
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["node", "src/platforms/next/server.js"]
 
-RUN pnpm run build-next
 
 
-
-
-FROM base as release
+FROM no-static AS with-static
 
 WORKDIR /
 
-COPY --from=dependencies /node_modules ./node_modules
+COPY src/platforms/next/.next/static ./src/platforms/next/.next/static
+COPY src/platforms/next/public ./src/platforms/next/public
 
-COPY --from=build /dist ./dist
-
-CMD ["node", "dist/index.js"]
+ENV IS_DOCKER=true
+ENV CONFIG_DIR=/config
+ENV PORT=3000
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["node", "src/platforms/next/server.js"]

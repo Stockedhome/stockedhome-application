@@ -1,7 +1,7 @@
 'use client'
 
-import { LogInScreenComponent } from "interface/features/login-bottom-sheet";
-import { Image } from "interface/components/Image";
+import { LogInScreenComponent } from "interface/features/login-dialog";
+import { Image } from "interface/components/image/Image";
 import { View } from "dripsy";
 import { useAuthentication } from "interface/provider/auth/authentication";
 import { redirect } from "next/navigation";

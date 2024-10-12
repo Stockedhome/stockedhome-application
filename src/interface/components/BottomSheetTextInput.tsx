@@ -30,7 +30,7 @@ const colorKeys: Record<ColorKeys, true> = {
 
 export function BottomSheetTextInput({ ...props }: DripsyTextInputProps) {
     const { theme } = useDripsyTheme();
-    Object.keys(colorKeys).forEach((key) => {
+    Object.keys(colorKeys).forEach((key: ColorKeys) => {
         if (props[key] && theme?.colors) {
             props[key] = get(theme.colors, props[key] as string) ?? props[key];
         }

@@ -3,9 +3,9 @@ import { useNavigation } from 'expo-router';
 import React from 'react';
 import { TextLink } from 'solito/link';
 import { type TextInput as RNTextInput } from 'react-native'
-import { TopLevelScreenView } from 'interface/components/TopLevelScreenView';
+import { OptionallyScrollable, TopLevelScreenView } from 'interface/components/TopLevelScreenView';
 import type { Config } from 'lib/config/schema';
-import { ValidatedInput } from 'interface/components/ValidatedInput';
+import {StockedhomeValidatedInput } from 'interface/components/ValidatedInput';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useConfig } from 'interface/provider/config-provider';
 import { useMobileConfigContext } from '../mobile-config';
@@ -39,7 +39,7 @@ export default function ChooseConfig() {
     const supplementaryConfigAsyncValidator = React.useCallback((value: string) => configUrlAsyncValidator(storedSupplementaryConfig, value), [storedSupplementaryConfig])
     const [isSupplementaryConfigValid, setIsSupplementaryConfigValid] = React.useState(false)
 
-    return <TopLevelScreenView scrollable><View sx={{alignItems: 'left'}}>
+    return <TopLevelScreenView><OptionallyScrollable scrollable><View sx={{alignItems: 'left'}}>
 
         <View sx={{ height: 8 }} />
 
@@ -50,7 +50,7 @@ export default function ChooseConfig() {
 
         <View sx={{ height: 32 }} />
 
-        <ValidatedInput
+        <StockedhomeValidatedInput
             title={<H2>Primary Server</H2>}
             description={<>
                 <P sx={{color: 'textSecondary'}}>
@@ -85,7 +85,7 @@ export default function ChooseConfig() {
 
         <View sx={{ height: 24 }} />
 
-        <ValidatedInput
+        <StockedhomeValidatedInput
             title={<H2>Supplementary Server</H2>}
             description={<>
                 <P sx={{color: 'textSecondary'}}>
@@ -129,7 +129,7 @@ export default function ChooseConfig() {
             nav.goBack();
         }}><ButtonText>OK</ButtonText></Button>
 
-    </View></TopLevelScreenView>
+    </View></OptionallyScrollable></TopLevelScreenView>
 }
 
 

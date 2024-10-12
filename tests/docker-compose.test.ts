@@ -5,6 +5,9 @@ import path from 'path';
 import { beforeAll, describe, test, expect, beforeEach } from 'vitest';
 import yaml from 'js-yaml';
 import type { DockerCompose } from './docker-compose-schema';
+import packageJson from '../package.json'
+import { envSchema } from '../src/lib/env-schema';
+import { z } from 'zod';
 
 // https://github.com/supabase/supabase/blob/master/docker/docker-compose.yml
 
@@ -19,16 +22,7 @@ const octokit = new Octokit({
         error: console.error,
     },
     userAgent: 'Stockedhome Codegen',
-}) as
-// octokit doesn't export their types correctly (giving Octokit type `any` because of a bad import in 'octokit.d.ts')
-// so we have to manually fix the error here
-InstanceType<typeof OctokitCore & import("@octokit/core/dist-types/types").Constructor<{
-    paginate: import("@octokit/plugin-paginate-rest").PaginateInterface;
-} & import("@octokit/plugin-paginate-graphql").paginateGraphQLInterface & import("@octokit/plugin-rest-endpoint-methods").Api & {
-    retry: {
-        retryRequest: (error: import("@octokit/request-error").RequestError, retries: number, retryAfter: number) => import("@octokit/request-error").RequestError;
-    };
-}>>;
+});
 
 let downloadDockerCompose = false;
 let latestReleaseTag = '________[  ]_____  NOT  BASE64  ____[  ]___________';
@@ -92,6 +86,13 @@ const IGNORED_SUPABASE_SERVICES = [ 'auth', 'functions' ]
 
 describe('Service images match latest Supabase release', ()=>{
     if (!supabaseDockerCompose) throw new Error('beforeAll never ran!')
+
+    supabaseDockerCompose.services ??= {}
+    supabaseDockerCompose.services['stockedhome-web-server'] = {
+        container_name: "main",
+        image: `stockedhome/web-server:with-static-${packageJson.version}`,
+    }
+
     for (const [sbServiceName, sbService] of Object.entries(supabaseDockerCompose.services ?? {})) {
         if (IGNORED_SUPABASE_SERVICES.includes(sbServiceName)) continue;
 
@@ -104,6 +105,47 @@ describe('Service images match latest Supabase release', ()=>{
 
             if (!shService) return;
             expect(shService.image).toBe(sbService.image)
+        })
+    }
+})
+
+// credit to @navtoj for getting the keys from a zod object
+// https://github.com/colinhacks/zod/discussions/2134#discussioncomment-5194111
+// get zod object keys recursively
+function zodKeys<T extends z.ZodTypeAny>(schema: T): string[] {
+	// make sure schema is not null or undefined
+	if (schema === null || schema === undefined) return [];
+	// check if schema is nullable or optional
+	if (schema instanceof z.ZodNullable || schema instanceof z.ZodOptional) return zodKeys(schema.unwrap());
+	// check if schema is an array
+	if (schema instanceof z.ZodArray) return zodKeys(schema.element);
+	// check if schema is an object
+	if (schema instanceof z.ZodObject) {
+		// get key/value pairs from schema
+		const entries = Object.entries(schema.shape);
+		// loop through key/value pairs
+		return entries.flatMap(([key, value]) => {
+			// get nested keys
+			const nested = value instanceof z.ZodType ? zodKeys(value).map(subKey => `${key}.${subKey}`) : [];
+			// return nested keys
+			return nested.length ? nested : key;
+		});
+	}
+	// return empty array
+	return [];
+};
+
+describe('Stockedhome Service Has Necessary ENV Variables', ()=>{
+    if (!stockedhomeDockerCompose) throw new Error('beforeAll never ran!')
+
+    const composeEnvKeys = Object.keys(stockedhomeDockerCompose.services?.['stockedhome-web-server']?.environment as Record<string, string> ?? {})
+    const envSchemaKeys = new Set(zodKeys(envSchema))
+    envSchemaKeys.delete('CONFIG_DIR')
+    envSchemaKeys.delete('IS_DOCKER')
+
+    for (const key of envSchemaKeys) {
+        test(`${key}`, ()=>{
+            expect(composeEnvKeys).includes(key)
         })
     }
 })

@@ -11,8 +11,6 @@
 
         - name: Set Up PNPM
           uses: pnpm/action-setup@v4
-          with:
-              version: 9
 
 
         - name: Set Up Node.js 21
@@ -24,10 +22,8 @@
 
         - name: Install dependencies
           run: pnpm install --frozen-lockfile
+          shell: pwsh
 
-
-        - name: Run Codegen
-          run: pnpm run codegen
 
         # =============================
         #    Workflow-Specific Stuff

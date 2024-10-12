@@ -19,7 +19,7 @@ export const envSchema = z.object({
      * * On Windows, you can run the PowerShell command `[Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(16))`
      * * On Linux or MacOS, you can run the bash command `openssl rand -base64 16`
     */
-    PASSWORD_PEPPER: z.string().describe(`
+    PASSWORD_PEPPER: z.string().refine(s => s.length > 2).describe(`
 In addition to a randomly-generated, per-password "salt" value, this value will be added to every password before hashing.
 
 This helps increase security in the case that the database is compromised but the application itself is not.
@@ -58,11 +58,11 @@ This is NOT needed unless you are making changes to the databse schema or runnin
 `.trim()),
 
     /**
-     * The directory where the configuration files are stored.
+     * The directory where the configuration files are stored. NOT used in the Docker container.
      *
      * For information on how Stockedhome loads configuration, see https://docs.stockedhome.app/hosting/configuration/intro#how-stockhome-loads-configuration
     */
-    CONFIG_DIR: z.string().describe(`
+    CONFIG_DIR: z.string().default('./config').describe(`
 The directory where the configuration files are stored.
 
 For information on how Stockedhome loads configuration, see https://docs.stockedhome.app/hosting/configuration/intro#how-stockhome-loads-configuration
@@ -105,6 +105,73 @@ See the captcha section in the config YAML file for more information.
 `.trim()),
 
 
+    /**
+     * The Secret Key for Supabase (formerly known as the Service Role Key)
+     *
+     * This key grants full access to every Supabase service.
+     * It should be kept absolutely secret.
+     */
+    SUPABASE_SECRET_KEY: z.string().refine(s => s.length > 2).describe(`
+The Secret Key for Supabase (formerly known as the Service Role Key)
+
+This key grants full access to every Supabase service.
+It should be kept absolutely secret.
+`.trim()),
+
+    /**
+     * The Publishable Key for Supabase (formerly known as the Anon Key)
+     *
+     * The Publishable Key is a layer of authentication for otherwise-unauthenticated actions on your Supabase project.
+     * An access token for unauthenticated users, if that makes sense.
+     * It has very few privileges.
+     *
+     * The Publishable Key is public and should be treated as such.
+     */
+    SUPABASE_PUBLISHABLE_KEY: z.string().refine(s => s.length > 2).describe(`
+The Publishable Key for Supabase (formerly known as the Anon Key)
+
+The Publishable Key is a layer of authentication for otherwise-unauthenticated actions on your Supabase project.
+An access token for unauthenticated users, if that makes sense.
+It has very few privileges.
+
+The Publishable Key is public and should be treated as such.
+`.trim()),
+
+
+    /**
+     * SHA-256 fingerprint(s) of the Android app's signing certificate(s).
+     *
+     * Required for Android App Links and WebAuthn.
+     *
+     * If using the default Android app, use the default value.
+     * If using a custom Android app, you will need to provide the SHA-256 fingerprint(s) of the signing certificate(s).
+     * Do not overwrite the original value or you will be UNABLE to use the default app.
+     *
+     * This value is comma-separated and ignores whitespace. For example, `AB:CD:...:MN:OP, HI:JK:...:UV:WX` is valid.
+    */
+    ANDROID_APP_SHA256_CERT_FINGERPRINTS: z.string().transform(s => s.split(',').map(s2 => s2.trim()).filter(s => s.length > 0)).optional().describe(`
+The SHA-256 fingerprint of the Android app's signing certificate.
+
+Required for Android App Links and WebAuthn.
+
+If using the default Android app, use the default value.
+If using a custom Android app, you will need to provide the SHA-256 fingerprint of the signing certificate.
+Do not overwrite the original value or you will be UNABLE to use the default app.
+
+This value is comma-separated and ignores whitespace. For example, \`AB:CD:...:MN:OP, HI:JK:...:UV:WX\` is valid.
+`.trim()),
+
+
+    /**
+     * Whether the server is running in a Docker container.
+     *
+     * Defaults to false.
+     */
+    IS_DOCKER: z.enum(['true', 'false']).default('false').transform(v => v === 'true').describe(`
+Whether the server is running in a Docker container.
+
+Defaults to false.
+`.trim()),
 
 }).merge(z.object({}))
 

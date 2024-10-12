@@ -12,7 +12,7 @@ import superjson from 'superjson';
 const trpc = createTRPCClient<APIRouter>({
     links: [
         httpBatchLink({
-            url: `http://localhost:${process.env.PORT ?? 3000}/api/`,
+            url: `${process.env.__NEXT_PRIVATE_ORIGIN}/api/`, // __NEXT_PRIVATE_ORIGIN is set by Next.js, both in dev and prod, and is incredibly reliable--even inside Docker and such
             transformer: superjson,
         }),
     ],

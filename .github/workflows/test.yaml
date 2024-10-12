@@ -13,7 +13,62 @@ on:
 
 
 jobs:
-  test:
+  tests-code:
+    name: Code Tests
+    runs-on: ubuntu-latest
+    steps:
+
+        # ============================
+        #        Project Setup
+        # ============================
+
+        - name: Clone Repo
+          uses: actions/checkout@v4
+          with:
+            submodules: 'recursive'
+
+
+        - name: Set Up PNPM
+          uses: pnpm/action-setup@v4
+
+
+        - name: Set Up Node.js 21
+          uses: actions/setup-node@v4
+          with:
+            node-version: 21
+            cache: 'pnpm'
+
+
+        - name: Install dependencies
+          run: pnpm install --frozen-lockfile
+
+
+        # =============================
+        #    Workflow-Specific Stuff
+        # =============================
+
+        - name: Run Code Tests
+          run: pnpm test-code
+
+
+  build-expo:
+    name: Build / Mobile
+    needs: tests-code
+    uses: ./.github/workflows/build-expo.yaml
+    with:
+      platform: '["ios","android"]'
+      profile: preview
+
+
+  build-next:
+    name: Build / Web
+    needs: tests-code
+    uses: ./.github/workflows/build-next.yaml
+
+
+  test-end-to-end:
+    name: End-to-End Tests
+    needs: [build-expo, build-next]
     runs-on: ubuntu-latest
     steps:
 
@@ -42,14 +97,15 @@ jobs:
 
         - name: Install dependencies
           run: pnpm install --frozen-lockfile
+          shell: pwsh
 
-
-        - name: Run Codegen
-          run: pnpm run codegen
 
         # =============================
         #    Workflow-Specific Stuff
         # =============================
 
-        - name: Run Tests
-          run: pnpm test
+        - name: Download Artifacts
+          uses: actions/download-artifact@v4
+
+        - name: Run End-to-End Tests
+          run: pnpm test-e2e

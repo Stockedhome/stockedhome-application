@@ -71,3 +71,6 @@ captcha:
   #
   # This can be removed if the CAPTCHA provider is `none`.
   siteKey: 0x4AAAAAAAi0czv5UTMVuCgL
+
+supabase:
+  url: http://127.0.0.1:54321

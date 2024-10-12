@@ -12,6 +12,8 @@ src/interface/components/icons/material-symbols/MaterialSymbolsOutlined.ttf
 src/interface/components/icons/material-symbols/MaterialSymbolsOutlined.json
 src/interface/components/icons/material-symbols/.commit-sha
 database.types.ts
+supabase_prod/supabase_volumes/db/init/schema.sql
+supabase_prod/supabase_volumes/db/init/prod-stuff.sql
 
 # Test Caching! (caching resources used in tests, not caching test results)
 tests/cache
@@ -68,6 +70,7 @@ local.properties
 # node.js
 #
 node_modules/
+__node_modules/
 npm-debug.log
 yarn-error.log
 
@@ -100,9 +103,6 @@ web-build/
 **/*/.expo
 
 **/*/.next
-
-**/*/ios
-**/*/android
 
 .turbo
 build/**

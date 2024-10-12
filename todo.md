@@ -59,6 +59,7 @@
 ## Before Release
 * [ ] Make route configs not optional
 * [ ] Recreate config templates
+* [ ] Create a CLI generator to generate secure ENV variables
 
 
 ## Down The Line

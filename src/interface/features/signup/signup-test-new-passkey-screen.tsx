@@ -38,7 +38,7 @@ export function SignUpTestNewPasskeyScreen({
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <P sx={{ color: 'red' }}>{error}</P>
 
-            <Button onPress={()=>{logIn}}>
+            <Button onPress={()=>{setError(null)}}>
                 <ButtonText>Try Again</ButtonText>
             </Button>
         </View>

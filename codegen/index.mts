@@ -19,6 +19,7 @@ const results = await Promise.allSettled([
     import('./api_clients.mjs'),
     import('./config-json-schema.mjs'),
     import('./common-passwords.mjs'),
+    import('./material-symbols.mjs'),
 ])
 
 console.log('[32mCodegen complete![0m')
