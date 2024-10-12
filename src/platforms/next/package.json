@@ -1,5 +1,5 @@
 {
-  "name": "next-app",
+  "name": "@stockedhome/next-app",
   "private": true,
   "type": "commonjs",
   "dependencies": {
@@ -15,7 +15,11 @@
     "setimmediate": "^1.0.5"
   },
   "peerDependencies": {
-    "next": "*"
+    "next": "*",
+    "@trpc/client": "*",
+    "@trpc/next": "*",
+    "@trpc/react-query": "*",
+    "@trpc/server": "*"
   },
   "devDependencies": {
     "@types/node": "20.13.0",

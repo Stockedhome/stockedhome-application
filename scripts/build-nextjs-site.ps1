@@ -1,6 +1,10 @@
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot/..
 
+rm ./node_modules/lib
+rm ./node_modules/interface
+pnpm install --frozen-lockfile --ignore-scripts
+
 pnpm exec next build src/platforms/next
 if ($?) {
     Write-Host "Next.js build successful" -ForegroundColor Green

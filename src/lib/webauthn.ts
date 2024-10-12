@@ -1,5 +1,5 @@
 import { startAuthentication, startRegistration, type WebAuthnErrorInfo } from '@stockedhome/react-native-passkeys';
-import type { TRPCClient } from '../interface/provider/tRPC-provider';
+import type { TRPCClient } from 'interface/provider/tRPC-provider';
 
 export async function createNewWebAuthnCredential({
     trpcUtils,

@@ -5,10 +5,9 @@ import fs from 'fs/promises';
 import url from 'url';
 import { Readable } from 'stream';
 
-console.log('Downloading Material Symbols and parsing codepoints.')
-
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
-const commonPasswordsOutDir = path.join(projectCommonDir, 'src/interface/components/icons/material-symbols');
+const materialSymbolsOutDir = path.join(projectCommonDir, 'src/interface/components/icons/material-symbols');
+const materialSymbolsDownloadedCommitSHAFile = path.join(materialSymbolsOutDir, '.commit-sha');
 
 const fontFileRepoPath = 'variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf'
 const codepointsFileRepoPath = 'variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].codepoints'
@@ -23,10 +22,11 @@ const octokit = new Octokit({
     userAgent: 'Stockedhome Codegen',
 });
 
-let latestCommitSHA = '_not_a_valid_sha_';
+let latestCommitSHA = '_not_a_valid_sha_   unfetched';
 async function getLatestReleaseSHA() {
-    if (latestCommitSHA !== '_not_a_valid_sha_') return latestCommitSHA;
-    const latestReleaseData = await octokit.rest.repos.listCommits({
+    if (!latestCommitSHA.startsWith('_not_a_valid_sha_')) return latestCommitSHA;
+
+    const latestCommitData = await octokit.rest.repos.listCommits({
         owner: 'google',
         repo: 'material-design-icons',
         per_page: 1,
@@ -36,26 +36,33 @@ async function getLatestReleaseSHA() {
         }
     })
 
-    latestCommitSHA = latestReleaseData.data[0]!.sha;
+    latestCommitSHA = latestCommitData.data[0]!.sha;
 
     return latestCommitSHA
 }
 
+
 let downloadFontAndCodepoints = false;
-if (await fs.stat(commonPasswordsOutDir).catch(e => e.code === 'ENOENT')) {
+if (await fs.access(materialSymbolsDownloadedCommitSHAFile, fs.constants.O_RDWR).catch(e => e.code === 'ENOENT')) {
     downloadFontAndCodepoints = true;
 } else {
-    const downloadedCommitSHA = await fs.readFile(path.join(commonPasswordsOutDir, '.commit-sha'), 'utf-8').catch(e => {
-        if (e.code === 'ENOENT') return '_not_a_valid_sha_';
+    const [downloadedCommitSHA, timestampRaw] = await fs.readFile(materialSymbolsDownloadedCommitSHAFile, 'utf-8').catch(e => {
+        if (e.code === 'ENOENT') return '_not_a_valid_sha_          read-from-cache-but-not-fetched, 0';
         throw e;
-    });
+    }).then(tag => tag.trim().split(',').map(s => s.trim()) as [string, string | undefined])
 
-    if (await getLatestReleaseSHA() !== downloadedCommitSHA) {
-        downloadFontAndCodepoints = true;
+    const timestamp = timestampRaw ? parseInt(timestampRaw) : 0;
+    if ((Date.now() - timestamp) > 1000 * 60 * 60 * 3) {
+
+        if (downloadedCommitSHA !== await getLatestReleaseSHA()) {
+            downloadFontAndCodepoints = true;
+        }
     }
 }
 
-if (downloadFontAndCodepoints) {
+if (!downloadFontAndCodepoints) {
+    console.log('Material Symbols font is up to date.')
+} else {
     await Promise.all([
         octokit.rest.repos.getContent({
             owner: 'google',
@@ -68,7 +75,7 @@ if (downloadFontAndCodepoints) {
             const downloadRes = await fetch(res.data.download_url);
             if (!downloadRes.ok) throw new Error(`Failed to download file MaterialSymbolsOutlined.ttf; status not OK: ${downloadRes.statusText}`);
             if (!downloadRes.body) throw new Error(`No body in download response for file MaterialSymbolsOutlined.ttf!`);
-            const file = await fs.open(path.join(commonPasswordsOutDir, 'MaterialSymbolsOutlined.ttf'), 'w');
+            const file = await fs.open(path.join(materialSymbolsOutDir, 'MaterialSymbolsOutlined.ttf'), 'w');
             const writer = file.createWriteStream();
             const reader = Readable.fromWeb(downloadRes.body as any).pipe(writer);
             await new Promise((resolve, reject) => {
@@ -91,9 +98,9 @@ if (downloadFontAndCodepoints) {
                 return [name.replaceAll('_', '-'), parseInt(rawNumber, 16)] as const;
             });
             const codepoints = Object.fromEntries(codepointEntries);
-            await fs.writeFile(path.join(commonPasswordsOutDir, 'MaterialSymbolsOutlined.json'), JSON.stringify(codepoints, null, 2));
+            await fs.writeFile(path.join(materialSymbolsOutDir, 'MaterialSymbolsOutlined.json'), JSON.stringify(codepoints, null, 2));
         }),
     ]);
 
-    await fs.writeFile(path.join(commonPasswordsOutDir, '.commit-sha'), await getLatestReleaseSHA());
+    await fs.writeFile(materialSymbolsDownloadedCommitSHAFile, await getLatestReleaseSHA());
 }

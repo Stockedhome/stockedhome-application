@@ -72,7 +72,7 @@ jobs:
             key: supabase-cli-${{ runner.os }}
 
 
-        #- name: Install Dependencies & Codegen
+        #- name: Install Dependencies & Run Codegen
         #  run: pnpm install --frozen-lockfile
 
 

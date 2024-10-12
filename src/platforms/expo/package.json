@@ -1,4 +1,5 @@
 {
+  "name": "@stockedhome/expo-app",
   "__COMMENT ": "⚠️ WHEN UPDATING THESE DEPENDENCIES ⚠️",
   "__COMMENT_": "⚠️ ALSO UPDATE THE PNPM OVERRIDES IN THE ROOT PACKAGE.JSON ⚠️",
   "dependencies": {
@@ -48,6 +49,5 @@
     "dev": "$env:APP_VARIANT = 'development' \n expo start -d",
     "build-NEEDS-PLATFORM": "eas build --non-interactive --build-logger-level=debug --local"
   },
-  "private": true,
-  "name": "expo-app"
+  "private": true
 }

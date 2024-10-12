@@ -1,6 +1,6 @@
 'use client';
 
-import type { APIRouter } from '../../lib/trpc/primaryRouter';
+import type { APIRouter } from 'lib/trpc/primaryRouter';
 import { httpBatchLink } from '@trpc/client';
 import React from 'react';
 import { useConfig } from './config-provider';

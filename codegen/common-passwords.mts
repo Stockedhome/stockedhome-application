@@ -5,10 +5,9 @@ import fs from 'fs/promises';
 import url from 'url';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "../src/lib/trpc/auth/signup-checks/passwords/client";
 
-console.log('Downloading and assembling list of common passwords.')
-
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
-const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/auth/checks/passwords/common-passwords');
+const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/auth/signup-checks/passwords/common-passwords');
+const commonPasswordsReleaseTagFile = path.join(commonPasswordsOutDir, '.seclists-release-id');
 
 const desiredPasswordLists = new Set([
     '2023-200_most_used_passwords.txt',
@@ -28,45 +27,54 @@ const octokit = new Octokit({
     userAgent: 'Stockedhome Codegen',
 });
 
-let downloadPasswordLists = false;
-let latestReleaseID = -1;
-if (await fs.stat(commonPasswordsOutDir).catch(e => e.code === 'ENOENT')) {
-    downloadPasswordLists = true;
-} else {
+
+let latestReleaseTag = '________[  ]_____  NOT  BASE64  ____[  ]___________          not-run';
+async function getLatestReleaseTag() {
+    if (!latestReleaseTag.startsWith('________[  ]_____  NOT  BASE64  ____[  ]___________')) return latestReleaseTag;
+
     const latestReleaseData = await octokit.rest.repos.getLatestRelease({
         owner: 'danielmiessler',
         repo: 'SecLists',
     })
 
-    latestReleaseID = latestReleaseData.data.id;
+    latestReleaseTag = latestReleaseData.data.tag_name;
+    return latestReleaseTag;
+}
 
-    const downloadedReleaseId = parseInt(await fs.readFile(path.join(commonPasswordsOutDir, '.release-id'), 'utf-8').catch(e => {
-        if (e.code === 'ENOENT') return '-1';
+let downloadPasswordLists = false;
+if (await fs.access(commonPasswordsReleaseTagFile, fs.constants.O_RDWR).catch(e => e.code === 'ENOENT')) {
+    downloadPasswordLists = true;
+} else {
+    const [downloadedTag, timestampRaw] = await fs.readFile(commonPasswordsReleaseTagFile, 'utf-8').catch(e => {
+        if (e.code === 'ENOENT') return '________[  ]_____  NOT  BASE64  ____[  ]___________          read-from-cache-but-not-fetched, 0';
         throw e;
-    }));
+    }).then(tag => tag.trim().split(',').map(s => s.trim()) as [string, string | undefined])
 
-    if (latestReleaseID !== downloadedReleaseId) {
-        downloadPasswordLists = true;
+    const timestamp = timestampRaw ? parseInt(timestampRaw) : 0;
+    if ((Date.now() - timestamp) > 1000 * 60 * 60 * 3) {
+        const latestReleaseData = await octokit.rest.repos.getLatestRelease({
+            owner: 'danielmiessler',
+            repo: 'SecLists',
+        })
+
+
+        if (downloadedTag !== await getLatestReleaseTag()) {
+            downloadPasswordLists = true;
+        }
     }
 }
 
-if (downloadPasswordLists) {
-    let latestReleasePromise: Promise<unknown> = Promise.resolve();
-    if (latestReleaseID === -1) {
-        latestReleasePromise = octokit.rest.repos.getLatestRelease({
-            owner: 'danielmiessler',
-            repo: 'SecLists',
-        }).then(data => (latestReleaseID = data.data.id));
-    }
+if (!downloadPasswordLists) {
+    console.log('List of common passwords is up to date.')
+} else {
+    console.log('Downloading and assembling list of common passwords.')
 
-    const passwordDirDataPromise = octokit.rest.repos.getContent({
+    const passwordDirData = await octokit.rest.repos.getContent({
         owner: 'danielmiessler',
         repo: 'SecLists',
         path: 'Passwords',
-
+        ref: await getLatestReleaseTag(),
     });
-
-    const [passwordDirData] = await Promise.all([passwordDirDataPromise, latestReleasePromise]);
 
     const mkDirPromise = fs.mkdir(commonPasswordsOutDir, {recursive: true}).catch(e => {
         console.warn(`Failed to create output directory: ${commonPasswordsOutDir} for the following reason:\n`, e);
@@ -94,5 +102,5 @@ if (downloadPasswordLists) {
 
     await fs.writeFile(path.join(commonPasswordsOutDir, 'index.ts'), `export const commonPasswords=new Set(${JSON.stringify(bigPasswordList)});`);
 
-    await fs.writeFile(path.join(commonPasswordsOutDir, '.release-id'), latestReleaseID.toString());
+    await fs.writeFile(commonPasswordsReleaseTagFile, `${latestReleaseTag.toString()},${Date.now()}`); // one after the other for safety reasons
 }

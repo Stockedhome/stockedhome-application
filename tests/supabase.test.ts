@@ -22,8 +22,20 @@ const octokit = new Octokit({
     userAgent: 'Stockedhome Codegen',
 });
 
-let downloadDockerCompose = false;
 let latestReleaseTag = '________[  ]_____  NOT  BASE64  ____[  ]___________          not-run';
+async function getLatestReleaseTag() {
+    if (!latestReleaseTag.startsWith('________[  ]_____  NOT  BASE64  ____[  ]___________')) return latestReleaseTag;
+
+    const latestReleaseData = await octokit.rest.repos.getLatestRelease({
+        owner: 'supabase',
+        repo: 'supabase',
+    })
+
+    latestReleaseTag = latestReleaseData.data.tag_name;
+    return latestReleaseTag;
+}
+
+let downloadDockerCompose = false;
 if (await fs.access('tests/cache/docker-compose/.supabase-release-id.txt', fs.constants.O_RDWR).catch(e => e.code === 'ENOENT')) {
     downloadDockerCompose = true;
 } else {
@@ -34,44 +46,29 @@ if (await fs.access('tests/cache/docker-compose/.supabase-release-id.txt', fs.co
 
     const timestamp = timestampRaw ? parseInt(timestampRaw) : 0;
     if ((Date.now() - timestamp) > 1000 * 60 * 60 * 3) {
-        const latestReleaseData = await octokit.rest.repos.getLatestRelease({
-            owner: 'supabase',
-            repo: 'supabase',
-        })
-
-        latestReleaseTag = latestReleaseData.data.tag_name;
-
-        if (latestReleaseTag !== downloadedTag) {
+        if (downloadedTag !== await getLatestReleaseTag()) {
             downloadDockerCompose = true;
         }
+    } else {
+        latestReleaseTag = downloadedTag;
     }
-
-    latestReleaseTag = downloadedTag;
 }
 
 if (downloadDockerCompose) {
-    let latestReleaseTagPromise: Promise<string> = Promise.resolve(latestReleaseTag);
-    if (latestReleaseTag.startsWith('________[  ]_____  NOT  BASE64  ____[  ]___________')) {
-        latestReleaseTagPromise = octokit.rest.repos.getLatestRelease({
-            owner: 'supabase',
-            repo: 'supabase',
-        }).then(data => (latestReleaseTag = data.data.tag_name));
-    }
 
-    console.log('Latest release commitish: latestReleaseCommitHash')
 
     const [supabaseDockerComposeRes, supabaseDockerExampleEnvRes] = await Promise.all([
         octokit.rest.repos.getContent({
             owner: 'supabase',
             repo: 'supabase',
             path: 'docker/docker-compose.yml',
-            ref: await latestReleaseTagPromise,
+            ref: await getLatestReleaseTag(),
         }),
         octokit.rest.repos.getContent({
             owner: 'supabase',
             repo: 'supabase',
             path: 'docker/.env.example',
-            ref: await latestReleaseTagPromise,
+            ref: await getLatestReleaseTag(),
         }),
     ])
 
