@@ -1,3 +1,5 @@
+name: Release Jobs
+
 on:
   workflow_dispatch:
   release:

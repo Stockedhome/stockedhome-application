@@ -21,7 +21,7 @@
     "codegen": "pwsh -File ./codegen/database-stuff.ps1 \n tsx codegen/index.mjs",
     "prepare": "pnpm run codegen",
     "prebuild-next": "pnpm run codegen",
-    "build-next": "next build src/platforms/next",
+    "build-next": "pwsh -File ./scripts/build-nextjs-site.ps1",
     "postbuild-next": "rm src/platforms/next/.next/standalone/.env",
     "prebuild-build-expo-NEEDS-PLATFORM": "pnpm run codegen",
     "build-expo-NEEDS-PLATFORM": "cd src/platforms/expo \n pnpm run build-NEEDS-PLATFORM",

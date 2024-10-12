@@ -1,3 +1,5 @@
+name: Build / Expo App
+
 # Some direction & snippets taken from https://github.com/thomasread99/expo-workflows/
 
 on:
@@ -50,6 +52,13 @@ jobs:
           uses: pnpm/action-setup@v4
 
 
+        - name: Copy Example ENV File to .env
+          run: |
+            cp .env.example .env
+            ECHO "PASSWORD_PEPPER = '123'" >> .env
+          shell: pwsh
+
+
         - name: Set Up Node.js 21
           uses: actions/setup-node@v4
           with:
@@ -57,7 +66,13 @@ jobs:
             cache: 'pnpm'
 
 
-        #- name: Install dependencies
+        - name: Cache Supabase CLI Docker Images
+          uses: ScribeMD/docker-cache@0.5.0
+          with:
+            key: supabase-cli-${{ runner.os }}
+
+
+        #- name: Install Dependencies & Codegen
         #  run: pnpm install --frozen-lockfile
 
 
@@ -111,3 +126,4 @@ jobs:
           with:
             name: "native-${{ matrix.platform }}"
             path: build/${{ matrix.platform }}
+            if-no-files-found: error

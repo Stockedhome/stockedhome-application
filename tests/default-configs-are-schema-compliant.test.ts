@@ -43,8 +43,8 @@ for (const configFile of configFiles) {
             expect((async () => {
                 const configRaw = await fs.readFile(configFile, 'utf-8');
                 const config = yaml.load(configRaw);
-                return configSchema.safeParse(config).success
-            })()).resolves.toBe(true);
+                return configSchema.safeParse(config).error
+            })(), `Config Preset File '${configFile}' Is Not Schema Compliant`).resolves.toBe(undefined);
         });
     });
 }

@@ -1,4 +1,10 @@
+$ErrorActionPreference = "Stop"
+
 pnpm exec prisma generate
+if (-not $?) {
+    exit 1
+}
+
 $base_seed_sql = pnpm exec pnpm exec prisma migrate diff --from-empty --to-schema-datamodel src/db/schema.prisma --script
 $seed_sql_addons = Get-Content -Path ./src/db/schema-additions.sql
 
@@ -14,5 +20,7 @@ Copy-Item -Path ./src/db/prod-stuff.sql -Destination ./supabase_prod/supabase_vo
 
 pnpm exec supabase start --ignore-health-check
 pnpm exec prisma db push
-Remove-Item -Path database.types.ts -Force
+if (Test-Path -Path 'database.types.ts') {
+    Remove-Item -Path 'database.types.ts' -Force
+}
 pnpm exec supabase gen types --lang=typescript --local > database.types.ts

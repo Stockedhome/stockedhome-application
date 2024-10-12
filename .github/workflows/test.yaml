@@ -1,3 +1,5 @@
+name: Run Tests
+
 on:
   workflow_dispatch:
   push:
@@ -32,6 +34,13 @@ jobs:
           uses: pnpm/action-setup@v4
 
 
+        - name: Copy Example ENV File to .env
+          run: |
+            cp .env.example .env
+            ECHO "PASSWORD_PEPPER = '123'" >> .env
+          shell: pwsh
+
+
         - name: Set Up Node.js 21
           uses: actions/setup-node@v4
           with:
@@ -39,7 +48,7 @@ jobs:
             cache: 'pnpm'
 
 
-        - name: Install dependencies
+        - name: Install Dependencies & Codegen
           run: pnpm install --frozen-lockfile
 
 

@@ -67,6 +67,9 @@ const baseConfig = {
         '@react-native/assets-registry',
         "react-native-vector-icons",
         "@expo/vector-icons",
+        "interface",
+        "lib",
+        "solito",
     ],
 
     //resolveAlias: {

@@ -1,3 +1,5 @@
+name: Build / Next.js Site
+
 on:
   workflow_dispatch:
   workflow_call:
@@ -21,6 +23,13 @@ jobs:
           uses: pnpm/action-setup@v4
 
 
+        - name: Copy Example ENV File to .env
+          run: |
+            cp .env.example .env
+            ECHO "PASSWORD_PEPPER = '123'" >> .env
+          shell: pwsh
+
+
         - name: Set Up Node.js 21
           uses: actions/setup-node@v4
           with:
@@ -28,7 +37,13 @@ jobs:
             cache: 'pnpm'
 
 
-        - name: Install dependencies
+        - name: Cache Supabase CLI Docker Images
+          uses: ScribeMD/docker-cache@0.5.0
+          with:
+            key: supabase-cli-${{ runner.os }}
+
+
+        - name: Install Dependencies & Codegen
           run: pnpm install --frozen-lockfile
           shell: pwsh
 
@@ -39,7 +54,8 @@ jobs:
 
         # TODO: Migrate this to a Docker build rather than a regular-ol Next.js build
 
-        - uses: actions/cache@v4
+        - name: "Restore Cache: Next.js Build"
+          uses: actions/cache/restore@v4
           with:
             path: ${{ github.workspace }}/src/platfrms/next/.next/cache
             # Generate a new cache whenever packages or source files change.
@@ -48,12 +64,31 @@ jobs:
             restore-keys: nextjs-${{ hashFiles('src/pnpm-lock.json') }}
 
         - name: Build Next.js Site
-          working-directory: src/platforms/next
-          run: pnpm run build
+          run: pwsh scripts/build-nextjs-site.ps1
           shell: pwsh
 
-        - name: Upload Artifact
+        - name: "Cache: Next.js Build"
+          uses: actions/cache/save@v4
+          with:
+            path: ${{ github.workspace }}/src/platfrms/next/.next/cache
+            key: nextjs-${{ hashFiles('src/pnpm-lock.json') }}-${{ hashFiles('src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx') }}
+
+        - name: Upload Docker Compose Artifact
           uses: actions/upload-artifact@v4
           with:
-            name: site
-            path: src/platforms/next/out
+            name: site-docker-compose
+            path: dist/web-server
+            include-hidden-files: true
+            if-no-files-found: error
+
+        - name: Save Docker Images
+          run: pwsh scripts/save-nextjs-images.ps1
+          shell: pwsh
+
+        - name: Upload Docker Images
+          uses: actions/upload-artifact@v4
+          with:
+            name: site-docker-images
+            path: dist/web-server-images.tar
+            include-hidden-files: true
+            if-no-files-found: error
