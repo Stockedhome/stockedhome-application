@@ -4,7 +4,7 @@ import type { Config } from "lib/config/schema";
 import React from "react";
 import { createClient } from '@supabase/supabase-js'
 import { useConfig } from "../config-provider";
-import type { Database } from '../../../../database.types';
+import type { Database } from '@stockedhome/codegen/database.types';
 
 function initSupabaseClient(config: Config) {
     return createClient<Database>(config.supabase.url.toString(), config.supabase.anonKey);

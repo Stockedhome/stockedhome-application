@@ -52,11 +52,12 @@ jobs:
           uses: pnpm/action-setup@v4
 
 
-        - name: Copy Example ENV File to .env
-          run: |
-            cp .env.example .env
-            ECHO "PASSWORD_PEPPER = '123'" >> .env
-          shell: pwsh
+        - name: Load Example ENV File
+          uses: duskmoon314/action-load-env@v1
+          id: load-env
+          with:
+            files: |
+              .env.example
 
 
         - name: Set Up Node.js 21
@@ -72,8 +73,8 @@ jobs:
             key: supabase-cli-${{ runner.os }}
 
 
-        #- name: Install Dependencies & Run Codegen
-        #  run: pnpm install --frozen-lockfile
+        - name: Install Dependencies & Run Codegen
+          run: pnpm install --frozen-lockfile
 
 
         # =============================
@@ -88,7 +89,7 @@ jobs:
             token: ${{ secrets.EXPO_TOKEN }}
             packager: pnpm
 
-        - name: "DEBUG: `eas whoami`" # Yes, the above does supposedly work. See https://docs.github.com/en/actions/learn-github-actions/contexts#runner-context
+        - name: "DEBUG: `eas whoami`"
           if: runner.debug == '1'
           run: eas whoami
 

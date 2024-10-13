@@ -6,8 +6,8 @@ import url from 'url';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "../src/lib/trpc/auth/signup-checks/passwords/client";
 
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
-const commonPasswordsOutDir = path.join(projectCommonDir, 'src/lib/trpc/auth/signup-checks/passwords/common-passwords');
-const commonPasswordsReleaseTagFile = path.join(commonPasswordsOutDir, '.seclists-release-id');
+const commonPasswordsOutDir = path.join(projectCommonDir, 'codegen/results/common-passwords');
+const commonPasswordsReleaseTagFile = path.join(commonPasswordsOutDir, '.seclists-release-tag');
 
 const desiredPasswordLists = new Set([
     '2023-200_most_used_passwords.txt',
@@ -52,12 +52,6 @@ if (await fs.access(commonPasswordsReleaseTagFile, fs.constants.O_RDWR).catch(e 
 
     const timestamp = timestampRaw ? parseInt(timestampRaw) : 0;
     if ((Date.now() - timestamp) > 1000 * 60 * 60 * 3) {
-        const latestReleaseData = await octokit.rest.repos.getLatestRelease({
-            owner: 'danielmiessler',
-            repo: 'SecLists',
-        })
-
-
         if (downloadedTag !== await getLatestReleaseTag()) {
             downloadPasswordLists = true;
         }

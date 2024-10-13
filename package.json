@@ -34,6 +34,7 @@
     "**/expo-router/**"
   ],
   "dependencies": {
+    "@stockedhome/codegen": "link:codegen/results",
     "@babel/core": "7.25.2",
     "@babel/preset-env": "7.25.4",
     "@babel/preset-flow": "^7.24.7",

@@ -8,7 +8,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import MaterialSymbols from "../../../components/icons/material-symbols/MaterialSymbols";
+import MaterialSymbols from "../../../components/icons/MaterialSymbols";
 
 export function SettingsScreenPasskeysTab() {
     const trpc = useTRPC();

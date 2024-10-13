@@ -1,5 +1,6 @@
 ignore-workspace-root-check: true
 packages:
+  - 'codegen/results'
   - 'src/*'
   - 'src/platforms/*'
   - 'src/forks/*'

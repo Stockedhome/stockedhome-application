@@ -1,4 +1,4 @@
-import { commonPasswords } from "./common-passwords";
+import { commonPasswords } from "@stockedhome/codegen/common-passwords";
 import { PasswordInvalidityReason, getClientSideReasonForInvalidPassword } from "./client";
 
 export function getServerSideReasonForInvalidPassword(password: string): PasswordInvalidityReason | null {

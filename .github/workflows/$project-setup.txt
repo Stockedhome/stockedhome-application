@@ -13,6 +13,14 @@
           uses: pnpm/action-setup@v4
 
 
+        - name: Load Example ENV File
+          uses: duskmoon314/action-load-env@v1
+          id: load-env
+          with:
+            files: |
+              .env.example
+
+
         - name: Set Up Node.js 21
           uses: actions/setup-node@v4
           with:

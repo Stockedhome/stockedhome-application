@@ -4,7 +4,7 @@ import { db } from "../../../../../db";
 import { TRPCError } from "@trpc/server";
 import { observable } from '@trpc/server/observable';
 import { useSupabase } from "interface/provider/supabase/useSupabase";
-import type { Database } from "../../../../../../../database.types";
+import type { Database } from "@stockedhome/codegen/database.types";
 import { REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from "@supabase/supabase-js";
 import { authenticatorTransportFutureSchema } from "@stockedhome/react-native-passkeys/ReactNativePasskeys.types";
 

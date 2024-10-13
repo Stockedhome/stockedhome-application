@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { env } from 'lib/env-schema';
-import type { Database } from '../../../../database.types';
+import type { Database } from '@stockedhome/codegen/database.types';
 
 
 function createSupabaseClient(config: Awaited<ReturnType<typeof import('lib/config/loader-server').loadConfigServer>>) {

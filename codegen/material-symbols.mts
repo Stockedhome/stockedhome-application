@@ -6,7 +6,7 @@ import url from 'url';
 import { Readable } from 'stream';
 
 const projectCommonDir = path.dirname(url.fileURLToPath(new URL('.', import.meta.url)));
-const materialSymbolsOutDir = path.join(projectCommonDir, 'src/interface/components/icons/material-symbols');
+const materialSymbolsOutDir = path.join(projectCommonDir, 'codegen/results/material-symbols');
 const materialSymbolsDownloadedCommitSHAFile = path.join(materialSymbolsOutDir, '.commit-sha');
 
 const fontFileRepoPath = 'variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf'
@@ -53,7 +53,6 @@ if (await fs.access(materialSymbolsDownloadedCommitSHAFile, fs.constants.O_RDWR)
 
     const timestamp = timestampRaw ? parseInt(timestampRaw) : 0;
     if ((Date.now() - timestamp) > 1000 * 60 * 60 * 3) {
-
         if (downloadedCommitSHA !== await getLatestReleaseSHA()) {
             downloadFontAndCodepoints = true;
         }
@@ -63,6 +62,11 @@ if (await fs.access(materialSymbolsDownloadedCommitSHAFile, fs.constants.O_RDWR)
 if (!downloadFontAndCodepoints) {
     console.log('Material Symbols font is up to date.')
 } else {
+    await fs.mkdir(materialSymbolsOutDir, {recursive: true}).catch(e => {
+        console.warn(`Failed to create output directory: ${materialSymbolsOutDir} for the following reason:\n`, e);
+        debugger;
+    });
+
     await Promise.all([
         octokit.rest.repos.getContent({
             owner: 'google',
@@ -102,5 +106,5 @@ if (!downloadFontAndCodepoints) {
         }),
     ]);
 
-    await fs.writeFile(materialSymbolsDownloadedCommitSHAFile, await getLatestReleaseSHA());
+    await fs.writeFile(materialSymbolsDownloadedCommitSHAFile, `${await getLatestReleaseSHA()},${Date.now()}`);
 }

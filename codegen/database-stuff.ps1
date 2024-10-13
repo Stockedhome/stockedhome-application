@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+Set-Location $PSScriptRoot/..
 
 pnpm exec prisma generate
 if (-not $?) {
@@ -20,7 +21,7 @@ Copy-Item -Path ./src/db/prod-stuff.sql -Destination ./supabase_prod/supabase_vo
 
 pnpm exec supabase start --ignore-health-check
 pnpm exec prisma db push
-if (Test-Path -Path 'database.types.ts') {
-    Remove-Item -Path 'database.types.ts' -Force
+if (Test-Path -Path 'codegen/results/database.types.ts') {
+    Remove-Item -Path 'codegen/results/database.types.ts' -Force
 }
-pnpm exec supabase gen types --lang=typescript --local > database.types.ts
+pnpm exec supabase gen types --lang=typescript --local > codegen/results/database.types.ts

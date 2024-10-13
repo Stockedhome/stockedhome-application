@@ -14,12 +14,14 @@ Stockedhome is a home management app to bring the power of meal planning and sto
 # This Repository (Stockedhome Application)
 
 This repository houses the frontend and backend of Stockedhome, built with Next.js, Expo, and Solito. Significant folders:
-* `assets` - Assets (primarily images) used in the application
 * `src/platforms/next` - The Next.js (web) part of Stockedhome
 * `src/platforms/expo` - The Expo (mobile) part of Stockedhome
 * `src/lib` - Logic code that may be shared by both platforms
 * `src/interface` - UI code that may be shared by both platforms
 * `src/forks` - Forks of third-party libraries used in Stockedhome (included as submodules)
+* `codegen` - Code generation scripts and configuration
+* `codegen/results` - Generated code from the code generation scripts. Accessible as the `@stockedhome/codegen` package
+* `supabase_prod` - A Docker Compose setup for running Stockedhome in production mode with a Supabase backend
 
 # Setting Up Your Workspace
 
