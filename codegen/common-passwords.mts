@@ -1,5 +1,4 @@
 import { Octokit } from "octokit";
-import type { Octokit as OctokitCore } from "@octokit/core";
 import path from 'path';
 import fs from 'fs/promises';
 import url from 'url';
@@ -25,6 +24,7 @@ const octokit = new Octokit({
         error: console.error,
     },
     userAgent: 'Stockedhome Codegen',
+    auth: process.env.GITHUB_TOKEN, // may be undefined which is fine as all routes used are public -- this just helps avoid rate limits when running up against them
 });
 
 

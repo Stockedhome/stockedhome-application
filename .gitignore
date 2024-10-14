@@ -10,8 +10,8 @@ config/_schema.json
 src/interface/components/icons/material-symbols/MaterialSymbolsOutlined.ttf
 src/interface/components/icons/material-symbols/MaterialSymbolsOutlined.json
 src/interface/components/icons/material-symbols/.commit-sha
-supabase_prod/supabase_volumes/db/init/*
-!supabase_prod/supabase_volumes/db/init/data.sql
+docker-compose-setup/supabase_volumes/db/init/*
+!docker-compose-setup/supabase_volumes/db/init/data.sql
 
 # Test Caching! (caching resources used in tests, not caching test results)
 tests/cache

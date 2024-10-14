@@ -21,7 +21,7 @@ This repository houses the frontend and backend of Stockedhome, built with Next.
 * `src/forks` - Forks of third-party libraries used in Stockedhome (included as submodules)
 * `codegen` - Code generation scripts and configuration
 * `codegen/results` - Generated code from the code generation scripts. Accessible as the `@stockedhome/codegen` package
-* `supabase_prod` - A Docker Compose setup for running Stockedhome in production mode with a Supabase backend
+* `docker-compose-setup` - A Docker Compose setup for running Stockedhome in production mode with a Supabase backend
 
 # Setting Up Your Workspace
 
@@ -30,10 +30,10 @@ This repository houses the frontend and backend of Stockedhome, built with Next.
 * [pnpm](https://pnpm.io/)
 * For Windows [WSL2](https://docs.microsoft.com/en-us/windows/wsl/install)
 * [Docker Desktop](https://www.docker.com/products/docker-desktop)
-  * Alternatively, if you're on Linux, you can install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) separately
+  * Alternatively, if you're on Linux, you can install [Docker Engine](https://docs.docker.com/engine/install/) and [Docker Compose](https://docs.docker.com/compose/install/) separately. You will need to do this if your machine does not support KVM virtualization.
 * [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell)
 
-Recommended OS: Linux, though you can probably get away with Windows. Unsure about MacOS because I don't own a Mac. Windows will likely have errors trying to build the development client thanks to Gradle being unable to handle deeply-nested paths, even with extended path support enabled.
+Recommended OS: Linux. Unsure about MacOS because I don't own a Mac. Windows will likely have errors trying to build the development client thanks to Gradle being unable to handle deeply-nested paths, even with extended path support enabled in the OS.
 
 ### Getting Started
 1. Clone the repository
@@ -41,25 +41,26 @@ Recommended OS: Linux, though you can probably get away with Windows. Unsure abo
 
 ### Configuring the Application
 
-A sample `.env.template` file is provided in the root of the repository. Copy this file to `.env` and fill in the necessary values. The `.env` file is used during build for all platforms and during server runtime for the Next.js platform.
+A sample `.env.example` file is provided in the root of the repository. Copy this file to `.env` (do not simply rename it) and fill in the necessary values. The `.env` file is used during development and build to supply important information for all platforms.
 
 Additionally, further configuration can be found in the `config` folder. You may wish to adjust `config.dev.yaml` to your specific purposes.
 
 ### Running the Application (Dev Mode)
 No matter what, you will always need the Next.js web server running. To start it, run `pnpm run dev:next` in the root of the repository.
 
-If you're running the web app, you can connect to the web server, which defaults to `http://localhost:3000`.
+You can connect to the web server, which defaults to `http://localhost:3000`. You may wish to load the webpage to make sure it works.
 
-If you're running the mobile app, you should run the `pnpm run dev-expo:` with your phone's OS following (e.g. `pnpm run dev-expo:ios` or `pnpm run dev-expo:android`) which will build the development client (native code) for your device and start the dev server (for JavaScript code) automatically. If your phone already has the development client loaded, you can run `pnpm run dev-expo:dev` to start the development server.
+For running the mobile app, you have two options:
+1. Run `pwsh scripts/expo-dev-chooser`, which will prompt you to choose a platform to run the Expo development client on. This will start the development server and build the development client for your chosen platform.
+2. Run the `pnpm run dev:expo:PLATFORM` with your phone's OS (e.g. `pnpm run dev:expo:ios` or `pnpm run dev:expo:android`) which will build the development client (native code) for your device and start the dev server (for JavaScript code) automatically. If your phone already has the development client installed, you can run `pnpm run dev:expo:dev` to start the development server.
 
-### Building the Website (Next.js)
-To build the website, run `pnpm run build:web` in the root of the repository. The built website will be output to the `dist/web-server` folder.
+### Building the Web & Native Applications
+To build the Next.js site, run `pwsh scripts/build-nextjs-site`. This will create Docker containers for the web server (one with static assets and one without), create the `dist/web-server-docker-compose` folder for a Docker Compose setup to run the server, and accumulate static files in the `dist/web-server-static` folder.
 
-Building the mobile app is somewhat more complex and, if you intend to build for iOS, will require you to use MacOS. The commands to build the mobile app are as follows:
-* `pnpm run uild-expo-NEEDS-PLATFORM --platform=ios` to build the iOS app in production mode
-* `pnpm run build-expo-NEEDS-PLATFORM --platform=android` to build the Android app in production mode
-* `pnpm run build-expo-NEEDS-PLATFORM --platform=PLATFORM_HERE --profile=preview` to build the app in preview mode (designed for testing the app on your device/emulator; not for publishing)
-* `pnpm run build-expo-NEEDS-PLATFORM --platform=PLATFORM_HERE --profile=producion` to build the app in production mode (designed for publishing to the app store)
+To build the Expo app (using EAS' --local option), run `pwsh scripts/build-expo-app`. It will prompt you for the necessary variables. Some notes:
+* You will need to know the build profile you wish to use. You may find the valid options in `src/platforms/expo/eas.json`.
+* If you are building for iOS, you must be running MacOS.
+* It's possible you may need to install additional tooling. The EAS build process should inform you if you need to do so.
 
 # Stockedhome In Detail
 

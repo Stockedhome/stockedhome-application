@@ -28,7 +28,11 @@
             cache: 'pnpm'
 
 
-        - name: Install dependencies
+        # Tried caching Docker images, but doing so maed it slightly slower---not faster.
+        # And when the images update, it tacks another minute onto the end of the job.
+
+
+        - name: Install Dependencies & Run Codegen
           run: pnpm install --frozen-lockfile
           shell: pwsh
 

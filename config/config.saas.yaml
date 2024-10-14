@@ -1,23 +1,76 @@
 # yaml-language-server: $schema=./_schema.json
 
+
+
+# Configuration for the server in development mode.
+# The configs are separated for ease of development. The default config shouldn't be nearly so open.
+
+
+
 # The root URI of the application. This is used to generate URLs for the application.
 # Any requests made to the server from a non-root URI will be redirected to the root.
 #
 # This should NOT be used as a security measure.
 # If your application is only accessible from your home network, do not forward ports to the application.
 # The best attack surface is no attack surface.
-canonicalRoot: https://stockedhome.app/
+canonicalRoot: https://stockedhome.app
 
 
 
 # Whether to trust local network users to select their own account
 # Useful when you have a local setup without a public IP address
 #
-# This will disable the existing public-key cryptography logins and allow anyone on your local network to select their own account.
+# This will disable the existing public-key cryptography and allow anyone on your local network to select their own account.
 # ⚠ This effectively disables all security! ⚠
 # ⚠ Use at your own risk! ⚠
 trustLocalNetwork: false
 
-# If you're using a local setup, you may desire to use a single household for all users
+
+
+# If you're using a local setup, you may desire to use a single household for all users.
 # That way, you don't have to worry about the hassle that might cause.
 singleHousehold: false
+
+
+
+# If true, extract the user's IP address from the X-Forwarded-For header, provided by a reverse proxy like Nginx or Cloudflare.
+#
+# If you do not have a reverse proxy, this should be set to false.
+# This should only be enabled if you trust your proxy to set the header correctly.
+#
+# If your hosting provider provides a NextRequest.ip value, it will always be used.
+#
+# IF YOUR HOSTING PROVIDER DOES NOT PROVIDE A NextRequest.ip VALUE:
+# Because Next.js does not provide a way to get the user's IP address from the connection directly,
+# setting this to false disables IP address matching when creating a new keypair, thus lowering security.
+# In local environments, this is not a concern. For SAAS hosting, disabling this is a noteworthy security downgrade.
+trustProxy: true
+
+
+
+# Configuration relating to CAPCHAs in the application
+#
+# CAPTCHAs anti-bot measures used to reduce spam and abuse.
+# They're used in important parts of the site, such as account creation and passkey requests
+#
+#
+#
+# If your CAPTCHA provider is not `none`, make sure you provide the CAPTHCA_SECRET_KEY environment variable too!
+captcha:
+  # The CAPTCHA provider to use
+  #
+  # * If `none` is specified, no CAPTCHA will be used. This is fine for development and for more privacy-conscious users. This is the default.
+  # * If `cloudflare-turnstile` is specified, the CAPTCHA will be provided by Cloudflare's Turnstile service.
+  # * (Not Yet Implemented) If `google-recaptcha` is specified, the CAPTCHA will be provided by Google's reCAPTCHA.
+  # * (Not Yet Implemented) If `hcaptcha` is specified, the CAPTCHA will be provided by hCaptcha.
+  #
+  # For more on setting up CAPTCHA, see https://docs.stockedhome.app/hosting/configuration/captcha
+  provider: cloudflare-turnstile
+
+  # A publicly-accessible site key uniquely identifying your site for the CAPTCHA provider.
+  #
+  # This can be removed if the CAPTCHA provider is `none`.
+  siteKey: 0x4AAAAAAAi0czv5UTMVuCgL # TODO: update this
+
+supabase:
+  url: http://supabase.stockedhome.app:54321

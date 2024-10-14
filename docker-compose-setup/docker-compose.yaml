@@ -15,7 +15,7 @@ services:
 
   stockedhome-web-server:
     container_name: stockedhome-web-server
-    image: stockedhome/web-server:with-static-0.1.0
+    image: stockedhome/web-server:with-static-0.0.1
     ports:
       - ${SITE_PORT}:${SITE_PORT}
     depends_on:

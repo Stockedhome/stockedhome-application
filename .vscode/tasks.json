@@ -6,7 +6,7 @@
 			"detail": "Runs `pnpm deb-next`",
 			"type": "shell",
 			"command": "pnpm",
-			"args": ["run", "dev-next"],
+			"args": ["run", "dev:next"],
 			"group": {
 				"kind": "build",
 			},
@@ -40,8 +40,7 @@
 			"label": "Dev Server - Expo",
 			"detail": "Runs `pnpm edv-expo`",
 			"type": "shell",
-			"command": "./.vscode/androidOrIOS.ps1",
-			"args": ["pnpm run dev-expo"],
+			"command": "./scripts/expo-dev-chooser.ps1",
 			"group": {
 				"kind": "build",
 			},
@@ -77,7 +76,7 @@
 			"detail": "Runs all dev server tasks",
 			"dependsOn": ["Dev Server - Next.js", "Dev Server - Expo"],
 			"group": {
-				"kind": "test",
+				"kind": "build",
 				"isDefault": true
 			}
 		}

@@ -11,13 +11,13 @@ $seed_sql_addons = Get-Content -Path ./src/db/schema-additions.sql
 
 $seed_sql = $base_seed_sql + "`n`n" + $seed_sql_addons
 
-if (-not (Test-Path -Path './supabase_prod/volumes/db/init')) {
-    New-Item -Path './supabase_prod/volumes/db/init' -ItemType Directory
+if (-not (Test-Path -Path './docker-compose-setup/volumes/db/init')) {
+    New-Item -Path './docker-compose-setup/volumes/db/init' -ItemType Directory
 }
 
-Write-Output $seed_sql | Out-File -FilePath './supabase_prod/supabase_volumes/db/init/schema.sql' -Encoding utf8
+Write-Output $seed_sql | Out-File -FilePath './docker-compose-setup/supabase_volumes/db/init/schema.sql' -Encoding utf8
 
-Copy-Item -Path ./src/db/prod-stuff.sql -Destination ./supabase_prod/supabase_volumes/db/init/prod-stuff.sql -Force
+Copy-Item -Path ./src/db/prod-stuff.sql -Destination ./docker-compose-setup/supabase_volumes/db/init/prod-stuff.sql -Force
 
 pnpm exec supabase start --ignore-health-check
 pnpm exec prisma db push

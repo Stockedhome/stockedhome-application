@@ -3,34 +3,133 @@ name: Release Jobs
 on:
   workflow_dispatch:
   release:
-    types: "created" # NOT 'released' or 'published'
+    types:
+      - published
 
 jobs:
+
+
+  saity-checks:
+    name: "Add Build Note & Release Sanity Checks"
+    if: github.event.release != null
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: "release-editing-${{ github.event.release.id }}"
+    steps:
+      - name: "Checkout root package.json"
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: package.json
+      - name: "Update Release Title & Description"
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: context.payload.release.id,
+              name: context.payload.release.name + " (Building)",
+              body: context.payload.release.body + "\n\n<!-- ACTIONS_REMOVE_AFTER_BUILD -->\n\n---\n\n> [!NOTE]\n> ### This release is currently being built.\n> Build artifacts will be added to this release once the build is complete. For now, you can watch the build progress from [its GitHub Actions page](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).",
+            })
+      - name: "Release Tag Must Match package.json Version"
+        shell: pwsh
+        run: |
+          $packageJson = Get-Content -Path package.json -Raw | ConvertFrom-Json
+          $releaseTag = $env:GITHUB_REF -replace 'refs/tags/', ''
+          if ($packageJson.version -ne $releaseTag) {
+            Write-Error "Release Tag '$releaseTag' does not match package.json version '$($packageJson.version)'" >> $env:GITHUB_STEP_SUMMARY
+            exit 1
+          }
+
+
+  test:
+    needs: [saity-checks]
+    name: "Run Tests Before Release"
+    if: always() && ( needs.saity-checks.result == 'success' || needs.saity-checks.result == 'skipped' )
+    uses: ./.github/workflows/test.yaml
+    with:
+      #e2e-platform-json: '{"platform": ["ios","android"]}'
+      e2e-platform-json: '{"platform": ["android"]}'
+      expo-profile: production
+
+
+  # Once we have e2e tests, we can comment this out since it will be covered in the test job:
+  build-next:
+    needs: [test]
+    name: "Build Next.js Site"
+    uses: ./.github/workflows/build-next.yaml
+
+
+  # Once we have e2e tests, we can comment this out since it will be covered in the test job:
   build-expo:
+    needs: [test]
+    name: "Build Expo App"
     uses: ./.github/workflows/build-expo.yaml
     with:
-      platform: '["ios","android"]'
+      #platformJson: '{"platform": ["ios","android"]}'
+      platformJson: '{"platform": ["android"]}'
       profile: production
-  build-next:
-    uses: ./.github/workflows/build-next.yaml
+      fail-fast: true
+    secrets:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+
   add-to-release:
-    needs: [build-expo, build-next]
+    permissions:
+      contents: write
+    name: "Add Build Artifacts to Release"
+    needs: [saity-checks, test, build-expo, build-next] # once we have e2e tests use, [saity-checks, test]
     runs-on: ubuntu-latest
     if: github.event.release != null
+    concurrency:
+      group: "release-editing-${{ github.event.release.id }}"
     steps:
-      #- uses: AButler/upload-release-assets@v3.0
-      #  with:
-      #    files: "artifacts/*;packages/*.nupkg"
-      #    repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Download Artifact: Expo App"
-        uses: actions/download-artifact@v3
+      - name: "Download Artifacts"
+        uses: actions/download-artifact@v4
         with:
-          name: expo-app
-      - name: "Download Artifact: Next.js Site - Docker Containers"
-        uses: actions/download-artifact@v3
+          path: build-artifacts
+          merge-multiple: true
+      - name: "Upload Files to Release"
+        uses: AButler/upload-release-assets@v3.0
         with:
-          name: site-docker-images
-      - name: "Download Artifact: Next.js Site - Static Files"
-        uses: actions/download-artifact@v3
+          files: "build-artifacts/*"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-id: ${{ github.event.release.id }}
+      - name: "Update Release Title & Description"
+        uses: actions/github-script@v7
         with:
-          name: site-static-files
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: context.payload.release.id,
+              name: context.payload.release.name.replace(/\s+\(Building\)$/, ''),
+              body: context.payload.release.body.replace(/<!-- ACTIONS_REMOVE_AFTER_BUILD -->[\s\S]*$/, '') + "\n\n---\n\n##### Built successfully by [GitHub Actions run #${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).",
+            })
+
+  note-release-build-failed:
+    permissions:
+      contents: write
+    name: "Note Release Build Failed"
+    needs: [saity-checks, add-to-release]
+    if: failure() && github.event.release != null
+    runs-on: ubuntu-latest
+    concurrency:
+      group: "release-editing-${{ github.event.release.id }}"
+    steps:
+      - name: "Update Release Title & Description"
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: context.payload.release.id,
+              name: context.payload.release.name.replace(/\s+\(Building\)$/, '') + " (Failed)",
+              body: "> [!CAUTION]\n> ### This Release's Build Failed\n> The build for this release failed. You can see where and why the build failed in [its GitHub Action page](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n---\n\n" + context.payload.release.body.replace(/<!-- ACTIONS_REMOVE_AFTER_BUILD -->[\s\S]*$/, ''),
+            })

@@ -1,7 +1,0 @@
-{
-    "action": "workflow_dispatch",
-    "inputs": {
-        "platform": "{\"platform\": [\"android\"]}",
-        "profile": "production"
-    }
-}

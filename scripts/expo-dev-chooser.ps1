@@ -1,6 +1,5 @@
-param (
-    [Parameter(Mandatory=$true)][string]$Command
-)
+$ErrorActionPreference = "Stop"
+Set-Location $PSScriptRoot/..
 
 $Platform = ""
 $doClean = $false
@@ -34,7 +33,7 @@ if ($Platform -eq "dev") {
 }
 
 if ($doClean -eq $true) {
-    Invoke-Expression "${Command}:${Platform} --clear"
+    Invoke-Expression "pnpm run dev:expo:${Platform} --clear"
 } else {
-    Invoke-Expression "${Command}:${Platform}"
+    Invoke-Expression "pnpm run dev:expo:${Platform}"
 }

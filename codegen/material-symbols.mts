@@ -19,7 +19,8 @@ const octokit = new Octokit({
         warn: console.warn,
         error: console.error,
     },
-    userAgent: 'Stockedhome Codegen',
+    userAgent: 'Stockedhome Tests',
+    auth: process.env.GITHUB_TOKEN, // may be undefined which is fine as all routes used are public -- this just helps avoid rate limits when running up against them
 });
 
 let latestCommitSHA = '_not_a_valid_sha_   unfetched';

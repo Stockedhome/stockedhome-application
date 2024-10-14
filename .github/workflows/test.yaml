@@ -2,7 +2,34 @@ name: Run Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      expo-profile:
+        type: string
+        description: 'Expo profile to use for the End-to-End test build'
+        required: false
+        default: 'preview'
+      e2e-platform-json:
+        type: string
+        description: 'Platforms to run End-to-End tests on'
+        required: false
+        #default: '{"platform": ["ios","android"]}'
+        default: '{"platform": ["android"]}'
+  workflow_call:
+    inputs:
+      expo-profile:
+        type: string
+        description: 'Expo profile to use for the End-to-End test build'
+        required: true
+        default: 'preview'
+      e2e-platform-json:
+        type: string
+        description: 'Platforms to run End-to-End tests on'
+        required: true
+        #default: '{"platform": ["ios","android"]}'
+        default: '{"platform": ["android"]}'
   push:
+    branches: '**'
+    tags: '!**'
     paths-ignore:
       - .gitignore
       - LICENSE.md
@@ -10,12 +37,14 @@ on:
       - todo.md
       - .vscode
 
+env:
+  DEFAULT_E2E_PLATFORMS_JSON: '{"platform": ["ios", "android"]}' # GitHub didn't like having curly braces in the variable brace thingies, even inside a string
 
 
 
 
 jobs:
-  tests-code:
+  test-code:
     name: Code Tests
     runs-on: ubuntu-latest
     steps:
@@ -55,6 +84,8 @@ jobs:
 
         - name: Install Dependencies & Run Codegen
           run: pnpm install --frozen-lockfile
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
         # =============================
@@ -62,27 +93,37 @@ jobs:
         # =============================
 
         - name: Run Code Tests
-          run: pnpm test-code
+          run: pnpm run test:code
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   build-expo:
     name: Build / Mobile
-    needs: tests-code
+    needs: test-code
+    # TODO: Add End-To-End Tests
+    if: true == false
     uses: ./.github/workflows/build-expo.yaml
     with:
-      platform: '["ios","android"]'
-      profile: preview
-
+      platformJson: ${{ inputs.e2e-platform-json || github.env.DEFAULT_E2E_PLATFORMS_JSON }}
+      profile: ${{ inputs.e2e-platform-json || 'preview' }}
+      fail-fast: true
+    secrets:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   build-next:
     name: Build / Web
-    needs: tests-code
+    needs: test-code
+    # TODO: Add End-To-End Tests
+    if: true == false
     uses: ./.github/workflows/build-next.yaml
 
 
   test-end-to-end:
     name: End-to-End Tests
     needs: [build-expo, build-next]
+    # TODO: Add End-To-End Tests
+    if: true == false
     runs-on: ubuntu-latest
     steps:
 
@@ -118,8 +159,26 @@ jobs:
         #    Workflow-Specific Stuff
         # =============================
 
-        - name: Download Artifacts
+        - name: Download Native App Artifacts
           uses: actions/download-artifact@v4
+          with:
+            pattern: expo-app-*
+            merge-multiple: true
+            path: ${{ github.workspace }}/dist
+
+        - name: Download Website Artifacts
+          uses: actions/download-artifact@v4
+          with:
+            pattern: site-docker-*
+            merge-multiple: true
+            path: ${{ github.workspace }}/dist
+
+        - name: Load Website Docker Images
+          run: docker load -i ${{ github.workspace }}/dist/site-docker-images.tar
+          shell: bash
 
         - name: Run End-to-End Tests
-          run: pnpm test-e2e
+          run: pnpm test:e2e
+          shell: pwsh
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

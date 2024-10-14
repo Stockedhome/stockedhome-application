@@ -1,6 +1,6 @@
 {
   "name": "stockedhome-application",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "private": true,
   "packageManager": "pnpm@9.8.0",
   "devDependencies": {
@@ -13,21 +13,24 @@
     "schema": "src/db/schema.prisma"
   },
   "scripts": {
-    "dev-expo:android": "cd src/platforms/expo \n pnpm run android",
-    "dev-expo:ios": "cd src/platforms/expo \n pnpm run ios",
-    "dev-expo:dev": "cd src/platforms/expo \n pnpm run dev",
-    "predev-next": "supabase start --ignore-health-check",
-    "dev-next": "next dev src/platforms/next",
     "codegen": "pwsh -File ./codegen/database-stuff.ps1 \n tsx codegen/index.mjs",
     "prepare": "pnpm run codegen",
-    "prebuild-next": "pnpm run codegen",
-    "build-next": "pwsh -File ./scripts/build-nextjs-site.ps1",
-    "postbuild-next": "rm src/platforms/next/.next/standalone/.env",
-    "prebuild-build-expo-NEEDS-PLATFORM": "pnpm run codegen",
-    "build-expo-NEEDS-PLATFORM": "cd src/platforms/expo \n pnpm run build-NEEDS-PLATFORM",
-    "test": "vitest",
-    "start-next": "next start src/platforms/next",
-    "lint-next": "next lint src/platforms/next"
+
+    "dev:expo:android": "cd src/platforms/expo \n pnpm run android",
+    "dev:expo:ios": "cd src/platforms/expo \n pnpm run ios",
+    "dev:expo:dev": "cd src/platforms/expo \n pnpm run dev",
+    "build:expo:NEEDS-PLATFORM": "cd src/platforms/expo \n pnpm run build-NEEDS-PLATFORM",
+
+    "predev:next": "supabase start --ignore-health-check",
+    "dev:next": "next dev src/platforms/next",
+
+    "prebuild:next": "pnpm run codegen",
+    "build:next": "pwsh -File ./scripts/build-nextjs-site.ps1",
+    "postbuild:next": "rm src/platforms/next/.next/standalone/.env",
+    "start:next": "next start src/platforms/next",
+
+    "test:code": "vitest",
+    "lint:next": "next lint src/platforms/next"
   },
   "nohoist": [
     "**/expo-router",
@@ -122,7 +125,8 @@
       "@trpc/client": "11.0.0-rc.413",
       "@trpc/next": "11.0.0-rc.413",
       "@trpc/react-query": "11.0.0-rc.413",
-      "@trpc/server": "11.0.0-rc.413"
+      "@trpc/server": "11.0.0-rc.413",
+      "cookie": "0.7.2"
     }
   }
 }

@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: Build Next.js Site
     runs-on: ubuntu-latest
     steps:
 
@@ -45,6 +46,8 @@ jobs:
         - name: Install Dependencies & Run Codegen
           run: pnpm install --frozen-lockfile
           shell: pwsh
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
         # =============================
@@ -75,13 +78,20 @@ jobs:
             path: ${{ github.workspace }}/src/platfrms/next/.next/cache
             key: nextjs-${{ hashFiles('src/pnpm-lock.json') }}-${{ hashFiles('src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx') }}
 
+
+        - name: "Zip Docker Compose"
+          working-directory: dist/web-server-docker-compose
+          run: zip -rv7r ../web-server-docker-compose.zip .
+          shell: pwsh
+
         - name: Upload Docker Compose Artifact
           uses: actions/upload-artifact@v4
           with:
             name: site-docker-compose
-            path: dist/web-server
+            path: dist/web-server-docker-compose.zip
             include-hidden-files: true
             if-no-files-found: error
+
 
         - name: Save Docker Images
           run: pwsh scripts/save-nextjs-images.ps1
@@ -95,8 +105,14 @@ jobs:
             include-hidden-files: true
             if-no-files-found: error
 
+
+        - name: Zip Static Files
+          working-directory: dist/web-server-static
+          run: zip -rv7r ../web-server-static.zip .
+          shell: pwsh
+
         - name: Upload Static Files
           uses: actions/upload-artifact@v4
           with:
             name: site-static-files
-            path: dist/web-server-static
+            path: dist/web-server-static.zip

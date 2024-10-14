@@ -2,11 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Next.js Server",
+            "name": "Next.js Dev Server",
             "request": "launch",
             "runtimeArgs": [
                 "run",
-                "dev-next"
+                "dev:next"
             ],
             "runtimeExecutable": "pnpm",
             "skipFiles": [

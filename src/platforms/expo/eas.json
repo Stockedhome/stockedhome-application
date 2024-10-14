@@ -2,7 +2,12 @@
   "cli": {
     "version": ">= 10.0.2"
   },
+
+
   "build": {
+    "FOR ANY PROFILES THAT BUILD AN ANDROID APP BUNDLE": {},
+    "YOU MUST CREATE A PROFILE OF THE SAME NAME WITH '-apk' AT THE END THAT BUILDS AN APK": {},
+    
     "development": {
       "developmentClient": true,
       "distribution": "internal",
@@ -36,6 +41,20 @@
       "distribution": "store",
       "android": {
         "buildType": "app-bundle"
+      },
+      "ios": {
+
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "APP_VARIANT": "production"
+      }
+    },
+    "production-apk": {
+      "developmentClient": false,
+      "distribution": "store",
+      "android": {
+        "buildType": "apk"
       },
       "ios": {
 

@@ -5,38 +5,60 @@ name: Build / Expo App
 on:
     workflow_dispatch:
       inputs:
-        platform:
+        platformJson:
           type: string
-          description: 'Platforms to build for, defined as {platform: ["ios", "android", "futurePhone(TM)"]} because Actions forgot what an array is'
+          description: 'Platforms to build for, defined as {"platform": ["ios", "android", "futurePhone(TM)"]} because Actions forgot what an array is'
           required: false
-          default: '{"platform": ["ios", "android"]}'
+          #default: '{"platform": ["ios", "android"]}'
+          default: '{"platform": ["android"]}'
         profile:
           type: string
           description: 'Build profile'
           required: false
           default: 'production'
+        fail-fast:
+          type: boolean
+          description: 'Abort all platforms if one platform fails'
+          required: false
     workflow_call:
-      inputs:
-        platform:
-          type: string
-          description: 'Platforms to build for, defined as {platform: ["ios", "android", "futurePhone(TM)"]} because Actions forgot what an array is'
+      secrets:
+        EXPO_TOKEN:
+          description: 'Expo token for building the app'
           required: true
-          default: '{"platform": ["ios", "android"]}'
+      inputs:
+        platformJson:
+          type: string
+          description: 'Platforms to build for, defined as {"platform": ["ios", "android", "futurePhone(TM)"]} because Actions forgot what an array is'
+          required: true
+          #default: '{"platform": ["ios", "android"]}'
+          default: '{"platform": ["android"]}'
         profile:
           type: string
           description: 'Build profile'
           required: true
           default: 'production'
+        fail-fast:
+          type: boolean
+          description: 'Abort all platforms if one platform fails'
+          required: true
 
 jobs:
   build:
     strategy:
-      matrix: ${{ fromJson( inputs.platform ) }}
+      matrix: ${{ fromJson( inputs.platformJson ) }}
+      fail-fast: ${{ inputs.fail-fast }}
     name: Build App (${{ matrix.platform }})
     runs-on: ${{ matrix.platform == 'ios' && 'macos-latest' || 'ubuntu-latest' }}
     steps:
+        - name: Terminate Job if Mac
+          if: matrix.platform == 'ios'
+          run: |
+            echo "# Invalid Parameter" >> $env:GITHUB_STEP_SUMMARY
+            echo "iOS is not supported yet." >> $env:GITHUB_STEP_SUMMARY
+            exit 1
+          shell: pwsh
 
-        - run: echo ${{inputs.platform}}
+        - run: echo ${{inputs.platformJson}}
 
         # ============================
         #        Project Setup
@@ -74,6 +96,8 @@ jobs:
         - name: Install Dependencies & Run Codegen
           run: pnpm install --frozen-lockfile
           shell: pwsh
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
         # =============================
@@ -110,22 +134,22 @@ jobs:
           uses: android-actions/setup-android@v3
 
 
-        # TODO: Set up Xcode for iOS
+        # TODO: Set up Xcode for iOS (once I have a developer account)
 
 
         # ==== Build App ====
 
-        - name: Get File Extension
-          id: get-file-extension
-          run: |
-            $extension = if ($env:PLATFORM -eq 'ios') { '.ipa' } else { node -e "console.log(require('./src/platforms/expo/eas.json').build.${{ inputs.profile }}.android.buildType)" }
-            if ($extension -eq 'app-bundle') { $extension = '.aab' }
-            echo "extension=$extension" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        - name: "DEBUG: Log Entire Directory Tree"
+          if: runner.debug == '1'
+          run: tree
           shell: pwsh
 
-        - name: Build App for ${{ matrix.platform }}
-          run: 'pnpm run build-expo-NEEDS-PLATFORM --platform=${{ matrix.platform }} --profile=${{ inputs.profile }} --message="GitHub Actions: ${{ github.sha }} (#${{ github.run_id }})" --output=../../../dist/expo-app-${{ matrix.platform }}${{ env.extension }}'
+        - name: Build Expo App for ${{ matrix.platform }}
+          run: 'pwsh -File ./scripts/build-expo-app.ps1 -androidAlwaysBuildAPK -platform ${{ matrix.platform }} -easProfile ${{ inputs.profile }} -buildMessage "GitHub Actions #${{ github.run_number }} ${{ matrix.platform }} for ${{ github.repository }} ${{ github.sha }}"'
           shell: pwsh
+          env:
+            EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
         # ==== Upload Artifact ====
@@ -134,5 +158,14 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: "expo-app-${{ matrix.platform }}"
-            path: dist/expo-app-${{ matrix.platform }}.${{ env.extension }}
+            path: ${{ env.EXPO_APP_PATH }}
+            if-no-files-found: error
+
+        # When building for Android,
+        - name: Upload Artifact (APK)
+          uses: actions/upload-artifact@v4
+          if: endsWith(env.EXPO_APP_PATH, '.aab') == true
+          with:
+            name: "expo-app-${{ matrix.platform }}-apk"
+            path: ${{ env.EXPO_APP_PATH_APK }}
             if-no-files-found: error

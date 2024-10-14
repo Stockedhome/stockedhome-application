@@ -31,7 +31,7 @@ describe('Developer Example ENV', () => {
 
 describe('Production Example ENV', () => {
     describe('has all keys', async () => {
-        const exampleEnvKeys = new Set(Object.keys(await fs.readFile('./supabase_prod/.env.example', 'utf-8').then(dotenv.parse)))
+        const exampleEnvKeys = new Set(Object.keys(await fs.readFile('./docker-compose-setup/.env.example', 'utf-8').then(dotenv.parse)))
         const envSchemaKeys = new Set(zodKeys(envSchema))
         envSchemaKeys.delete('DATABASE_URL')
         envSchemaKeys.delete('DIRECT_URL')
@@ -46,7 +46,7 @@ describe('Production Example ENV', () => {
     })
 
     it('is schema-compliant', async () => {
-        const parsedSchema = await fs.readFile('./supabase_prod/.env.example', 'utf-8').then(dotenv.parse)
+        const parsedSchema = await fs.readFile('./docker-compose-setup/.env.example', 'utf-8').then(dotenv.parse)
         expect(
             envSchema.merge(z.object({
                 PASSWORD_PEPPER: z.literal(''),

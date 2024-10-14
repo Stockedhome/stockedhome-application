@@ -28,6 +28,7 @@ overrides:
   '@trpc/next': 11.0.0-rc.413
   '@trpc/react-query': 11.0.0-rc.413
   '@trpc/server': 11.0.0-rc.413
+  cookie: 0.7.2
 
 patchedDependencies:
   '@hexagon/base64':
@@ -3938,8 +3939,8 @@ packages:
     resolution: {integrity: sha512-78KWk9T26NhzXtuL26cIJ8/qNHANyJ/ZYrmEXFzUmhZdjpBv+DlWlOANRTGBt48YcyslsLrj0bMLFTmXvLRCOw==}
     engines: {node: '>=6.6.0'}
 
-  cookie@0.6.0:
-    resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
+  cookie@0.7.2:
+    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
 
   copy-anything@3.0.5:
@@ -12774,7 +12775,7 @@ snapshots:
       '@remix-run/router': 1.19.2
       '@types/cookie': 0.6.0
       '@web3-storage/multipart-parser': 1.0.0
-      cookie: 0.6.0
+      cookie: 0.7.2
       set-cookie-parser: 2.7.0
       source-map: 0.7.4
       turbo-stream: 2.4.0
@@ -12786,7 +12787,7 @@ snapshots:
       '@remix-run/router': 1.19.2
       '@types/cookie': 0.6.0
       '@web3-storage/multipart-parser': 1.0.0
-      cookie: 0.6.0
+      cookie: 0.7.2
       set-cookie-parser: 2.7.0
       source-map: 0.7.4
       turbo-stream: 2.4.0
@@ -14560,7 +14561,7 @@ snapshots:
 
   cookie-signature@1.2.1: {}
 
-  cookie@0.6.0: {}
+  cookie@0.7.2: {}
 
   copy-anything@3.0.5:
     dependencies:

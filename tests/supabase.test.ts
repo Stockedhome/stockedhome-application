@@ -19,7 +19,8 @@ const octokit = new Octokit({
         warn: console.warn,
         error: console.error,
     },
-    userAgent: 'Stockedhome Codegen',
+    userAgent: 'Stockedhome Tests',
+    auth: process.env.GITHUB_TOKEN, // may be undefined which is fine as all routes used are public -- this just helps avoid rate limits when running up against them
 });
 
 let latestReleaseTag = '________[  ]_____  NOT  BASE64  ____[  ]___________          not-run';
@@ -36,10 +37,10 @@ async function getLatestReleaseTag() {
 }
 
 let downloadDockerCompose = false;
-if (await fs.access('tests/cache/docker-compose/.supabase-release-id.txt', fs.constants.O_RDWR).catch(e => e.code === 'ENOENT')) {
+if (await fs.access('tests/cache/supabase-docker-compose/.supabase-release-tag.txt', fs.constants.O_RDWR).catch(e => e.code === 'ENOENT')) {
     downloadDockerCompose = true;
 } else {
-    const [downloadedTag, timestampRaw] = await fs.readFile('tests/cache/docker-compose/.supabase-release-id.txt', 'utf-8').catch(e => {
+    const [downloadedTag, timestampRaw] = await fs.readFile('tests/cache/supabase-docker-compose/.supabase-release-tag.txt', 'utf-8').catch(e => {
         if (e.code === 'ENOENT') return '________[  ]_____  NOT  BASE64  ____[  ]___________          read-from-cache-but-not-fetched, 0';
         throw e;
     }).then(tag => tag.trim().split(',').map(s => s.trim()) as [string, string | undefined])
@@ -88,33 +89,27 @@ if (downloadDockerCompose) {
     ])
     supabaseDockerExampleEnv = dotenv.parse(supabaseDockerExampleEnvRaw);
 
-    const mkDirPromise = fs.mkdir('tests/cache/docker-compose/', {recursive: true})
+    const mkDirPromise = fs.mkdir('tests/cache/supabase-docker-compose/', {recursive: true})
 
     await mkDirPromise;
     await Promise.all([
-        fs.writeFile('tests/cache/docker-compose/docker-compose.json', JSON.stringify(supabaseDockerCompose)),
-        fs.writeFile('tests/cache/docker-compose/.env.example', supabaseDockerExampleEnvRaw),
+        fs.writeFile('tests/cache/supabase-docker-compose/docker-compose.json', JSON.stringify(supabaseDockerCompose)),
+        fs.writeFile('tests/cache/supabase-docker-compose/.env.example', supabaseDockerExampleEnvRaw),
     ])
-    await fs.writeFile('tests/cache/docker-compose/.supabase-release-id.txt', `${latestReleaseTag.toString()},${Date.now()}`); // one after the other for safety reasons
+    await fs.writeFile('tests/cache/supabase-docker-compose/.supabase-release-tag.txt', `${latestReleaseTag.toString()},${Date.now()}`); // one after the other for safety reasons
 } else {
     [supabaseDockerCompose, supabaseDockerExampleEnv] = await Promise.all([
-        fs.readFile('tests/cache/docker-compose/docker-compose.json', 'utf8').then(text => JSON.parse(text)),
-        fs.readFile('tests/cache/docker-compose/.env.example', 'utf8').then(dotenv.parse),
+        fs.readFile('tests/cache/supabase-docker-compose/docker-compose.json', 'utf8').then(text => JSON.parse(text)),
+        fs.readFile('tests/cache/supabase-docker-compose/.env.example', 'utf8').then(dotenv.parse),
     ])
 }
 
-stockedhomeDockerCompose = await fs.readFile('./supabase_prod/docker-compose.yaml', 'utf8').then(rawYaml => yaml.load(rawYaml) as DockerCompose.ComposeSpecification)
+stockedhomeDockerCompose = await fs.readFile('./docker-compose-setup/docker-compose.yaml', 'utf8').then(rawYaml => yaml.load(rawYaml) as DockerCompose.ComposeSpecification)
 
 const IGNORED_SUPABASE_SERVICES = [ 'auth', 'functions' ]
 
 describe('Service images match latest Supabase release', ()=>{
     if (!supabaseDockerCompose) throw new Error('beforeAll never ran!')
-
-    supabaseDockerCompose.services ??= {}
-    supabaseDockerCompose.services['stockedhome-web-server'] = {
-        container_name: "main",
-        image: `stockedhome/web-server:with-static-${packageJson.version}`,
-    }
 
     for (const [sbServiceName, sbService] of Object.entries(supabaseDockerCompose.services ?? {})) {
         if (IGNORED_SUPABASE_SERVICES.includes(sbServiceName)) continue;
@@ -178,7 +173,7 @@ const ignoredOrChangedSupabaseENVKeys = new Map<string, null|string>([
 ])
 
 describe('Production Example ENV Has Supabase Keys', async ()=>{
-    const stockedhomeExampleEnvKeys = new Set(Object.keys(await fs.readFile('./supabase_prod/.env.example', 'utf-8').then(dotenv.parse)))
+    const stockedhomeExampleEnvKeys = new Set(Object.keys(await fs.readFile('./docker-compose-setup/.env.example', 'utf-8').then(dotenv.parse)))
     const supabaseExampleEnvKeys = new Set(Object.keys(supabaseDockerExampleEnv))
 
     for (const key of supabaseExampleEnvKeys) {
