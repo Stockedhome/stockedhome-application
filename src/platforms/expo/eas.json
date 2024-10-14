@@ -9,6 +9,9 @@
       "android": {
         "buildType": "apk"
       },
+      "ios": {
+
+      },
       "env": {
         "NODE_ENV": "development",
         "APP_VARIANT": "development"
@@ -20,6 +23,9 @@
       "android": {
         "buildType": "apk"
       },
+      "ios": {
+
+      },
       "env": {
         "NODE_ENV": "development",
         "APP_VARIANT": "production"
@@ -30,6 +36,9 @@
       "distribution": "store",
       "android": {
         "buildType": "app-bundle"
+      },
+      "ios": {
+
       },
       "env": {
         "NODE_ENV": "production",

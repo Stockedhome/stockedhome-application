@@ -18,7 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.release != null
     steps:
-      - uses: AButler/upload-release-assets@v3.0
+      #- uses: AButler/upload-release-assets@v3.0
+      #  with:
+      #    files: "artifacts/*;packages/*.nupkg"
+      #    repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Download Artifact: Expo App"
+        uses: actions/download-artifact@v3
         with:
-          files: "artifacts/*;packages/*.nupkg"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          name: expo-app
+      - name: "Download Artifact: Next.js Site - Docker Containers"
+        uses: actions/download-artifact@v3
+        with:
+          name: site-docker-images
+      - name: "Download Artifact: Next.js Site - Static Files"
+        uses: actions/download-artifact@v3
+        with:
+          name: site-static-files

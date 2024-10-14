@@ -38,10 +38,8 @@ jobs:
             cache: 'pnpm'
 
 
-        - name: Cache Supabase CLI Docker Images
-          uses: ScribeMD/docker-cache@0.5.0
-          with:
-            key: supabase-cli-${{ runner.os }}
+        # Tried caching Docker images, but doing so maed it slightly slower---not faster.
+        # And when the images update, it tacks another minute onto the end of the job.
 
 
         - name: Install Dependencies & Run Codegen
@@ -96,3 +94,9 @@ jobs:
             path: dist/web-server-images.tar
             include-hidden-files: true
             if-no-files-found: error
+
+        - name: Upload Static Files
+          uses: actions/upload-artifact@v4
+          with:
+            name: site-static-files
+            path: dist/web-server-static
