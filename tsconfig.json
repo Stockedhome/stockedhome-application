@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
-    "target": "ES2018",
+    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "allowJs": true,
@@ -11,9 +11,9 @@
     "resolvePackageJsonExports": true,
     "noEmit": true,
     "lib": [
-      "dom",
+      "DOM",
       "dom.iterable",
-      "esnext",
+      "ESNext",
       "ES2023",
     ],
     "skipLibCheck": false,
@@ -24,13 +24,21 @@
     "jsx": "preserve",
     "incremental": true,
   },
-  "extends": "./node_modules/expo/tsconfig.base.json",
+  "include": [
+    "src",
+    "codegen",
+    "tests",
+    "file-imports.d.ts",
+    "utilityTypes.ts",
+  ],
   "exclude": [
-    "dist",
-    "node_modules",
+    "**/node_modules/**/*",
+    "./node_modules/**/*",
+    "./node_modules",
     "__node_modules",
     "**/*.js",
-    "./src/platforms/expo/android",
-    "./src/platforms/expo/ios",
+    "./src/platforms/next/",
+    "./src/platforms/expo/",
+    "./src/forks"
   ]
 }

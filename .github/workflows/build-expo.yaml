@@ -161,7 +161,9 @@ jobs:
             path: ${{ env.EXPO_APP_PATH }}
             if-no-files-found: error
 
-        # When building for Android,
+        # When building for Android, we build an AAB (Android App Bundle) for production builds--but those are
+        # incredibly difficult to sideload and would make using Stockedhome's SAAS servers for authentication practically impossible.
+        # So, we also build an APK for Android, which is significantly easier to sideload.
         - name: Upload Artifact (APK)
           uses: actions/upload-artifact@v4
           if: endsWith(env.EXPO_APP_PATH, '.aab') == true

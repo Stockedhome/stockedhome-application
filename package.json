@@ -15,29 +15,25 @@
   "scripts": {
     "codegen": "pwsh -File ./codegen/database-stuff.ps1 \n tsx codegen/index.mjs",
     "prepare": "pnpm run codegen",
-
     "dev:expo:android": "cd src/platforms/expo \n pnpm run android",
     "dev:expo:ios": "cd src/platforms/expo \n pnpm run ios",
     "dev:expo:dev": "cd src/platforms/expo \n pnpm run dev",
     "build:expo:NEEDS-PLATFORM": "cd src/platforms/expo \n pnpm run build-NEEDS-PLATFORM",
-
     "predev:next": "supabase start --ignore-health-check",
     "dev:next": "next dev src/platforms/next",
-
     "prebuild:next": "pnpm run codegen",
     "build:next": "pwsh -File ./scripts/build-nextjs-site.ps1",
     "postbuild:next": "rm src/platforms/next/.next/standalone/.env",
     "start:next": "next start src/platforms/next",
-
     "test:code": "vitest",
-    "lint:next": "next lint src/platforms/next"
+    "lint:next": "next lint src/platforms/next",
+    "typecheck": "tsc --noEmit --pretty --skipLibCheck -p . \n tsc --noEmit --pretty --skipLibCheck -p src/platforms/next \n tsc --noEmit --pretty --skipLibCheck -p src/platforms/expo"
   },
   "nohoist": [
     "**/expo-router",
     "**/expo-router/**"
   ],
   "dependencies": {
-    "@stockedhome/codegen": "link:codegen/results",
     "@babel/core": "7.25.2",
     "@babel/preset-env": "7.25.4",
     "@babel/preset-flow": "^7.24.7",
@@ -48,8 +44,7 @@
     "@gorhom/bottom-sheet": "^4.6.4",
     "@prisma/client": "^5.15.1",
     "@react-native/assets-registry": "file:src/forks/assets-registry",
-    "lib": "file:src/lib",
-    "interface": "file:src/interface",
+    "@stockedhome/codegen": "link:codegen/results",
     "@stockedhome/expo-app": "file:src/platforms/expo",
     "@stockedhome/next-app": "file:src/platforms/next",
     "@tanstack/react-query": "^5.56.2",
@@ -66,8 +61,10 @@
     "expo-auth-session": "^5.5.2",
     "flowtype-loader": "^0.2.2",
     "geolite2-redist": "^3.1.1",
+    "interface": "file:src/interface",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
+    "lib": "file:src/lib",
     "maxmind": "^4.3.21",
     "next": "^14.2.15",
     "octokit": "^4.0.2",

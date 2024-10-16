@@ -59,11 +59,13 @@ export function ConfigAndTRPCProviderMobileEdition({ children }: { children: Rea
     React.useEffect(() => {
         if (directUserToChooseConfigState === 'directing') {
             router.push('/choose-config');
-            setDirectUserToChooseConfigState('has-directed');
+            setTimeout(() => {
+                setDirectUserToChooseConfigState('has-directed');
+            }, 75);
         }
     }, [directUserToChooseConfigState]);
 
-    useControlSplashScreen(directUserToChooseConfigState !== 'undecided', 'Mobile Config Provider');
+    useControlSplashScreen(directUserToChooseConfigState === 'has-directed' || directUserToChooseConfigState === 'has-config', 'Mobile Config Provider');
 
     const Provider = configContextMobileWrapper.Provider as ((...args: Parameters<typeof configContextMobileWrapper.Provider>) => Exclude<React.ReactPortal, bigint>) // thanks, TS
     return <Provider value={{ setPrimaryConfig }}>
