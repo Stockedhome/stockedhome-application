@@ -2,9 +2,9 @@ import * as fs from 'fs/promises';
 import { describe, test, expect } from 'vitest';
 import yaml from 'js-yaml';
 import type { DockerCompose } from './docker-compose-schema';
-import { envSchema } from '../src/lib/env-schema';
-import { zodKeys } from './utils';
-import packageJson from '../package.json';
+import { envSchema } from '../../src/lib/env-schema';
+import { zodKeys } from '../utils';
+import packageJson from '../../package.json';
 
 const stockedhomeDockerCompose = await fs.readFile('docker-compose-setup/docker-compose.yaml', 'utf8').then(rawYaml => yaml.load(rawYaml) as DockerCompose.ComposeSpecification)
 

@@ -6,6 +6,8 @@ import { ConfigProvider } from 'interface/provider/config-provider';
 import { loadConfigServer } from 'lib/config/loader-server';
 import { metadata as rootMetadata } from '../layout';
 import { TopLevelScreenView } from 'interface/components/TopLevelScreenView';
+import { ConfigProviderWeb } from './ConfigProviderWeb';
+import * as superjson from "superjson";
 
 export const metadata: Metadata = {
     title: {
@@ -27,12 +29,12 @@ const configPromise = loadConfigServer();
 
 export default async function WebAppRootLayout({ children }: { children: React.ReactNode }) {
     return <ProvidersBeforeConfig>
-        <ConfigProvider primaryConfig={await configPromise}>
+        <ConfigProviderWeb primaryConfig={superjson.serialize(await configPromise)}>
             <ProvidersAfterConfig>
                 <TopLevelScreenView>
                     {children}
                 </TopLevelScreenView>
             </ProvidersAfterConfig>
-        </ConfigProvider>
+        </ConfigProviderWeb>
     </ProvidersBeforeConfig>
 }

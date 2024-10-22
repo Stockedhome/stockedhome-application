@@ -43,7 +43,7 @@ Recommended OS: Linux. Unsure about MacOS because I don't own a Mac. Windows wil
 
 A sample `.env.example` file is provided in the root of the repository. Copy this file to `.env` (do not simply rename it) and fill in the necessary values. The `.env` file is used during development and build to supply important information for all platforms.
 
-Additionally, further configuration can be found in the `config` folder. You may wish to adjust `config.dev.yaml` to your specific purposes.
+Once secrets and critical environment variables are set, additional configuration can be found in the `config` folder. You may wish to adjust `config.dev.yaml` to your specific purposes.
 
 ### Running the Application (Dev Mode)
 No matter what, you will always need the Next.js web server running. To start it, run `pnpm run dev:next` in the root of the repository.

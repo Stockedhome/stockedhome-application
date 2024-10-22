@@ -19,5 +19,5 @@
     "server-only": "^0.0.1",
     "zod": "*"
   },
-  "sideEffects": false
+  "sideEffects": true
 }

@@ -75,7 +75,7 @@ function renderLoginError(config: ConfigProfile, [error, additionalContext, opti
             console.log('Encountered error InvalidOptions_NotPublicKey during authentication. Details:', [error, additionalContext, options])
             return <>
                 We could not understand the login instructions sent to us.
-                {config.primary?.isSAAS
+                {config.primary?.useSAAS_UX
                     ? 'Please try again and, if the issue persists, report it to the Stockedhome team.'
                     : <>
                         Make sure your Stockedhome instance is up to date and that you have not modified the auth code.
@@ -98,7 +98,7 @@ function renderLoginError(config: ConfigProfile, [error, additionalContext, opti
         case WebAuthnError.NotAllowedByServer:
             return <>
                 The server did not allow this request.
-                {config.primary?.isSAAS
+                {config.primary?.useSAAS_UX
                     ? 'Please try again and, if the issue persists, report it to the Stockedhome team. '
                     : <>
                         { (additionalContext as typeof Platform.OS) === 'android'
@@ -116,7 +116,7 @@ function renderLoginError(config: ConfigProfile, [error, additionalContext, opti
         case WebAuthnError.RelayingPartyIDNotValidHostname:
             return <>
                 The server did not tell us who it was, which is required for security reasons.
-                {config.primary?.isSAAS
+                {config.primary?.useSAAS_UX
                     ? 'Please try again and, if the issue persists, report it to the Stockedhome team.'
                     : 'This error is likely due to a misconfiguration on the server. Please check the server logs for more information.'
                 }
@@ -127,7 +127,7 @@ function renderLoginError(config: ConfigProfile, [error, additionalContext, opti
         case WebAuthnError.UserIdInvalidLength:
             return <>
                 The server sent us an impossible user ID.
-                {config.primary?.isSAAS
+                {config.primary?.useSAAS_UX
                     ? 'Please try again and, if the issue persists, report it to the Stockedhome team.'
                     : 'Please make sure your Stockedhome instance is up to date and that you have not modified the auth code. However, this is likely a bug in Stockedhome. Once you perform a rudimentary check, please report this to the Stockedhome team.'
                 }
@@ -197,7 +197,7 @@ export function LogInScreenComponent({ hideLogInScreen, isLogInScreenVisible = t
         </View>
         <View sx={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
             <P sx={{ color: 'text' }}> Have an account but not a passkey? </P>
-            <TextLink textProps={{variant: 'a', sx: {marginTop: -8}}} href="/web/request-passkey" style={{display: 'inline'}} onClick={hideLogInScreen}>Request a New Passkey</TextLink>
+            <TextLink textProps={{variant: 'a', sx: {marginTop: -8}}} href="/web/login/request-passkey" style={{display: 'inline'}} onClick={hideLogInScreen}>Request a New Passkey</TextLink>
         </View>
 
 

@@ -4,7 +4,7 @@
   "__COMMENT_": "⚠️ ALSO UPDATE THE PNPM OVERRIDES IN THE ROOT PACKAGE.JSON ⚠️",
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
-    "@stockedhome/react-native-passkeys": "file:..\\..\\forks\\react-native-passkeys",
+    "@stockedhome/react-native-passkeys": "file:../../forks/react-native-passkeys",
     "babel-preset-es2018": "^1.0.0",
     "eas-cli": "^12.5.1",
     "expo": "~51.0.36",
@@ -17,8 +17,6 @@
     "expo-router": "~3.5.18",
     "expo-splash-screen": "~0.27.5",
     "expo-status-bar": "~1.12.1",
-    "interface": "file:..\\..\\interface",
-    "lib": "file:..\\..\\lib",
     "react": "~18.2.0",
     "react-native": "0.74.5",
     "react-native-gesture-handler": "~2.16.2",
@@ -27,6 +25,8 @@
     "react-native-screens": "~3.31.1",
     "react-native-svg": "15.2.0",
     "react-native-webview": "13.12.1",
+    "interface": "file:../../interface",
+    "lib": "file:../../lib",
     "solito": "file:../../forks/solito"
   },
   "peerDependencies": {

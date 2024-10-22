@@ -6,17 +6,17 @@ export async function createNewWebAuthnCredential({
     registerKeyMutation,
     clientGeneratedRandom,
     userId,
-    keypairRequestId,
+    passkeyRequestId,
 }: {
     trpcUtils: ReturnType<TRPCClient['useUtils']>,
     registerKeyMutation: ReturnType<TRPCClient['auth']['passkeys']['registerKey']['useMutation']>,
     clientGeneratedRandom: string,
     userId: string,
-    keypairRequestId: string,
+    passkeyRequestId: string,
 }): Promise<WebAuthnErrorInfo | null> {
 
     const credentialCreationOptions = await trpcUtils.auth.passkeys.getKeyRegistrationParameters.fetch({
-        clientGeneratedRandom, userId, keypairRequestId,
+        clientGeneratedRandom, userId, passkeyRequestId,
     });
 
     const newCredentialOrError = await startRegistration(credentialCreationOptions);
@@ -27,7 +27,7 @@ export async function createNewWebAuthnCredential({
     }
 
     const registeredKey = await registerKeyMutation.mutateAsync({
-        userId, keypairRequestId, clientGeneratedRandom,
+        userId, passkeyRequestId, clientGeneratedRandom,
         response: newCredentialOrError,
     })
 

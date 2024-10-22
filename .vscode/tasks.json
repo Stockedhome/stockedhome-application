@@ -2,6 +2,15 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "Dev Server - All",
+			"detail": "Runs all dev server tasks",
+			"dependsOn": ["Dev Server - Next.js", "Dev Server - Expo"],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
 			"label": "Dev Server - Next.js",
 			"detail": "Runs `pnpm deb-next`",
 			"type": "shell",
@@ -72,13 +81,100 @@
 			],
 		},
 		{
-			"label": "Dev Server - All",
-			"detail": "Runs all dev server tasks",
-			"dependsOn": ["Dev Server - Next.js", "Dev Server - Expo"],
+			"label": "Watch-Check All Types",
+			"detail": "Runs all type-checking tasks in watch mode to ensure errors are shown in the editor",
+			"dependsOn": ["Watch-Check Pt.1", "Watch-Check Pt.2", "Watch-Check Pt.3"],
 			"group": {
-				"kind": "build",
+				"kind": "test",
 				"isDefault": true
 			}
-		}
+		},
+		{
+			"label": "Watch-Check Pt.1",
+			"detail": "Runs `pnpm run typecheck:watch-1`",
+			"type": "shell",
+			"command": "pnpm",
+			"args": ["run", "typecheck:watch-1"],
+			"group": {
+				"kind": "test",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "never",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"icon": {
+				"id": "eye",
+				"color": "terminal.ansiYellow",
+			},
+			"isBackground": true,
+			"problemMatcher": [{
+				"base": "$tsc-watch",
+				"applyTo": "closedDocuments",
+				"source": "Typescript (closed files)",
+			}],
+			"hide": true,
+		},
+		{
+			"label": "Watch-Check Pt.2",
+			"detail": "Runs `pnpm run typecheck:watch-2`",
+			"type": "shell",
+			"command": "pnpm",
+			"args": ["run", "typecheck:watch-2"],
+			"group": {
+				"kind": "test",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "never",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"icon": {
+				"id": "eye",
+				"color": "terminal.ansiYellow",
+			},
+			"isBackground": true,
+			"problemMatcher": [{
+				"base": "$tsc-watch",
+				"applyTo": "closedDocuments",
+				"source": "Typescript (closed files)",
+			}],
+			"hide": true,
+		},
+		{
+			"label": "Watch-Check Pt.3",
+			"detail": "Runs `pnpm run typecheck:watch-3`",
+			"type": "shell",
+			"command": "pnpm",
+			"args": ["run", "typecheck:watch-3"],
+			"group": {
+				"kind": "test",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "never",
+				"focus": false,
+				"panel": "dedicated",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"icon": {
+				"id": "eye",
+				"color": "terminal.ansiYellow",
+			},
+			"isBackground": true,
+			"problemMatcher": [{
+				"base": "$tsc-watch",
+				"applyTo": "closedDocuments",
+				"source": "Typescript (closed files)",
+			}],
+			"hide": true,
+		},
 	]
 }

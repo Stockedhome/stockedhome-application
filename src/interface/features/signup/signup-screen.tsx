@@ -63,9 +63,9 @@ function SignUpScreenInternal() {
 
     switch (signupStep) {
         case 'new-account':
-            return <SignUpNewAccountScreen clientGeneratedRandom={clientGeneratedRandom} setUsername={setUsername} setUserId={setUserId} setKeypairRequestId={setKeypairRequestId} setSignupStep={setSignupStep} />;
+            return <SignUpNewAccountScreen clientGeneratedRandom={clientGeneratedRandom} setUsername={setUsername} setUserId={setUserId} setPasskeyRequestId={setKeypairRequestId} setSignupStep={setSignupStep} />;
         case 'new-passkey':
-            return <SignUpCreateFirstPasskeyScreen userId={userId} keypairRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStep={setSignupStep} />;
+            return <SignUpCreateFirstPasskeyScreen userId={userId} passkeyRequestId={keypairRequestId} username={username} clientGeneratedRandom={clientGeneratedRandom} setSignupStep={setSignupStep} />;
         case 'test-passkey':
             return <SignUpTestNewPasskeyScreen username={username} />; // auth code generates its own random
     }

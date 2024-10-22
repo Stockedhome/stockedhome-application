@@ -24,13 +24,13 @@ export const AuthSignUpRouter = createRouter({
             z.object({
                 success: z.literal(true),
                 userId: z.string(),
-                keypairRequestId: z.string(),
+                passkeyRequestId: z.string(),
                 error: z.undefined(),
             }),
             z.object({
                 success: z.literal(false),
                 userId: z.undefined().optional(),
-                keypairRequestId: z.undefined(),
+                passkeyRequestId: z.undefined(),
                 error: z.string(),
             }),
         ]))
@@ -52,7 +52,7 @@ export const AuthSignUpRouter = createRouter({
                 const { passwordSalt, passwordHash } = await hashPassword(input.password);
 
                 // Unfinished users are pruned after 1 hour
-                // Should treat this keypair request the same way
+                // Should treat this passkey request the same way
                 const pruneAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
 
                 const user = await db.user.create({
@@ -76,13 +76,13 @@ export const AuthSignUpRouter = createRouter({
                     }
                 });
 
-                const keypairRequest = user.authNewPasskeyRequests[0];
-                if (!keypairRequest) throw new Error('Impossible condition! In /api/auth.signup.signUp, keypairRequest is null!')
+                const passkeyRequest = user.authNewPasskeyRequests[0];
+                if (!passkeyRequest) throw new Error('Impossible condition! In /api/auth.signup.signUp, passkeyRequest is null!')
 
                 return {
                     success: true,
                     userId: user.id.toString(),
-                    keypairRequestId: keypairRequest.id,
+                    passkeyRequestId: passkeyRequest.id,
                 }
             } catch (e) {
                 console.error(e);
@@ -90,14 +90,14 @@ export const AuthSignUpRouter = createRouter({
                 if (typeof e === 'string') return {
                     success: false,
                     userId: undefined,
-                    keypairRequestId: undefined,
+                    passkeyRequestId: undefined,
                     error: e,
                 };
                 if (typeof e !== 'object') throw e;
                 if ('message' in e && typeof e.message === 'string') return {
                     success: false,
                     userId: undefined,
-                    keypairRequestId: undefined,
+                    passkeyRequestId: undefined,
                     error: e.message,
                 };
                 throw e;

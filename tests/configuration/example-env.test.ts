@@ -1,8 +1,8 @@
 import { describe, test, expect, it } from 'vitest';
 import dotenv from 'dotenv';
 import fs from 'fs/promises';
-import { envSchema } from '../src/lib/env-schema';
-import { zodKeys } from './utils';
+import { envSchema } from '../../src/lib/env-schema';
+import { zodKeys } from '../utils';
 import { z } from 'zod';
 
 // frankly, it's easy to forget to update the example ENV file -- which is why this file exists
@@ -15,6 +15,7 @@ describe('Developer Example ENV', () => {
         const exampleEnvKeys = new Set(Object.keys(await parsedSchemaPromise))
         const envSchemaKeys = new Set(zodKeys(envSchema))
         envSchemaKeys.delete('IS_DOCKER')
+        envSchemaKeys.delete('USE_SAAS_UX')
 
         for (const key of envSchemaKeys) {
             test(`${key}`, ()=>{
@@ -32,7 +33,7 @@ describe('Developer Example ENV', () => {
 describe('Production Example ENV', () => {
     describe('has all keys', async () => {
         const exampleEnvKeys = new Set(Object.keys(await fs.readFile('./docker-compose-setup/.env.example', 'utf-8').then(dotenv.parse)))
-        const envSchemaKeys = new Set(zodKeys(envSchema))
+        const envSchemaKeys = new Set(zodKeys(envSchema)) as Set<keyof z.infer<typeof envSchema>>
         envSchemaKeys.delete('DATABASE_URL')
         envSchemaKeys.delete('DIRECT_URL')
         envSchemaKeys.delete('CONFIG_DIR')

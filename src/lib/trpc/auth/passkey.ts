@@ -51,7 +51,7 @@ enum RequestPasskeyFailureReason {
 export const PasskeyRouter = createRouter({
     getKeyRegistrationParameters: publicProcedure
         .input(z.object({
-            keypairRequestId: z.string(),
+            passkeyRequestId: z.string(),
             clientGeneratedRandom: z.string(),
             userId: z.string(),
         }))
@@ -61,7 +61,7 @@ export const PasskeyRouter = createRouter({
             const userId = BigInt(input.userId);
             const dbData = await db.authNewPasskeyRequest.findUnique({
                 where: {
-                    id: input.keypairRequestId,
+                    id: input.passkeyRequestId,
                     userId,
                     OR: [
                         { authorizedByPasskeyId: { not: null } },
@@ -82,7 +82,7 @@ export const PasskeyRouter = createRouter({
                 }
             });
 
-            if (!dbData) throw new Error('Invalid keypair request! This could be because of a bad request, an unsigned keypair request, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
+            if (!dbData) throw new Error('Invalid passkey request! This could be because of a bad request, a passkey request that has not yet been authorized, not calling auth.getKeyRegistrationParameters first, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#passkey-request]');
 
             const challenge = crypto.getRandomValues(new Uint8Array(32));
 
@@ -94,7 +94,7 @@ export const PasskeyRouter = createRouter({
             }));
 
             await db.authNewPasskeyRequest.update({
-                where: { id: input.keypairRequestId },
+                where: { id: input.passkeyRequestId },
                 data: { challenge: options.challenge },
                 select: { id: true },
             });
@@ -106,7 +106,7 @@ export const PasskeyRouter = createRouter({
 
     registerKey: publicProcedure
         .input(z.object({
-            keypairRequestId: z.string(),
+            passkeyRequestId: z.string(),
             clientGeneratedRandom: z.string(),
             userId: z.string(),
             response: registrationResponseJSONSchema,
@@ -130,7 +130,7 @@ export const PasskeyRouter = createRouter({
                 const userId = BigInt(input.userId);
                 const dbData = await db.authNewPasskeyRequest.findUnique({
                     where: {
-                        id: input.keypairRequestId,
+                        id: input.passkeyRequestId,
                         userId,
                         OR: [
                             { authorizedByPasskeyId: { not: null } },
@@ -149,7 +149,7 @@ export const PasskeyRouter = createRouter({
                     }
                 });
 
-                if (!dbData) throw new Error('Invalid keypair request! This could be because of a bad request, an unsigned keypair request, you didn\'t call auth.getKeyRegistrationParameters first, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
+                if (!dbData) throw new Error('Invalid passkey request! This could be because of a bad request, a passkey request that has not yet been authorized, not calling auth.getKeyRegistrationParameters first, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#passkey-request]');
 
                 const verification = await verifyRegistrationResponse({
                     response: castToSimpleWebAuthnRegistrationResponse(input.response),
@@ -160,7 +160,7 @@ export const PasskeyRouter = createRouter({
                     requireUserVerification: userVerification as UserVerificationRequirement === 'required',
                 });
 
-                if (!verification.verified) throw new Error('Verification failed! Please try again. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
+                if (!verification.verified) throw new Error('Verification failed! Please try again. [https://docs.stockedhome.app/authentication/webauthn#passkey-request]');
 
                 const dbResponse = await db.authPasskey.create({
                     data: {
@@ -178,7 +178,7 @@ export const PasskeyRouter = createRouter({
 
                 await Promise.all([
                     db.authNewPasskeyRequest.delete({
-                        where: { id: input.keypairRequestId },
+                        where: { id: input.passkeyRequestId },
                     }),
                     dbData.user.pruneAt !== null && db.user.update({
                         where: { id: userId },
@@ -218,13 +218,15 @@ export const PasskeyRouter = createRouter({
         .output(z.union([
             z.object({
                 success: z.literal(true),
-                keypairRequestId: z.string(),
+                passkeyRequestId: z.string(),
+                userID: z.bigint(),
                 error: z.undefined(),
                 errorName: z.undefined(),
             }),
             z.object({
                 success: z.literal(false),
-                keypairRequestId: z.undefined(),
+                passkeyRequestId: z.undefined(),
+                userID: z.undefined(),
                 error: z.enum(Object.values(RequestPasskeyFailureReason)),
                 errorName: z.enum(Object.keys(RequestPasskeyFailureReason)),
             }),
@@ -233,7 +235,8 @@ export const PasskeyRouter = createRouter({
             if (!(await validateCaptchaResponse(input.captchaToken, ctx.req, ctx.config))) {
                 return {
                     success: false,
-                    keypairRequestId: undefined,
+                    passkeyRequestId: undefined,
+                    userID: undefined,
                     error: RequestPasskeyFailureReason.CAPTCHA_INVALID,
                     errorName: 'CAPTCHA_INVALID',
                 }
@@ -260,14 +263,16 @@ export const PasskeyRouter = createRouter({
 
             if (!user) return {
                 success: false,
-                keypairRequestId: undefined,
+                passkeyRequestId: undefined,
+                userID: undefined,
                 error: RequestPasskeyFailureReason.USER_DOES_NOT_EXIST,
                 errorName: 'USER_DOES_NOT_EXIST',
             }
 
             if (user.authPasskeys.length === 0) return {
                 success: false,
-                keypairRequestId: undefined,
+                passkeyRequestId: undefined,
+                userID: undefined,
                 error: RequestPasskeyFailureReason.USER_NOT_SET_UP,
                 errorName: 'USER_NOT_SET_UP',
             }
@@ -276,12 +281,13 @@ export const PasskeyRouter = createRouter({
 
             if (!isPasswordValid) return {
                 success: false,
-                keypairRequestId: undefined,
+                passkeyRequestId: undefined,
+                userID: undefined,
                 error: RequestPasskeyFailureReason.PASSWORD_INVALID,
                 errorName: 'PASSWORD_INVALID',
             }
 
-            const keypairRequest = await db.authNewPasskeyRequest.create({
+            const passkeyRequest = await db.authNewPasskeyRequest.create({
                 data: {
                     pruneAt: new Date(Date.now() + 1000 * 60 * 30), // 30 minutes
                     userId: user.id,
@@ -296,7 +302,8 @@ export const PasskeyRouter = createRouter({
 
             return {
                 success: true,
-                keypairRequestId: keypairRequest.id,
+                passkeyRequestId: passkeyRequest.id,
+                userID: user.id,
                 error: undefined,
                 errorName: undefined,
             };

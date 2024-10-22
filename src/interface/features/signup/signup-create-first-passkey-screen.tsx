@@ -8,13 +8,13 @@ import { useTRPC } from '../../provider/tRPC-provider';
 
 export function SignUpCreateFirstPasskeyScreen({
     userId,
-    keypairRequestId,
+    passkeyRequestId,
     username,
     clientGeneratedRandom,
     setSignupStep,
 }: {
     userId: string,
-    keypairRequestId: string,
+    passkeyRequestId: string,
     username: string,
     clientGeneratedRandom: string,
     setSignupStep: (stage: 'test-passkey') => void
@@ -39,7 +39,7 @@ export function SignUpCreateFirstPasskeyScreen({
             registerKeyMutation,
             clientGeneratedRandom,
             userId,
-            keypairRequestId,
+            passkeyRequestId: passkeyRequestId,
         }).then(() => {
             setSignupStep('test-passkey')
         }).catch((err) => {

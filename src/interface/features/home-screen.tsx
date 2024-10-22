@@ -1,12 +1,12 @@
 'use client';
 
-import { View, H1, P, Row, Text, A, useSx } from 'dripsy';
+import { View, H1, P, Row, Text, useSx } from 'dripsy';
 import { TextLink } from 'solito/link';
 import { OptionallyScrollable } from '../components/TopLevelScreenView';
 import { useAuthentication } from '../provider/auth/authentication';
 import { Button, ButtonText } from '../components/Button';
 import { useLogInScreen } from './login-dialog';
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 
 export function HomeScreen() {
     return <OptionallyScrollable>

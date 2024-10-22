@@ -10,7 +10,7 @@ import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/t
 import { Button, ButtonText } from '../../components/Button';
 import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/signup-checks/usernames/client';
 import { Form } from '../../components/Form';
-import { CAPTCHA } from '../../components/capcha';
+import { CAPTCHA } from '../../components/captcha';
 
 export function stringifyPasswordInvalidityReason(reason: PasswordInvalidityReason): Exclude<React.ReactNode, undefined> {
     switch (reason) {
@@ -64,6 +64,8 @@ export function stringifyUsernameInvalidReason(reason: UsernameInvalidityReason)
             return 'An unknown error occurred; please try again.'
         case UsernameInvalidityReason.AlreadyInUse:
             return 'This username is already in use; please choose a different one.'
+        case UsernameInvalidityReason.UserDoesNotExist:
+            throw new Error('It should not be possible to receive a UserDoesNotExist Username Invalidity Reason during signup; this is for the "request passkey" flow, not the "sign up" flow.')
     }
 }
 
@@ -71,13 +73,13 @@ export function SignUpNewAccountScreen({
     clientGeneratedRandom,
     setUsername: setUsernameInParent,
     setUserId,
-    setKeypairRequestId,
+    setPasskeyRequestId,
     setSignupStep,
 }: {
     clientGeneratedRandom: string
     setUsername: (username: string) => void
     setUserId: (userId: string) => void
-    setKeypairRequestId: (keypairRequestId: string) => void
+    setPasskeyRequestId: (passkeyRequestId: string) => void
     setSignupStep: (stage: 'new-passkey') => void
 }) {
     const trpc = useTRPC()
@@ -139,7 +141,7 @@ export function SignUpNewAccountScreen({
         }
 
         setUserId(signupData.userId)
-        setKeypairRequestId(signupData.keypairRequestId)
+        setPasskeyRequestId(signupData.passkeyRequestId)
         setUsernameInParent(usernameStorageRef.current)
         setSignupStep('new-passkey')
     }, [emailStorageRef, passwordStorageRef, usernameStorageRef, captchaToken, submitting, isEmailValid, isUsernameValid, isPasswordValid])

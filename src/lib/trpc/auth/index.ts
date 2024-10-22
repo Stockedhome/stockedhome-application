@@ -14,22 +14,22 @@ import {
 
 import type { ConfigSchemaBaseWithComputations } from "../../config/schema-base";
 import { db } from "../../db";
-import type { AuthPublicKey, User } from "@prisma/client";
-import { getServerSideReasonForInvalidPassword } from "./checks/passwords/server";
-import { EmailInvalidityReason } from "./checks/emails/client";
-import { PasswordInvalidityReason } from "./checks/passwords/client";
-import { getServerSideReasonForInvalidEmail } from "./checks/emails/server";
-import { getServerSideReasonForInvalidUsername } from "./checks/usernames/server";
-import { UsernameInvalidityReason } from "./checks/usernames/client";
-import { hashPassword } from "./password";
+import type { AuthPasskey, User } from "@prisma/client";
+import { getServerSideReasonForInvalidPassword } from "./signup-checks/passwords/server";
+import { EmailInvalidityReason } from "./signup-checks/emails/client";
+import { PasswordInvalidityReason } from "./signup-checks/passwords/client";
+import { getServerSideReasonForInvalidEmail } from "./signup-checks/emails/server";
+import { getServerSideReasonForInvalidUsername } from "./signup-checks/usernames/server";
+import { UsernameInvalidityReason } from "./signup-checks/usernames/client";
+import { hashPassword } from "./passwordUtils";
 import { cookies } from "next/headers";
 import base64 from '@hexagon/base64';
 import { STOCKEDHOME_COOKIE_NAME, SessionValidationFailureReason, authenticateUser, getExpectedOrigin, getSessionTokenFromRequest } from "../../auth";
 import { authenticationResponseJSONSchema, publicKeyCredentialCreationOptionsJSONSchema, registrationResponseJSONSchema } from "@stockedhome/react-native-passkeys/src/ReactNativePasskeys.types";
 import { castFromSimpleWebAuthnRegistrationOptions } from "@stockedhome/react-native-passkeys/casts";
-import type { AuthenticatorTransportFuture } from "@simplewebauthn/server/script/deps";
+import type { AuthenticatorTransportFuture } from "@simplewebauthn/types";
 import { castToSimpleWebAuthnAuthenticationResponse, castToSimpleWebAuthnRegistrationResponse } from "@stockedhome/react-native-passkeys/src/casts";
-import { getIpOrIpChain } from "../../ip-address";
+import { getIpOrIpChain } from "../../device-identifiers";
 import { validateCaptchaResponse } from "../../captcha";
 
 
@@ -52,7 +52,7 @@ export const userVerification = 'discouraged' as const satisfies UserVerificatio
 
 function generateGenerateAuthenticationOptionsInput({ config, publicKeys, challenge }: {
     config: ConfigSchemaBaseWithComputations,
-    publicKeys: Pick<AuthPublicKey, 'id'|'clientTransports'>[],
+    publicKeys: Pick<AuthPasskey, 'clientId'|'clientTransports'>[],
     challenge: string,
 }) {
     return {
@@ -60,17 +60,17 @@ function generateGenerateAuthenticationOptionsInput({ config, publicKeys, challe
         rpID: config.canonicalRoot.hostname,
         timeout: 1000 * 60 * 13, // 13 minutes -- two minutes before the DB row is pruned
         allowCredentials: publicKeys.map(key => ({
-            id: key.id,
+            id: key.clientId,
             transports: key.clientTransports as AuthenticatorTransportFuture[],
         })),
         userVerification,
     } as const satisfies GenerateAuthenticationOptionsOpts;
 };
 
-function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, challenge }: {
+function generateGenerateRegistrationOptionsInput({ config, user, passkeys, challenge }: {
     config: ConfigSchemaBaseWithComputations,
     user: Pick<User, 'id'|'username'>,
-    publicKeys: Pick<AuthPublicKey, 'id'|'clientTransports'>[],
+    passkeys: Pick<AuthPasskey, 'clientId'|'clientTransports'>[],
     challenge: string,
 }) {
     return {
@@ -79,435 +79,16 @@ function generateGenerateRegistrationOptionsInput({ config, user, publicKeys, ch
         rpID: config.canonicalRoot.hostname,
         userName: user.username,
         userDisplayName: user.username,
-        userID: Buffer.from(user.id.toString()),
+        userID: Uint8Array.from(Buffer.from(user.id.toString())),
         authenticatorSelection: {
             residentKey: 'preferred', // -- this shows a different prompt on mobile and, personally, I prefer the non-resident prompt
             userVerification,
             //authenticatorAttachment: 'cross-platform', -- nobody told me I could just, like, not define this and it doesn't filter
         },
         attestationType: 'none', // TODO: Test what this does and determine whether we want it for security purposes
-        excludeCredentials: publicKeys.map(key => ({
-            id: key.id,
+        excludeCredentials: passkeys.map(key => ({
+            id: key.clientId,
             transports: key.clientTransports as AuthenticatorTransportFuture[],
         })),
     } as const satisfies GenerateRegistrationOptionsOpts;
 };
-
-export const authRouter = createRouter({
-    getKeyRegistrationParameters: publicProcedure
-        .input(z.object({
-            keypairRequestId: z.string(),
-            clientGeneratedRandom: z.string(),
-            userId: z.string(),
-        }))
-        .output(publicKeyCredentialCreationOptionsJSONSchema)
-        // TODO: .output(z.union([z.object({ success: z.literal(true), options: z.any() }), z.object({ success: z.literal(false), error: z.string() })]))
-        .query(async ({ctx, input}) => {
-            const userId = BigInt(input.userId);
-            const dbData = await db.newKeypairRequest.findUnique({
-                where: {
-                    id: input.keypairRequestId,
-                    userId,
-                    OR: [
-                        { signedWithKeyId: { not: null } },
-                        { user: { publicKeys: {none: {}} } },
-                    ],
-                    sendingIP: getIpOrIpChain(ctx.req, ctx.config),
-                    identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
-                },
-                select: {
-                    user: {select:{
-                        username: true,
-                        id: true,
-                        publicKeys: {select:{
-                            id: true,
-                            clientTransports: true,
-                        }}
-                    }}
-                }
-            });
-
-            if (!dbData) throw new Error('Invalid keypair request! This could be because of a bad request, an unsigned keypair request, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
-
-            const challenge = crypto.getRandomValues(new Uint8Array(32));
-
-            const options = await generateRegistrationOptions(generateGenerateRegistrationOptionsInput({
-                config: ctx.config,
-                user: dbData.user,
-                publicKeys: dbData.user.publicKeys,
-                challenge: base64.fromArrayBuffer(challenge),
-            }));
-
-            await db.newKeypairRequest.update({
-                where: { id: input.keypairRequestId },
-                data: { challenge: options.challenge },
-            });
-
-            return castFromSimpleWebAuthnRegistrationOptions(options);
-        })
-    ,
-
-
-    registerKey: publicProcedure
-        .input(z.object({
-            keypairRequestId: z.string(),
-            clientGeneratedRandom: z.string(),
-            userId: z.string(),
-            response: registrationResponseJSONSchema,
-        }))
-        .output(z.union([
-            z.object({
-                success: z.literal(true),
-                publicKeyId: z.string(),
-                error: z.undefined(),
-            }),
-            z.object({
-                success: z.literal(false),
-                publicKeyId: z.undefined(),
-                error: z.string(),
-            }),
-        ]))
-        .mutation(async ({ctx, input}) => {
-            // TODO: Account for every error thrown in the simplewebauthn validator
-            //       Maybe even fork it and replace every error with an enum value return instead 🤔
-            try {
-                const userId = BigInt(input.userId);
-                const dbData = await db.newKeypairRequest.findUnique({
-                    where: {
-                        id: input.keypairRequestId,
-                        userId,
-                        OR: [
-                            { signedWithKeyId: { not: null } },
-                            { user: { publicKeys: {none: {}} } },
-                        ],
-                        sendingIP: getIpOrIpChain(ctx.req, ctx.config),
-                        identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
-                        challenge: { not: null },
-                    },
-                    select: {
-                        challenge: true,
-                        signedWithKeyId: true,
-                        user: {select:{
-                            pruneAt: true,
-                        }}
-                    }
-                });
-
-                if (!dbData) throw new Error('Invalid keypair request! This could be because of a bad request, an unsigned keypair request, you didn\'t call auth.getKeyRegistrationParameters first, or a timeout. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
-
-                const verification = await verifyRegistrationResponse({
-                    response: castToSimpleWebAuthnRegistrationResponse(input.response),
-                    expectedChallenge: dbData.challenge!,
-                    expectedOrigin: getExpectedOrigin(ctx, input.response.response.clientDataJSON),
-                    expectedRPID: ctx.config.canonicalRoot.hostname,
-                    expectedType: ['webauthn.create', 'public-key'],
-                    requireUserVerification: userVerification as UserVerificationRequirement === 'required',
-                });
-
-                if (!verification.verified) throw new Error('Verification failed! Please try again. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
-
-                const dbResponse = await db.authPublicKey.create({
-                    data: {
-                        id: input.response.id,
-                        clientTransports: input.response.response.transports,
-                        userId,
-                        publicKey: Buffer.from(verification.registrationInfo!.credentialPublicKey),
-                        authorizedByKeyId: dbData.signedWithKeyId,
-                        sessionCounter: verification.registrationInfo?.counter,
-                    },
-                    select: {
-                        id: true,
-                    }
-                });
-
-                await Promise.all([
-                    db.newKeypairRequest.delete({
-                        where: { id: input.keypairRequestId },
-                    }),
-                    dbData.user.pruneAt !== null && db.user.update({
-                        where: { id: userId },
-                        data: { pruneAt: new Date(Date.now() + 1000 * 60 * 60 ) }, // if user's on a timer, restart it at 1 hour
-                    }),
-                ]);
-
-                return {
-                    success: true,
-                    publicKeyId: dbResponse.id,
-                }
-            } catch (e) {
-                console.error(e);
-                if (!e) throw e;
-                if (typeof e === 'string') return {
-                    success: false,
-                    publicKeyId: undefined,
-                    error: e,
-                };
-                if (typeof e !== 'object') throw e;
-                if ('message' in e && typeof e.message === 'string') return {
-                    success: false,
-                    publicKeyId: undefined,
-                    error: e.message,
-                };
-                throw e;
-            }
-        })
-    ,
-
-    signUp: publicProcedure
-        .input(z.object({
-            username: z.string(),
-            password: z.string(),
-            email: z.string(),
-            captchaToken: z.string(),
-            clientGeneratedRandom: z.string(),
-        }))
-        .output(z.union([
-            z.object({
-                success: z.literal(true),
-                userId: z.string(),
-                keypairRequestId: z.string(),
-                error: z.undefined(),
-            }),
-            z.object({
-                success: z.literal(false),
-                userId: z.undefined().optional(),
-                keypairRequestId: z.undefined(),
-                error: z.string(),
-            }),
-        ]))
-        .mutation(async ({ctx, input}) => {
-            try {
-                if (!(await validateCaptchaResponse(input.captchaToken, ctx.req, ctx.config))) {
-                    throw new Error('Invalid CAPTCHA token! Please try again.');
-                }
-
-                const reasonForInvalidUsername = await getServerSideReasonForInvalidUsername(input.username);
-                if (reasonForInvalidUsername) throw new Error(`Invalid username (${reasonForInvalidUsername}); please use the auth.checks.validUsername route to check usernames before trying to sign up!`);
-
-                const reasonForInvalidEmail = await getServerSideReasonForInvalidEmail(input.email);
-                if (reasonForInvalidEmail) throw new Error(`Invalid email (${reasonForInvalidEmail}); please use the auth.checks.validEmail route to check emails before trying to sign up!`);
-
-                const reasonForInvalidPassword = getServerSideReasonForInvalidPassword(input.password);
-                if (reasonForInvalidPassword) throw new Error(`Invalid password (${reasonForInvalidPassword}); please use the auth.checks.validPassword route to check passwords before trying to sign up!`);
-
-                const { passwordSalt, passwordHash } = await hashPassword(input.password);
-
-                // Unfinished users are pruned after 1 hour
-                // Should treat this keypair request the same way
-                const pruneAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
-
-                const user = await db.user.create({
-                    data: {
-                        username: input.username,
-                        email: input.email.toLowerCase(),
-                        passwordSalt: Buffer.from(passwordSalt),
-                        passwordHash: Buffer.from(passwordHash),
-                        pruneAt,
-                        newKeypairRequests: {
-                            create: {
-                                sendingIP: getIpOrIpChain(ctx.req, ctx.config),
-                                identifier: JSON.stringify(getDeviceIdentifier(ctx.req, input.clientGeneratedRandom)),
-                                pruneAt,
-                            },
-                        }
-                    },
-                    select: {
-                        id: true,
-                        newKeypairRequests: {select: {id: true}}
-                    }
-                });
-
-                const keypairRequest = user.newKeypairRequests[0];
-                if (!keypairRequest) throw new Error('Impossible condition! In /api/auth.signUp, keypairRequest is null!')
-
-                return {
-                    success: true,
-                    userId: user.id.toString(),
-                    keypairRequestId: keypairRequest.id,
-                }
-            } catch (e) {
-                console.error(e);
-                if (!e) throw e;
-                if (typeof e === 'string') return {
-                    success: false,
-                    userId: undefined,
-                    keypairRequestId: undefined,
-                    error: e,
-                };
-                if (typeof e !== 'object') throw e;
-                if ('message' in e && typeof e.message === 'string') return {
-                    success: false,
-                    userId: undefined,
-                    keypairRequestId: undefined,
-                    error: e.message,
-                };
-                throw e;
-            }
-        }),
-
-    checks: {
-        validEmail: publicProcedure
-            .input(z.object({
-                email: z.string(),
-            }))
-            .output(z.union([
-                z.literal(true),
-                z.enum(Object.values(EmailInvalidityReason))
-            ]))
-            .query(async ({input}) => { // this all goes over HTTPS anyway
-                const reasonForInvalidEmail = await getServerSideReasonForInvalidEmail(input.email);
-                if (reasonForInvalidEmail) return reasonForInvalidEmail;
-                return true;
-            }),
-
-        validUsername: publicProcedure
-            .input(z.object({
-                username: z.string(),
-            }))
-            .output(z.union([
-                z.literal(true),
-                z.enum(Object.values(UsernameInvalidityReason))
-            ]))
-            .query(async ({input}) => { // this all goes over HTTPS anyway
-                const reasonForInvalidUsername = await getServerSideReasonForInvalidUsername(input.username);
-                if (reasonForInvalidUsername) return reasonForInvalidUsername;
-                return true;
-            }),
-
-        /** Returns `true` if a password is valid. Client-side checks should be run before passing off to the server.
-         *
-         * If the password is invalid, returns the error code string.
-         */
-        validPassword: publicProcedure
-            .input(z.object({
-                password: z.string(),
-            }))
-            .output(z.union([
-                z.literal(true),
-                z.enum(Object.values(PasswordInvalidityReason))
-            ]))
-            .query(async ({input}) => { // this all goes over HTTPS anyway
-                const reasonForInvalidPassword = getServerSideReasonForInvalidPassword(input.password);
-                if (reasonForInvalidPassword) return reasonForInvalidPassword;
-                return true;
-            }),
-    },
-
-    getAuthenticationParameters: publicProcedure
-        .input(z.object({
-            username: z.string(),
-        }))
-        .output(z.object({
-            authSessionId: z.string(),
-            options: z.object({
-                challenge: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                timeout: z.number(),
-                rpId: z.string(),
-                allowCredentials: z.array(z.object({
-                    id: z.string().refine(v => base64.validate(v, true), { message: 'value must be base64url' }),
-                    transports: z.array(z.string()).optional(),
-                    type: z.literal('public-key'),
-                })).optional(),
-                userVerification: z.literal(userVerification),
-                extensions: z.object({}).optional(),
-            })
-        }))
-        .query(async ({ctx, input}) => {
-            const dbData_ = await db.user.findFirst({
-                where: {
-                    username: {
-                        equals: input.username,
-                        mode: 'insensitive',
-                    }
-                },
-                select: {
-                    id: true,
-                    publicKeys: {select:{
-                        id: true,
-                        clientTransports: true,
-                    }},
-                }
-            });
-
-            if (!dbData_) throw new Error('Invalid username! This could be because the username does not exist, the user has no public keys, or the user is on a timer. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
-
-            const dbData = Object.assign(dbData_, { username: input.username });
-
-            const challenge = crypto.getRandomValues(new Uint8Array(32));
-
-            const options = await generateAuthenticationOptions(generateGenerateAuthenticationOptionsInput({
-                config: ctx.config,
-                publicKeys: dbData.publicKeys,
-                challenge: base64.fromArrayBuffer(challenge),
-            }));
-
-            const authSession = await db.authSession.create({
-                data: {
-                    userId: dbData.id,
-                    challenge: options.challenge,
-                    pruneAt: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes
-                    finalExpiration: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14), // 2 weeks
-                },
-                select: {
-                    id: true,
-                }
-            });
-
-            return {
-                authSessionId: authSession.id,
-                options: options as Required<typeof options> & { userVerification: typeof userVerification },
-            }
-        }),
-
-
-    submitAuthentication: publicProcedure
-        .input(z.object({
-            authSessionId: z.string(),
-            authResponse: authenticationResponseJSONSchema,
-        }))
-        .output(z.union([
-            z.object({
-                success: z.literal(true),
-                expiresAt: z.date(),
-                error: z.undefined(),
-            }),
-            z.object({
-                success: z.literal(false),
-                expiresAt: z.undefined(),
-                error: z.enum(Object.values(SessionValidationFailureReason)),
-            }),
-        ]))
-        .mutation(async ({ctx, input}) => {
-            const expirationOrError = await authenticateUser(ctx, input);
-
-            if (typeof expirationOrError === 'string') {
-                return {
-                    success: false,
-                    error: expirationOrError,
-                    expiresAt: undefined,
-                };
-            } else {
-                return {
-                    success: true,
-                    error: undefined,
-                    expiresAt: expirationOrError.authSession.pruneAt,
-                }
-            }
-        }),
-
-    signOut: publicProcedure
-        .output(z.literal(true))
-        .mutation(async ({ctx, input}) => {
-            const sessionOrError = getSessionTokenFromRequest()
-            if (typeof sessionOrError === 'string') return true as const;
-
-            cookies().delete(STOCKEDHOME_COOKIE_NAME);
-
-            await db.authSession.delete({
-                where: { id: sessionOrError.authSessionId },
-                select: { id: true },
-            });
-
-            return true as const;
-        }),
-})

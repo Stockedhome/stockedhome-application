@@ -76,7 +76,7 @@ That way, you don't have to worry about the hassle that might cause.
      *
      * IF YOUR HOSTING PROVIDER DOES NOT PROVIDE A NextRequest.ip VALUE:
      * Because Next.js does not provide a way to get the user's IP address from the connection directly,
-     * setting this to false disables IP address matching when creating a new keypair, thus lowering security.
+     * setting this to false disables IP address matching when creating a new passkey, thus lowering security.
      * In local environments, this is not a concern. For SAAS hosting, disabling this is a noteworthy security downgrade.
      */
     trustProxy: z.boolean().describe(`
@@ -89,7 +89,7 @@ If your hosting provider provides a NextRequest.ip value, it will always be used
 
 IF YOUR HOSTING PROVIDER DOES NOT PROVIDE A NextRequest.ip VALUE:
 Because Next.js does not provide a way to get the user's IP address from the connection directly,
-setting this to false disables IP address matching when creating a new keypair, thus lowering security.
+setting this to false disables IP address matching when creating a new passkey, thus lowering security.
 In local environments, this is not a concern. For SAAS hosting, disabling this is a noteworthy security downgrade.
 `.trim()),
 
@@ -101,7 +101,7 @@ In local environments, this is not a concern. For SAAS hosting, disabling this i
 
 
     /**
-     * Configuration relating to CAPCHAs in the application
+     * Configuration relating to CAPTCHAs in the application
      *
      * CAPTCHAs anti-bot measures used to reduce spam and abuse.
      * They're used in important parts of the site, such as account creation and passkey creation.
@@ -181,7 +181,7 @@ This can be removed if the CAPTCHA provider is 'none'.
 
         }),
     ]).describe(`
-Configuration relating to CAPCHAs in the application
+Configuration relating to CAPTCHAs in the application
 
 CAPTCHAs anti-bot measures used to reduce spam and abuse.
 They're used in important parts of the site, such as account creation and passkey creation.
@@ -218,6 +218,20 @@ Configuration related to Supabase
 `.trim()),
 
 
+
+
+    /**
+     * Whether to use UX as though the server is a SAAS server, such as
+     * sending users to contact support rather than giving them a docs link.
+     *
+     * Defaults to false.
+     */
+    useSAAS_UX: z.enum(['true', 'false']).default('false').transform(v => v === 'true').describe(`
+Whether to use UX as though the server is a SAAS server, such as
+sending users to contact support rather than giving them a docs link.
+
+Defaults to false.
+`.trim()),
 })
 type ConfigBase = z.infer<typeof configSchemaBase>;
 
@@ -227,13 +241,6 @@ export const configSchemaComputations = z.object({
      */
     devMode: z.boolean().default(false).describe(`
 Whether the application is running in development mode
-`.trim()),
-
-    /**
-     * Whether the server is being hosted under a Software As A Service deployment, as opposed to local hosting or development servers
-    */
-    isSAAS: z.boolean().default(false).describe(`
-Whether the server is being hosted under a Software As A Service deployment, as opposed to local hosting or development servers
 `.trim()),
 
     /**

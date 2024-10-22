@@ -1,5 +1,4 @@
 import z from "zod";
-import { HostingConfiguration } from "./miscEnums/HostingConfiguration";
 
 // TODO: Add this all to the docs
 // TODO: Integrate this validator into instrumentation.ts
@@ -69,24 +68,20 @@ For information on how Stockedhome loads configuration, see https://docs.stocked
 `.trim()),
 
     /**
-     * The type of hosting environment that Stockedhome is running in.
+     * A custom name for the configuration file to use.
      *
-     * Valid values are:
-     * * "dev" for development
-     * * "local" for locally-hosted servers
-     * * "saas" for Software as a Service hosting
+     * For example, the SAAS servers for Stockedhome would use `config.saas.yaml` as the configuration file.
      *
-     * For information on how Stockedhome loads configuration, see https://docs.stockedhome.app/hosting/configuration/intro#how-stockhome-loads-configuration
+     * This value is relative to CONFIG_DIR (if set) and should ideally only be a file name.
+     * When running under Docker, remember that the Docker container has a different file system than the host machine.
     */
-    HOSTING_CONFIGURATION: z.nativeEnum(HostingConfiguration).describe(`
-The type of hosting environment that Stockedhome is running in.
+    CONFIG_FILE: z.string().optional().describe(`
+A custom name for the configuration file to use.
 
-Valid values are:
-* "dev" for development
-* "local" for locally-hosted servers
-* "saas" for Software as a Service hosting
+For example, the SAAS servers for Stockedhome would use \`config.saas.yaml\` as the configuration file.
 
-For information on how Stockedhome loads configuration, see https://docs.stockedhome.app/hosting/configuration/intro#how-stockhome-loads-configuration
+This value is relative to CONFIG_DIR (if set) and should ideally only be a file name.
+When running under Docker, remember that the Docker container has a different file system than the host machine.
 `.trim()),
 
     /**
@@ -171,6 +166,17 @@ This value is comma-separated and ignores whitespace. For example, \`AB:CD:...:M
 Whether the server is running in a Docker container.
 
 Defaults to false.
+`.trim()),
+
+    /**
+     * Whether the server is running in production mode (built from source),
+     * testing mode (testing against source code and/or running E2E tests),
+     * or development mode (running the server locally, usually from source code directly).
+     */
+    NODE_ENV: z.enum(['production', 'testing', 'development']).default('development').describe(`
+Whether the server is running in production mode (built from source),
+testing mode (testing against source code and/or running E2E tests),
+or development mode (running the server locally, usually from source code directly).
 `.trim()),
 
 }).merge(z.object({}))

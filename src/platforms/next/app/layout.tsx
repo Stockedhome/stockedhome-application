@@ -199,7 +199,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
     console.log('Rendering root layout!')
 
-    return <html>
+    return <html lang="en"> {/* TODO: i18n */}
         <head>
             {sheet && <style dangerouslySetInnerHTML={{ __html: sheet.textContent }} id={sheet.id} />}
         </head>

@@ -8,16 +8,16 @@ import type { Database } from "@stockedhome/codegen/database.types";
 import { REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from "@supabase/supabase-js";
 import { authenticatorTransportFutureSchema } from "@stockedhome/react-native-passkeys/ReactNativePasskeys.types";
 
-const keypairRequestSchema = z.object({
+const passkeyRequestSchema = z.object({
     id: z.string(),
     createdAt: z.date(),
     sendingIP: z.string(),
     identifier: z.string(),
 });
 
-const keypairRequestSubscriptionSchema = z.object({
+const passkeyRequestSubscriptionSchema = z.object({
     eventType: z.enum(Object.values(REALTIME_POSTGRES_CHANGES_LISTEN_EVENT)),
-    data: keypairRequestSchema.nullable(),
+    data: passkeyRequestSchema.nullable(),
 });
 
 export const userMeSecurityPasskeysRouter = createRouter({
@@ -104,7 +104,7 @@ export const userMeSecurityPasskeysRouter = createRouter({
 
     subscribeToPasskeyRequests: authenticatedProcedure
         .subscription(({ctx}) => { // TODO: Once this is tested, abstract it out into a function for making DB subscriptions
-            return observable<z.infer<typeof keypairRequestSubscriptionSchema>>((obs) => {
+            return observable<z.infer<typeof passkeyRequestSubscriptionSchema>>((obs) => {
                 const subscription = useSupabase(true)
                     .channel('db-changes-subscribeToPasskeyRequests-all')
                     .on<Database['public']['Tables']['AuthNewPasskeyRequest']['Insert']>('postgres_changes', {

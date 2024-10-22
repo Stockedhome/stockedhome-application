@@ -10,7 +10,7 @@ import { EmailInvalidityReason, getClientSideReasonForInvalidEmail } from 'lib/t
 import { Button, ButtonText } from '../../components/Button';
 import { MAX_USERNAME_LENGTH, MIN_USERNAME_LENGTH, MIN_USERNAME_UNIQUE_CHARACTERS, UsernameInvalidityReason, getClientSideReasonForInvalidUsername } from 'lib/trpc/auth/signup-checks/usernames/client';
 import { Form } from '../../components/Form';
-import { CAPTCHA } from '../../components/capcha';
+import { CAPTCHA } from '../../components/captcha';
 import { StockedhomeInput } from '../../components/StockedhomeInput';
 
 export function stringifyUsernameInvalidReason(reason: UsernameInvalidityReason): Exclude<React.ReactNode, undefined> {
@@ -21,49 +21,75 @@ export function stringifyUsernameInvalidReason(reason: UsernameInvalidityReason)
         case UsernameInvalidityReason.NotEnoughUniqueCharacters:
         case UsernameInvalidityReason.UnknownError:
         case UsernameInvalidityReason.AlreadyInUse:
+        case UsernameInvalidityReason.UserDoesNotExist:
             return 'User does not exist.'
     }
 }
 
-export function SignUpNewAccountScreen({
-    clientGeneratedRandom,
+export function RequestPasskeyAuthenticateScreen({
     setUsername: setUsernameInParent,
     setUserId,
-    setKeypairRequestId,
-    setSignupStep,
+    setPasskeyRequestId,
+    setRequestStep,
 }: {
-    clientGeneratedRandom: string
     setUsername: (username: string) => void
-    setUserId: (userId: string) => void
-    setKeypairRequestId: (keypairRequestId: string) => void
-    setSignupStep: (stage: 'new-passkey') => void
+    setUserId: (userId: bigint) => void
+    setPasskeyRequestId: (passkeyRequestId: string) => void
+    setRequestStep: (stage: 'waiting') => void
 }) {
     const trpc = useTRPC()
     if (!trpc) throw new Error('No TRPC provider found; this page should not be accessible without one.')
 
     const trpcUtils = trpc.useUtils()
 
-    const signUp = trpc.auth.passkeys.registerKey.useMutation()
+    const requestPasskey = trpc.auth.passkeys.requestPasskey.useMutation()
 
     const usernameInputRef = React.useRef<RNTextInput>(null)
     const [isUsernameValid, setIsUsernameValid] = React.useState(false);
     const usernameStorageRef = React.useRef<string>('')
-    const username = usernameStorageRef.current
+
+    const passwordInputRef = React.useRef<RNTextInput>(null)
+    const passwordStorageRef = React.useRef<string>('')
+
+    const [hasPassword, setHasPassword] = React.useState(false)
+    const determineIfHasPassword = React.useCallback((password: string) => {
+        setHasPassword(password.length > 0)
+    }, [])
 
     const [captchaToken, setCaptchaToken] = React.useState<string | null>(null)
 
     const [submitting, setSubmitting] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
+    const canSubmit = isUsernameValid && hasPassword && !!captchaToken
 
     const submit = React.useCallback(async () => {
         if (submitting) return
-        if (!isUsernameValid || !captchaToken) {
+        if (!canSubmit) {
             return;
         }
 
+        const username = usernameStorageRef.current
+        const password = passwordStorageRef.current
+
         setSubmitting(true)
-    }, [email, username, password, captchaToken, submitting, isEmailValid, isUsernameValid, isPasswordValid])
+
+        const res = await requestPasskey.mutateAsync({
+            username,
+            password,
+            captchaToken,
+        })
+
+        if (!res.success) {
+            setError(res.error)
+            setSubmitting(false)
+            return
+        }
+
+        setPasskeyRequestId(res.passkeyRequestId)
+        setUsernameInParent(username)
+        setUserId(res.userID)
+    }, [submitting, captchaToken, canSubmit, requestPasskey, setPasskeyRequestId])
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -74,7 +100,7 @@ export function SignUpNewAccountScreen({
 
     if (submitting) {
         return <Row sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <P sx={{ mb: 16 }}>Signing up as {username}...</P>
+            <P sx={{ mb: 16 }}>Submitting passkey request for {usernameStorageRef.current}...</P>
             <View sx={{ width: 16 }} />
             <ActivityIndicator size={32} color='highlight' />
         </Row>
@@ -82,8 +108,7 @@ export function SignUpNewAccountScreen({
 
     return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <H1 sx={{textAlign: 'center'}}>
-            <Text>Sign Up</Text>{'\n'}
-            <Text>for Stockedhome</Text>
+            <Text>Request Passkey</Text>{'\n'}
         </H1>
         <Form>
 
@@ -92,14 +117,6 @@ export function SignUpNewAccountScreen({
                 defaultValue=''
                 emptyValue=''
                 title={<H3>Username</H3>}
-                description={<>
-                    <P sx={{color: 'textSecondary'}}>
-                        Your username is how other people will see you on Stockedhome.
-                    </P>
-                    <P sx={{color: 'textMuted', marginTop: -4}}>
-                        Usernames must be at least {MIN_USERNAME_LENGTH} characters long and contain at least {MIN_USERNAME_UNIQUE_CHARACTERS} unique characters.
-                    </P>
-                </>}
                 invalidityReasonEnum={UsernameInvalidityReason}
                 onChangeProp='onChangeText'
                 ref={usernameInputRef}
@@ -115,9 +132,9 @@ export function SignUpNewAccountScreen({
                     else return cachedServerInvalidityReason
                 }}
                 asyncValidator={async (username: string, abortController) => {
-                    const invalidityReason = await trpcUtils.auth.signup.checks.validUsername.ensureData({username}, { signal: abortController.signal, staleTime: 30_000 })
-                    if (invalidityReason === true) return null;
-                    else return invalidityReason
+                    const [user] = await trpcUtils.user.getUsers.ensureData({users: [['un', username]]}, { signal: abortController.signal, staleTime: 30_000 })
+                    if (user) return null;
+                    else return UsernameInvalidityReason.UserDoesNotExist
                 }}
                 onValidationStateChanged={setIsUsernameValid}
                 inputProps={{
@@ -133,18 +150,10 @@ export function SignUpNewAccountScreen({
                 }}
             />
 
-            <StockedhomeInput // literally just using this for styling lol
+            <StockedhomeInput
                 InputComponent={TextInput}
                 defaultValue=''
                 title={<H3>Password</H3>}
-                description={<>
-                    <P sx={{color: 'textSecondary' }}>
-                        You'll use your password any time you want to create a Passkey (device-specific login credential); more on that later.
-                    </P>
-                    <P sx={{color: 'textMuted', marginTop: -4}}>
-                        Passwords must be at least {MIN_PASSWORD_LENGTH} characters long and not in any "common password" lists.
-                    </P>
-                </>}
                 onChangeProp='onChangeText'
                 ref={passwordInputRef}
                 valueRef={passwordStorageRef}
@@ -157,13 +166,14 @@ export function SignUpNewAccountScreen({
                     blurOnSubmit: false,
                     onSubmitEditing: submit
                 }}
+                onValueChange={determineIfHasPassword}
             />
         </Form>
 
         <CAPTCHA setToken={setCaptchaToken} setError={setError} actionIdentifier='signup' />
 
         <View sx={{ height: 16 }} />
-        <Button onPress={submit} disabled={!isUsernameValid || !captchaToken}><ButtonText>Sign Up</ButtonText></Button>
+        <Button onPress={submit} disabled={!canSubmit}><ButtonText>Request Passkey</ButtonText></Button>
 
     </View>
 }

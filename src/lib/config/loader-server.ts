@@ -5,7 +5,6 @@ import type { Config } from './schema';
 import type { ComputedConfigProps } from './schema-base';
 import { apiRouter } from '../trpc/primaryRouter';
 import { env } from '../env-schema';
-import { HostingConfiguration } from '../miscEnums/HostingConfiguration';
 
 declare global {
     var ___config___: Config;
@@ -19,7 +18,8 @@ export async function loadConfigServer(): Promise<Config> {
     }
 
     const configDir = path.resolve(env.IS_DOCKER ? '/config' : env.CONFIG_DIR || './config');
-    let configPath = path.join(configDir, `config.${env.HOSTING_CONFIGURATION}.yaml`);
+    const configFileName = env.CONFIG_FILE ? env.CONFIG_FILE : env.NODE_ENV === 'production' ? 'config.yaml' : 'config.dev.yaml';
+    let configPath = path.join(configDir, configFileName);
 
     try {
         console.log('Checking config directory...')
@@ -65,12 +65,11 @@ export async function loadConfigServer(): Promise<Config> {
         const { configSchema } = await import('./schema');
         const baseParsedConfig = configSchema.parse(configYamlParsed);
         validatedConfig = Object.assign(baseParsedConfig, {
-            devMode: env.HOSTING_CONFIGURATION === HostingConfiguration.Development,
+            devMode: env.NODE_ENV !== 'production',
             supabase: {
                 url: baseParsedConfig.supabase.url,
                 anonKey: env.SUPABASE_PUBLISHABLE_KEY,
             },
-            isSAAS: env.HOSTING_CONFIGURATION === HostingConfiguration.SoftwareAsAService,
         } satisfies ComputedConfigProps);
 
         if (validatedConfig.captcha.provider !== 'none' && !env.CAPTCHA_SECRET_KEY) {

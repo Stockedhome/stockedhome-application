@@ -1,4 +1,5 @@
-import geolite2, { GeoIpDbName } from 'geolite2-redist';
+import { GeoIpDbName } from 'geolite2-redist';
+import * as geolite2 from 'geolite2-redist';
 import maxmind, { type CityResponse } from 'maxmind';
 import { z } from "zod";
 import 'server-only';

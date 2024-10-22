@@ -42,13 +42,13 @@ singleHousehold: true
 #
 # IF YOUR HOSTING PROVIDER DOES NOT PROVIDE A NextRequest.ip VALUE:
 # Because Next.js does not provide a way to get the user's IP address from the connection directly,
-# setting this to false disables IP address matching when creating a new keypair, thus lowering security.
+# setting this to false disables IP address matching when creating a new passkey, thus lowering security.
 # In local environments, this is not a concern. For SAAS hosting, disabling this is a noteworthy security downgrade.
 trustProxy: false
 
 
 
-# Configuration relating to CAPCHAs in the application
+# Configuration relating to CAPTCHAs in the application
 #
 # CAPTCHAs anti-bot measures used to reduce spam and abuse.
 # They're used in important parts of the site, such as account creation and passkey requests

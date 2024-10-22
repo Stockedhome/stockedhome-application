@@ -19,7 +19,7 @@ Write-Output $seed_sql | Out-File -FilePath './docker-compose-setup/supabase_vol
 
 Copy-Item -Path ./src/db/prod-stuff.sql -Destination ./docker-compose-setup/supabase_volumes/db/init/prod-stuff.sql -Force
 
-pnpm exec supabase start --ignore-health-check
+pwsh -File ./scripts/run-supabase.ps1
 pnpm exec prisma db push
 if (Test-Path -Path 'codegen/results/database.types.ts') {
     Remove-Item -Path 'codegen/results/database.types.ts' -Force

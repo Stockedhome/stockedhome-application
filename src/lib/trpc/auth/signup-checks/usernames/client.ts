@@ -24,8 +24,13 @@ export function getClientSideReasonForInvalidUsername(username: string): Usernam
 export enum UsernameInvalidityReason {
     TooShort = 'TooShort',
     TooLong = 'TooLong',
-    AlreadyInUse = 'AlreadyInUse',
     UnknownError = 'UnknownError',
     InvalidCharacters = 'InvalidCharacters',
     NotEnoughUniqueCharacters = 'NotEnoughUniqueCharacters',
+
+    // only used when signing up
+    AlreadyInUse = 'AlreadyInUse',
+
+    // only used when checking for an existing user
+    UserDoesNotExist = 'UserDoesNotExist',
 }

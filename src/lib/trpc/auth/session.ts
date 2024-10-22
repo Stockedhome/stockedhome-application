@@ -67,7 +67,7 @@ export const AuthSessionRouter = createRouter({
                 }
             });
 
-            if (!dbData_) throw new Error('Invalid username! This could be because the username does not exist, the user has no public keys, or the user is on a timer. [https://docs.stockedhome.app/authentication/webauthn#keypair-request]');
+            if (!dbData_) throw new Error('Invalid username! This could be because the username does not exist, the user has no public keys, or the user is on a timer. [https://docs.stockedhome.app/authentication/webauthn#passkey-request]');
 
             const dbData = Object.assign(dbData_, { username: input.username });
 
