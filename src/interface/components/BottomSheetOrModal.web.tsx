@@ -28,7 +28,7 @@ export function BottomSheetOrModal({ hide, isVisible, children }: { hide(): void
     }, [isVisible, modalRef.current]);
 
     return <>
-        <dialog ref={modalRef} onClick={clickHandler} onClose={hide} style={{ padding: 0, background: 'none', border: 'none', maxWidth: 'max(60%, 9in)' }} data-isVisible={isVisible}>
+        <dialog ref={modalRef} onClick={clickHandler} onClose={hide} style={{ padding: 0, background: 'none', border: 'none', maxWidth: 'max(60%, 9in)' }} data-is-visible={isVisible}>
             <View sx={{
                 backgroundColor: 'backgroundVeryDark',
                 flex: 1,

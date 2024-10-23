@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import { Octokit } from 'octokit';
-import { describe, test, expect } from 'vitest';
+//import { describe, test, expect } from 'vitest';
 import yaml from 'js-yaml';
 import type { DockerCompose } from './docker-compose-schema';
 import packageJson from '../../package.json';

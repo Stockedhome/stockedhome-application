@@ -226,7 +226,7 @@ Configuration related to Supabase
      *
      * Defaults to false.
      */
-    useSAAS_UX: z.enum(['true', 'false']).default('false').transform(v => v === 'true').describe(`
+    useSAAS_UX: z.union([z.boolean(), z.enum(['true', 'false']).default('false').transform(v => v === 'true')]).describe(`
 Whether to use UX as though the server is a SAAS server, such as
 sending users to contact support rather than giving them a docs link.
 

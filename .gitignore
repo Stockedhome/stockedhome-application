@@ -29,6 +29,10 @@ pids
 *.seed
 *.pid.lock
 
+# Other Stuff
+/auto-imports.d.ts
+tsconfig.vitest-temp.json
+
 # ==============
 #    Preset
 # ==============

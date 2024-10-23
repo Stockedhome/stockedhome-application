@@ -3,7 +3,7 @@
 
 import { z } from "zod";
 import { animal as animalDict } from 'memorable-moniker/dist/dict/animal';
-import { describe, type TestAPI } from "vitest";
+import { type TestAPI } from "vitest";
 import { inspect } from 'node:util';
 
 // get zod object keys recursively

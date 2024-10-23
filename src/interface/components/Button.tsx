@@ -31,21 +31,22 @@ export const Button = React.forwardRef(function Button(
     },
     ref?: ComponentPropsWithRef<typeof NativePressable>['ref']
 ) {
-    return (
-        <StyledPressable
-            showCursor={
-                !!(
-                    props.onPress ||
-                    props.accessibilityRole === 'link' ||
-                    !props.disabled
-                )
-            }
-            {...props}
-            ref={ref}
-        >
-            {props.children as any}
-        </StyledPressable>
-    );
+    return <StyledPressable
+        showCursor={
+            !!(
+                props.onPress ||
+                props.accessibilityRole === 'link' ||
+                !props.disabled
+            )
+        }
+        {...props}
+        ref={ref}
+    >
+        { Platform.select({
+            web: () => <button style={{display: 'contents'}} disabled={!!props.disabled} type='button'>{props.children as any}</button>,
+            default: () => props.children as any,
+        }) as any }
+    </StyledPressable>
 });
 
 import { P as ExpoP } from '@expo/html-elements';

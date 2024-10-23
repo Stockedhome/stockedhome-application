@@ -136,15 +136,27 @@ export const AuthSessionRouter = createRouter({
     signOut: publicProcedure
         .output(z.literal(true))
         .mutation(async ({ctx, input}) => {
-            const sessionOrError = getSessionTokenFromRequest()
+            const sessionOrError = await getSessionTokenFromRequest()
             if (typeof sessionOrError === 'string') return true as const;
 
-            cookies().delete(STOCKEDHOME_COOKIE_NAME);
+            await Promise.all([
+                db.authSession.delete({
+                    where: { id: sessionOrError.authSessionId },
+                    select: { id: true },
+                }).catch((err) => {
+                    if (!(err instanceof Error)) throw err;
 
-            await db.authSession.delete({
-                where: { id: sessionOrError.authSessionId },
-                select: { id: true },
-            });
+                    // P2005 = "An operation failed because it depends on one or more records that were required but not found. {cause}"
+                    // https://www.prisma.io/docs/orm/reference/error-reference#p2025
+                    // Since the auth session is already gone, well, we don't really have anything further to do here.
+                    if ('code' in err && err.code === 'P2025') {
+                        return;
+                    }
+
+                    throw err;
+                }),
+                cookies().then(c => c.delete(STOCKEDHOME_COOKIE_NAME)),
+            ]);
 
             return true as const;
         }),

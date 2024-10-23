@@ -12,7 +12,7 @@ import { useAuthentication } from '../../provider/auth/authentication';
 import { SignUpNewAccountScreen } from './signup-new-account-screen';
 import { SignUpCreateFirstPasskeyScreen } from './signup-create-first-passkey-screen';
 import { SignUpTestNewPasskeyScreen } from './signup-test-new-passkey-screen';
-if (!window.crypto) window.crypto = Crypto as any;
+if (typeof window !== 'undefined' && !window.crypto) window.crypto = Crypto as any;
 
 export function SignUpScreen() {
     return <OptionallyScrollable scrollable>

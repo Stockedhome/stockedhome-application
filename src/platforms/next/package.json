@@ -1,12 +1,13 @@
 {
   "name": "@stockedhome/next-app",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
+  "___COMMENT_ON_DEPENDENCIES": "Any local packages MUST use the `link` protocol for the Next.js platform; otherwise, it doesn't watch files for changes properly",
   "dependencies": {
+    "@react-native/assets-registry": "link:../../forks/assets-registry",
+    "interface": "link:../../interface",
+    "lib": "link:../../lib",
     "@expo/next-adapter": "6.0.0",
-    "@react-native/assets-registry": "file:../../forks/assets-registry",
-    "interface": "file:../../interface",
-    "lib": "file:../../lib",
     "json-loader": "^0.5.7",
     "next-compose-plugins": "^2.2.1",
     "next-fonts": "^1.5.1",

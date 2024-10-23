@@ -1,4 +1,4 @@
-import { describe, test, expect, it } from 'vitest';
+//import { describe, test, expect, it } from 'vitest';
 import dotenv from 'dotenv';
 import fs from 'fs/promises';
 import { envSchema } from '../../src/lib/env-schema';
@@ -16,6 +16,8 @@ describe('Developer Example ENV', () => {
         const envSchemaKeys = new Set(zodKeys(envSchema))
         envSchemaKeys.delete('IS_DOCKER')
         envSchemaKeys.delete('USE_SAAS_UX')
+        envSchemaKeys.delete('NODE_ENV')
+        envSchemaKeys.delete('CONFIG_FILE')
 
         for (const key of envSchemaKeys) {
             test(`${key}`, ()=>{
@@ -38,6 +40,7 @@ describe('Production Example ENV', () => {
         envSchemaKeys.delete('DIRECT_URL')
         envSchemaKeys.delete('CONFIG_DIR')
         envSchemaKeys.delete('IS_DOCKER')
+        envSchemaKeys.delete('NODE_ENV')
 
         for (const key of envSchemaKeys) {
             test(`${key}`, ()=>{
@@ -55,6 +58,7 @@ describe('Production Example ENV', () => {
                 DIRECT_URL: z.never().optional(),
                 CONFIG_DIR: z.never().optional(),
                 IS_DOCKER: z.never().optional(),
+                NEXT_PUBLIC_BASEURL: z.literal(''),
             })).safeParse(parsedSchema).error,
         'Production ENV was not schema-compliant').toBeUndefined()
     })

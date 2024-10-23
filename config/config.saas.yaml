@@ -70,7 +70,8 @@ captcha:
   # A publicly-accessible site key uniquely identifying your site for the CAPTCHA provider.
   #
   # This can be removed if the CAPTCHA provider is `none`.
-  siteKey: 0x4AAAAAAAi0czv5UTMVuCgL # TODO: update this
+          # TODO: update this for SAAS
+  siteKey: 0x4AAAAAAAi0czv5UTMVuCgL
 
 supabase:
   url: http://supabase.stockedhome.app:54321

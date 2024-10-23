@@ -179,6 +179,18 @@ testing mode (testing against source code and/or running E2E tests),
 or development mode (running the server locally, usually from source code directly).
 `.trim()),
 
+
+    /**
+     * OPTIONAL: Base URL of your web server, used for SEO metadata and the Web App Manifest.
+     *
+     * For example, "https://stockedhome.app/"
+     */
+    NEXT_PUBLIC_BASEURL: z.string().url().optional().describe(`
+OPTIONAL: Base URL of your web server, used for SEO metadata and the Web App Manifest.
+
+For example, "https://stockedhome.app/"
+`.trim()),
+
 }).merge(z.object({}))
 
 type EnvBase = z.infer<typeof envSchema>;

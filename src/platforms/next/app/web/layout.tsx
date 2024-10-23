@@ -27,6 +27,10 @@ export const metadata: Metadata = {
 
 const configPromise = loadConfigServer();
 
+// calculate at server runtime but don't constantly regenerate it
+export const dynamic = 'force-dynamic';
+export const revalidate = false;
+
 export default async function WebAppRootLayout({ children }: { children: React.ReactNode }) {
     return <ProvidersBeforeConfig>
         <ConfigProviderWeb primaryConfig={superjson.serialize(await configPromise)}>

@@ -37,8 +37,8 @@ export enum SessionValidationFailureReason {
     DatabaseError = 'Database Error',
 }
 
-export function getSessionTokenFromRequest(): SessionToken | SessionValidationFailureReason {
-    const sessionTokenRaw = cookies().get(STOCKEDHOME_COOKIE_NAME);
+export async function getSessionTokenFromRequest(): Promise<SessionToken | SessionValidationFailureReason> {
+    const sessionTokenRaw = (await cookies()).get(STOCKEDHOME_COOKIE_NAME);
     if (!sessionTokenRaw) return SessionValidationFailureReason.NoSessionCookie;
 
     let sessionTokenJson: any;
@@ -95,7 +95,8 @@ export interface AuthenticateUserResult {
 const AUTH_SESSION_EXPIRES_AFTER_MILLIS = 32 * 60 * 60 * 1000;
 const AUTH_SESSION_RENEW_AT_MILLIS_TIL_EXPIRATION = 24 * 60 * 60 * 1000;
 
-export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken: SessionToken | SessionValidationFailureReason = getSessionTokenFromRequest()): Promise<SessionValidationFailureReason | AuthenticateUserResult> {
+export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, sessionToken?: SessionToken | SessionValidationFailureReason): Promise<SessionValidationFailureReason | AuthenticateUserResult> {
+    sessionToken ??= await getSessionTokenFromRequest();
     try {
         if (typeof sessionToken === 'string') return sessionToken;
         const {authResponse, authSessionId} = sessionToken;
@@ -194,7 +195,7 @@ export async function authenticateUser(ctx: Pick<TRPCGlobalContext, 'config'>, s
         }
 
         try {
-            cookies().set({
+            (await cookies()).set({
                 name: STOCKEDHOME_COOKIE_NAME,
                 value: JSON.stringify({ authSessionId, authResponse }),
                 domain: ctx.config.canonicalRoot.hostname,

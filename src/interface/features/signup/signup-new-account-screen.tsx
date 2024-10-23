@@ -109,10 +109,11 @@ export function SignUpNewAccountScreen({
     const [submitting, setSubmitting] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
+    const canSubmit = isEmailValid && isUsernameValid && isPasswordValid && captchaToken
 
     const submit = React.useCallback(async () => {
         if (submitting) return
-        if (!isEmailValid || !isUsernameValid || !isPasswordValid || !captchaToken) {
+        if (!canSubmit) {
             return;
         }
 
@@ -144,7 +145,7 @@ export function SignUpNewAccountScreen({
         setPasskeyRequestId(signupData.passkeyRequestId)
         setUsernameInParent(usernameStorageRef.current)
         setSignupStep('new-passkey')
-    }, [emailStorageRef, passwordStorageRef, usernameStorageRef, captchaToken, submitting, isEmailValid, isUsernameValid, isPasswordValid])
+    }, [emailStorageRef, passwordStorageRef, usernameStorageRef, captchaToken, canSubmit, submitting])
 
     if (error) {
         return <View sx={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -305,7 +306,7 @@ export function SignUpNewAccountScreen({
         <CAPTCHA setToken={setCaptchaToken} setError={setError} actionIdentifier='signup' />
 
         <View sx={{ height: 16 }} />
-        <Button onPress={submit} disabled={!isEmailValid || !isUsernameValid || !isPasswordValid || !captchaToken}><ButtonText>Sign Up</ButtonText></Button>
+        <Button onPress={submit} disabled={!canSubmit}><ButtonText>Sign Up</ButtonText></Button>
 
     </View>
 }

@@ -15,16 +15,16 @@ export function GET() {
         theme_color: '#146fc7',
         icons: [
             {
-                src: resolveMetaUrl('assets/favicon.128.png').href,
-                purpose: 'any',
+                src: resolveMetaUrl('assets/logo-background.128.png').href,
+                purpose: 'maskable',
             },
             {
-                src: resolveMetaUrl('assets/logo-notification.96.png').href,
+                src: resolveMetaUrl('assets/logo-notification.128.png').href,
                 purpose: 'monochrome',
             },
             {
-                src: resolveMetaUrl('assets/logo-notification.96.png').href,
-                purpose: 'badge',
+                src: resolveMetaUrl('assets/favicon.128.png').href,
+                purpose: 'any',
             },
         ],
     }

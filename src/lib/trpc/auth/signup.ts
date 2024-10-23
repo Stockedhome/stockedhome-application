@@ -37,6 +37,7 @@ export const AuthSignUpRouter = createRouter({
         .mutation(async ({ctx, input}) => {
             try {
                 if (!(await validateCaptchaResponse(input.captchaToken, ctx.req, ctx.config))) {
+                    console.log('CAPTCHA token could not be validated:', input.captchaToken);
                     throw new Error('Invalid CAPTCHA token! Please try again.');
                 }
 

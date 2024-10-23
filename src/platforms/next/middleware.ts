@@ -31,7 +31,7 @@ const excludedPaths = [
     '/assets', // (assets directory)
 ];
 
-const serviceConfigPromise = trpc.config.query();
+const serviceConfigPromise = trpc.config.query()
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
@@ -44,17 +44,20 @@ export async function middleware(request: NextRequest) {
 
     const clientHost = request.headers.get('host') || request.nextUrl.host;
     request.nextUrl.host = clientHost;
+    const originalNextUrlHref = request.nextUrl.href;
     request.nextUrl.port = '';
     console.log(`HTTP ${request.method}: ${request.nextUrl.href}`);
 
     const serviceConfig = await serviceConfigPromise;
+    const canonicalRoot = new URL(serviceConfig.canonicalRoot) // superjson didn't seem to be reserializing the URL object
 
-    if (!request.nextUrl.href.startsWith(serviceConfig.canonicalRoot.href)) {
+    if (!request.nextUrl.href.startsWith(canonicalRoot.href) && !originalNextUrlHref.startsWith(canonicalRoot.href)) {
         let path = `${request.nextUrl.pathname}${request.nextUrl.search}${request.nextUrl.hash}`.slice(1)
-        const newUrl = new URL(path, serviceConfig.canonicalRoot);
+        const newUrl = new URL(path, canonicalRoot);
         console.log({
             originalUrl: request.nextUrl.href,
-            canonicalRoot: serviceConfig.canonicalRoot.href,
+            originalNextUrlHref,
+            canonicalRoot: canonicalRoot.href,
             path,
             newUrl: newUrl.href
         })

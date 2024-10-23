@@ -14,7 +14,6 @@
       "DOM",
       "dom.iterable",
       "ESNext",
-      "ES2023",
     ],
     "skipLibCheck": false,
     "forceConsistentCasingInFileNames": true,
@@ -23,6 +22,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "types": ["vitest/globals"],
   },
   "include": [
     "src",
@@ -40,5 +40,9 @@
     "./src/platforms/next/",
     "./src/platforms/expo/",
     "./src/forks"
-  ]
+  ],
+  "watchOptions": {
+    "watchFile": "useFsEventsOnParentDirectory",
+    "watchDirectory": "useFsEvents",
+  }
 }

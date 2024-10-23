@@ -36,6 +36,8 @@ services:
       ANDROID_APP_SHA256_CERT_FINGERPRINTS: ${ANDROID_APP_SHA256_CERT_FINGERPRINTS}
       KEEP_ALIVE_TIMEOUT: 10
       USE_SAAS_UX: ${USE_SAAS_UX}
+      NODE_ENV: production
+      NEXT_PUBLIC_BASEURL: ${NEXT_PUBLIC_BASEURL:-https://stockedhome.app}
 
 
   studio:

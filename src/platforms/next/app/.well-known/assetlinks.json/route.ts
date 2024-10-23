@@ -2,7 +2,9 @@ import { resolveMetaUrl } from '../../metadataUtils';
 import { NextResponse, type NextRequest } from 'next/server';
 import { env } from 'lib/env-schema'
 
-export const dynamic = 'force-static'
+// Effectively static, only it's generated at server runtime and uses the user's environment variables
+export const dynamic = 'force-dynamic'
+export const revalidate = false;
 
 export function GET(req: NextRequest) {
 

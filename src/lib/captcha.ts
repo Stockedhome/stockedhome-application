@@ -1,4 +1,3 @@
-import { loadConfigServer } from "./config/loader-server";
 import type { ConfigSchemaBaseWithComputations } from "./config/schema-base";
 import { env } from "./env-schema";
 
@@ -34,5 +33,14 @@ async function validateTurnstileCaptchaResponse(token: string, req: NextRequest,
     });
 
     const outcome = await result.json();
+
+    if (outcome['error-codes']?.length) {
+        console.error('Failed to validate Turnstile CAPTCHA response, possiby with server-side errors:', {
+            token,
+            outcome,
+        });
+        return false
+    }
+
     return outcome.success
 }

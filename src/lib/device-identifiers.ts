@@ -3,7 +3,7 @@ import type { ConfigSchemaBaseWithComputations } from "./config/schema-base";
 
 
 export function getIpOrIpChain(req: NextRequest, config: ConfigSchemaBaseWithComputations) {
-    if (req.ip) return req.ip;
+    if ('ip' in req && typeof req.ip === 'string') return req.ip
 
     if (!config.trustProxy) return 'PROXY_NOT_TRUSTED';
 

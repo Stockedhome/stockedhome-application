@@ -1,8 +1,10 @@
 import { withExpo } from "@expo/next-adapter";
+// @ts-ignore -- this one doesn't have types
 import withFonts from "next-fonts";
 import fs from 'fs';
 import url from 'url';
 import path from 'path';
+import type { NextConfig } from "next";
 
 console.log('Entering Next.js config 🎇');
 
@@ -13,8 +15,7 @@ if (!fs.existsSync(path.join(nextRoot, './.env'))) {
     if (fs.existsSync(path.join(projectRoot, './.env'))) fs.symlinkSync(path.join(projectRoot, './.env'), path.join(nextRoot, './.env'), 'file');
 }
 
-/** @type {import('next').NextConfig} */
-const baseConfig = {
+const baseConfig: NextConfig = {
     //       // ~~reanimated (and thus, Moti) doesn't work with strict mode currently...~~
     // fixed // ~~https://github.com/nandorojo/moti/issues/224~~
     //       // https://github.com/necolas/react-native-web/pull/2330
@@ -27,9 +28,21 @@ const baseConfig = {
 
     output: 'standalone',
 
+    watchOptions: {
+        pollIntervalMs: 100,
+    },
+
+    productionBrowserSourceMaps: true,
+    poweredByHeader: true,
+
     experimental: {
+
+        staleTimes: { // timescale is minutes here
+            static: 24 * 60,
+            dynamic: 10,
+        },
+
         forceSwcTransforms: true,
-        instrumentationHook: true,
 //            turbo: {
 //                resolveAlias: {
 //                    // Alias direct react-native imports to react-native-web
@@ -49,6 +62,11 @@ const baseConfig = {
 
 /** @param {import('webpack').Configuration} config */
    webpack(config, options) {
+        config.snapshot = {...(config.snapshot ?? {}),
+            // Add all node_modules but @next module to managedPaths
+            // Allows for hot refresh of changes to @next module
+            managedPaths: [/^(.+?[\\/]node_modules[\\/])(?!@next|@stockedhome|lib|interface|solito)[\w@-]+[\\/]/],
+        };
         return config;
    },
 

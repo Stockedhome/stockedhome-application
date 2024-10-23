@@ -1,5 +1,5 @@
 import * as fs from 'fs/promises';
-import { describe, test, expect } from 'vitest';
+//import { describe, test, expect } from 'vitest';
 import yaml from 'js-yaml';
 import type { DockerCompose } from './docker-compose-schema';
 import { envSchema } from '../../src/lib/env-schema';
@@ -15,6 +15,7 @@ describe('Stockedhome Service Has Necessary ENV Variables', ()=>{
     const composeEnvKeys = Object.keys(stockedhomeDockerCompose.services?.['stockedhome-web-server']?.environment as Record<string, string> ?? {})
     const envSchemaKeys = new Set(zodKeys(envSchema))
     envSchemaKeys.delete('CONFIG_DIR')
+    envSchemaKeys.delete('CONFIG_FILE')
     envSchemaKeys.delete('IS_DOCKER')
 
     for (const key of envSchemaKeys) {
