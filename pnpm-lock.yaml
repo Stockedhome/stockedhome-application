@@ -83,10 +83,10 @@ importers:
         version: link:codegen/results
       '@stockedhome/expo-app':
         specifier: file:./src/platforms/expo
-        version: file:src/platforms/expo(nca3vspcetfolxk5ftwuh4zd4y)
+        version: file:src/platforms/expo(kfdqyl5d6nwi54enscfjo7avcm)
       '@stockedhome/next-app':
         specifier: file:./src/platforms/next
-        version: file:src/platforms/next(llqgsmv7t7oe2a5p6t3zrk2foe)
+        version: file:src/platforms/next(kft327xdhmujbepfpv6ec4wrbm)
       '@tanstack/react-query':
         specifier: ^5.59.15
         version: 5.59.15(react@18.3.1)
@@ -95,7 +95,7 @@ importers:
         version: 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
       '@trpc/next':
         specifier: 11.0.0-rc.413
-        version: 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/react-query':
         specifier: 11.0.0-rc.413
         version: 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
@@ -149,7 +149,7 @@ importers:
         version: 9.0.2
       lib:
         specifier: file:./src/lib
-        version: file:src/lib(3y5fkuuwadqad7tmoeani4tb6i)
+        version: file:src/lib(fkgfor7avtot32vyxfh2dsoyxi)
       maxmind:
         specifier: ^4.3.21
         version: 4.3.22
@@ -158,7 +158,7 @@ importers:
         version: 0.5.1
       next:
         specifier: ^15.0.1
-        version: 15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4)
       octokit:
         specifier: ^4.0.2
         version: 4.0.2
@@ -208,8 +208,8 @@ importers:
         specifier: ^0.18.3
         version: 0.18.3(rollup@4.24.0)(webpack-sources@3.2.3)
       vitest:
-        specifier: ^2.1.3
-        version: 2.1.3(@types/node@22.7.8)(jsdom@20.0.3)(terser@5.36.0)
+        specifier: 2.1.3
+        version: 2.1.3(@types/node@22.7.8)(jsdom@20.0.3)(sass@1.80.4)(terser@5.36.0)
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -305,7 +305,7 @@ importers:
         version: 0.27.6(expo-modules-autolinking@1.11.3)(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
       lib:
         specifier: file:../lib
-        version: file:src/lib(3y5fkuuwadqad7tmoeani4tb6i)
+        version: file:src/lib(fkgfor7avtot32vyxfh2dsoyxi)
       moti:
         specifier: '*'
         version: 0.29.0(react-dom@18.2.0(react@18.3.1))(react-native-reanimated@3.10.1(@babel/core@7.25.2)(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react@18.3.1)
@@ -353,7 +353,7 @@ importers:
         version: 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
       '@trpc/next':
         specifier: 11.0.0-rc.413
-        version: 11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+        version: 11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/react-query':
         specifier: 11.0.0-rc.413
         version: 11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
@@ -431,10 +431,10 @@ importers:
         version: 1.12.1
       interface:
         specifier: file:../../interface
-        version: app@file:src/interface(u6h5p2ot6bkrnvhrlsiuzotl2i)
+        version: app@file:src/interface(oz3s6jqarczycccszcbqh2p6da)
       lib:
         specifier: file:../../lib
-        version: file:src/lib(bzeq5zbyc5jvgfax445iad46ou)
+        version: file:src/lib(3rj2igyqzsbqirghej2c4lzk6e)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -520,6 +520,9 @@ importers:
       raf:
         specifier: ^3.4.1
         version: 3.4.1
+      sass:
+        specifier: ^1.80.4
+        version: 1.80.4
       setimmediate:
         specifier: ^1.0.5
         version: 1.0.5
@@ -2531,6 +2534,82 @@ packages:
     resolution: {integrity: sha512-TUkJLtI163Bz5+JK0O+zDkQpn4gKwN+BovclUvCj6pI/6RXrFqQvUMRS2M+Rt8Rv0qR3wjoMoOPmpJKeOh0nBg==}
     engines: {node: '>= 18'}
 
+  '@parcel/watcher-android-arm64@2.4.1':
+    resolution: {integrity: sha512-LOi/WTbbh3aTn2RYddrO8pnapixAziFl6SMxHM69r3tvdSm94JtCenaKgk1GRg5FJ5wpMCpHeW+7yqPlvZv7kg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [android]
+
+  '@parcel/watcher-darwin-arm64@2.4.1':
+    resolution: {integrity: sha512-ln41eihm5YXIY043vBrrHfn94SIBlqOWmoROhsMVTSXGh0QahKGy77tfEywQ7v3NywyxBBkGIfrWRHm0hsKtzA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@parcel/watcher-darwin-x64@2.4.1':
+    resolution: {integrity: sha512-yrw81BRLjjtHyDu7J61oPuSoeYWR3lDElcPGJyOvIXmor6DEo7/G2u1o7I38cwlcoBHQFULqF6nesIX3tsEXMg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@parcel/watcher-freebsd-x64@2.4.1':
+    resolution: {integrity: sha512-TJa3Pex/gX3CWIx/Co8k+ykNdDCLx+TuZj3f3h7eOjgpdKM+Mnix37RYsYU4LHhiYJz3DK5nFCCra81p6g050w==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@parcel/watcher-linux-arm-glibc@2.4.1':
+    resolution: {integrity: sha512-4rVYDlsMEYfa537BRXxJ5UF4ddNwnr2/1O4MHM5PjI9cvV2qymvhwZSFgXqbS8YoTk5i/JR0L0JDs69BUn45YA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm]
+    os: [linux]
+
+  '@parcel/watcher-linux-arm64-glibc@2.4.1':
+    resolution: {integrity: sha512-BJ7mH985OADVLpbrzCLgrJ3TOpiZggE9FMblfO65PlOCdG++xJpKUJ0Aol74ZUIYfb8WsRlUdgrZxKkz3zXWYA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@parcel/watcher-linux-arm64-musl@2.4.1':
+    resolution: {integrity: sha512-p4Xb7JGq3MLgAfYhslU2SjoV9G0kI0Xry0kuxeG/41UfpjHGOhv7UoUDAz/jb1u2elbhazy4rRBL8PegPJFBhA==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@parcel/watcher-linux-x64-glibc@2.4.1':
+    resolution: {integrity: sha512-s9O3fByZ/2pyYDPoLM6zt92yu6P4E39a03zvO0qCHOTjxmt3GHRMLuRZEWhWLASTMSrrnVNWdVI/+pUElJBBBg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [linux]
+
+  '@parcel/watcher-linux-x64-musl@2.4.1':
+    resolution: {integrity: sha512-L2nZTYR1myLNST0O632g0Dx9LyMNHrn6TOt76sYxWLdff3cB22/GZX2UPtJnaqQPdCRoszoY5rcOj4oMTtp5fQ==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [linux]
+
+  '@parcel/watcher-win32-arm64@2.4.1':
+    resolution: {integrity: sha512-Uq2BPp5GWhrq/lcuItCHoqxjULU1QYEcyjSO5jqqOK8RNFDBQnenMMx4gAl3v8GiWa59E9+uDM7yZ6LxwUIfRg==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@parcel/watcher-win32-ia32@2.4.1':
+    resolution: {integrity: sha512-maNRit5QQV2kgHFSYwftmPBxiuK5u4DXjbXx7q6eKjq5dsLXZ4FJiVvlcw35QXzk0KrUecJmuVFbj4uV9oYrcw==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [ia32]
+    os: [win32]
+
+  '@parcel/watcher-win32-x64@2.4.1':
+    resolution: {integrity: sha512-+DvS92F9ezicfswqrvIRM2njcYJbd5mb9CUgtrHCHmvn7pPPa+nMDRu1o1bYYz/l5IB2NVGNJWiH7h1E58IF2A==}
+    engines: {node: '>= 10.0.0'}
+    cpu: [x64]
+    os: [win32]
+
+  '@parcel/watcher@2.4.1':
+    resolution: {integrity: sha512-HNjmfLQEVRZmHRET336f20H/8kOozUGwk7yajvsonjNxbj2wBTK1WsQuHkD5yYh9RxFGL2EyDHryOihOwUoKDA==}
+    engines: {node: '>= 10.0.0'}
+
   '@peculiar/asn1-android@2.3.13':
     resolution: {integrity: sha512-0VTNazDGKrLS6a3BwTDZanqq6DR/I3SbvmDMuS8Be+OYpvM6x1SRDh9AGDsHVnaCOIztOspCPc6N1m+iUv1Xxw==}
 
@@ -3937,6 +4016,10 @@ packages:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
 
+  chokidar@4.0.1:
+    resolution: {integrity: sha512-n8enUVCED/KVRQlab1hr3MVpcVMvxtZjmEa956u+4YijlmQED223XMSYj2tLuKvr4jcCTzNNMpQDUer72MMmzA==}
+    engines: {node: '>= 14.16.0'}
+
   chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
@@ -5203,9 +5286,6 @@ packages:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
     engines: {node: 6.* || 8.* || >= 10.*}
 
-  get-func-name@2.0.2:
-    resolution: {integrity: sha512-8vXOvuE167CtIc3OyItco7N/dpRtBbYOsPsXCz7X/PMnlGjYjSGuZJgM1Y7mmew7BKf9BqvLX2tnOVy1BBUsxQ==}
-
   get-intrinsic@1.2.4:
     resolution: {integrity: sha512-5uYhsJH8VJBTv7oslg4BznJYhDoRI6waYCxMmCdnTrcCrHA/fCFKoTFz2JKKE0HdDFUF7/oQuhzumXJK7paBRQ==}
     engines: {node: '>= 0.4'}
@@ -5458,6 +5538,9 @@ packages:
     resolution: {integrity: sha512-541xKlUw6jr/6gGuk92F+mYM5zaFAc5ahphvkqvNe2bQ6gVBkd6bfrmVJ2t4KDAfikAYZyIqTnktX3i6/aQDrQ==}
     engines: {node: '>=16.x'}
     hasBin: true
+
+  immutable@4.3.7:
+    resolution: {integrity: sha512-1hqclzwYwjRDFLjcFxOM5AYkkG0rpFPpr1RLPMEuGczoS7YA8gLhy8SWXYRAA/XwfEHpfo3cw5JGioS32fnMRw==}
 
   import-fresh@2.0.0:
     resolution: {integrity: sha512-eZ5H8rcgYazHbKC3PG4ClHNykCSxtAhxSSEM+2mb+7evD2CKF5V7c0dNum7AdpDh0ZdICwZY9sRSn8f+KH96sg==}
@@ -6250,9 +6333,6 @@ packages:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
 
-  loupe@3.1.1:
-    resolution: {integrity: sha512-edNu/8D5MKVfGVFRhFf8aAxiTM6Wumfz5XsaatSxlD3w4R1d/WEKUTydCdPGbl9K7QG/Ca3GnDV2sIKIpXRQcw==}
-
   loupe@3.1.2:
     resolution: {integrity: sha512-23I4pFZHmAemUnz8WZXbYRSKYj801VDaNv9ETuMh7IrMc7VuVVSo+Z9iLE3ni30+U48iDWfi30d3twAXBYmnCg==}
 
@@ -6631,6 +6711,9 @@ packages:
 
   node-abort-controller@3.1.1:
     resolution: {integrity: sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==}
+
+  node-addon-api@7.1.1:
+    resolution: {integrity: sha512-5m3bsyrjFWE1xf7nz7YXdN4udnVtXK6/Yfgn5qnahL6bCkf2yKt4k3nuTKAtT4r3IG8JNR2ncsIMdZuAzJjHQQ==}
 
   node-dir@0.1.17:
     resolution: {integrity: sha512-tmPX422rYgofd4epzrNoOXiE8XFZYOcCq1vD7MAXCDO+O+zndlA2ztdKKMa+EeuBG5tHETpr4ml4RGgpqDCCAg==}
@@ -7297,6 +7380,10 @@ packages:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
 
+  readdirp@4.0.2:
+    resolution: {integrity: sha512-yDMz9g+VaZkqBYS/ozoBJwaBhTbZo3UNYQHNRw1D3UFQB8oHB4uS/tAODO+ZLjGWmUbKnIlOWO+aaIiAxrUWHA==}
+    engines: {node: '>= 14.16.0'}
+
   readline@1.3.0:
     resolution: {integrity: sha512-k2d6ACCkiNYz222Fs/iNze30rRJ1iIicW7JuX/7/cozvih6YCkFZH+J6mAFDVgv0dRBaAyr4jDqC95R2y4IADg==}
 
@@ -7474,6 +7561,11 @@ packages:
 
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
+
+  sass@1.80.4:
+    resolution: {integrity: sha512-rhMQ2tSF5CsuuspvC94nPM9rToiAFw2h3JTrLlgmNw1MH79v8Cr3DH6KF6o6r+8oofY3iYVPUf66KzC8yuVN1w==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
 
   sax@1.4.1:
     resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
@@ -12454,6 +12546,62 @@ snapshots:
       '@octokit/request-error': 6.1.5
       '@octokit/webhooks-methods': 5.1.0
 
+  '@parcel/watcher-android-arm64@2.4.1':
+    optional: true
+
+  '@parcel/watcher-darwin-arm64@2.4.1':
+    optional: true
+
+  '@parcel/watcher-darwin-x64@2.4.1':
+    optional: true
+
+  '@parcel/watcher-freebsd-x64@2.4.1':
+    optional: true
+
+  '@parcel/watcher-linux-arm-glibc@2.4.1':
+    optional: true
+
+  '@parcel/watcher-linux-arm64-glibc@2.4.1':
+    optional: true
+
+  '@parcel/watcher-linux-arm64-musl@2.4.1':
+    optional: true
+
+  '@parcel/watcher-linux-x64-glibc@2.4.1':
+    optional: true
+
+  '@parcel/watcher-linux-x64-musl@2.4.1':
+    optional: true
+
+  '@parcel/watcher-win32-arm64@2.4.1':
+    optional: true
+
+  '@parcel/watcher-win32-ia32@2.4.1':
+    optional: true
+
+  '@parcel/watcher-win32-x64@2.4.1':
+    optional: true
+
+  '@parcel/watcher@2.4.1':
+    dependencies:
+      detect-libc: 1.0.3
+      is-glob: 4.0.3
+      micromatch: 4.0.8
+      node-addon-api: 7.1.1
+    optionalDependencies:
+      '@parcel/watcher-android-arm64': 2.4.1
+      '@parcel/watcher-darwin-arm64': 2.4.1
+      '@parcel/watcher-darwin-x64': 2.4.1
+      '@parcel/watcher-freebsd-x64': 2.4.1
+      '@parcel/watcher-linux-arm-glibc': 2.4.1
+      '@parcel/watcher-linux-arm64-glibc': 2.4.1
+      '@parcel/watcher-linux-arm64-musl': 2.4.1
+      '@parcel/watcher-linux-x64-glibc': 2.4.1
+      '@parcel/watcher-linux-x64-musl': 2.4.1
+      '@parcel/watcher-win32-arm64': 2.4.1
+      '@parcel/watcher-win32-ia32': 2.4.1
+      '@parcel/watcher-win32-x64': 2.4.1
+
   '@peculiar/asn1-android@2.3.13':
     dependencies:
       '@peculiar/asn1-schema': 2.3.13
@@ -13325,7 +13473,7 @@ snapshots:
     dependencies:
       '@sinonjs/commons': 3.0.1
 
-  '@stockedhome/expo-app@file:src/platforms/expo(nca3vspcetfolxk5ftwuh4zd4y)':
+  '@stockedhome/expo-app@file:src/platforms/expo(kfdqyl5d6nwi54enscfjo7avcm)':
     dependencies:
       '@babel/runtime': 7.25.7
       '@react-native-async-storage/async-storage': 1.23.1(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))
@@ -13346,8 +13494,8 @@ snapshots:
       expo-router: 3.5.23(r576gndovmhylht4mggp3opj6m)
       expo-splash-screen: 0.27.6(expo-modules-autolinking@1.11.3)(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
       expo-status-bar: 1.12.1
-      interface: app@file:src/interface(jtrh5s66sotjjxuedif5j2xl6m)
-      lib: file:src/lib(3y5fkuuwadqad7tmoeani4tb6i)
+      interface: app@file:src/interface(pzruogjkt4a3yi47ebf34afhc4)
+      lib: file:src/lib(fkgfor7avtot32vyxfh2dsoyxi)
       react: 18.3.1
       react-native: 0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1)
       react-native-gesture-handler: 2.16.2(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
@@ -13386,18 +13534,18 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@stockedhome/next-app@file:src/platforms/next(llqgsmv7t7oe2a5p6t3zrk2foe)':
+  '@stockedhome/next-app@file:src/platforms/next(kft327xdhmujbepfpv6ec4wrbm)':
     dependencies:
       '@expo/next-adapter': 6.0.0(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(react-native-web@0.19.13(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(webpack@5.95.0)
       '@react-native/assets-registry': link:../../forks/assets-registry
       '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
-      '@trpc/next': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      '@trpc/next': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/react-query': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/server': 11.0.0-rc.413
       interface: link:../../interface
       json-loader: 0.5.7
       lib: link:../../lib
-      next: 15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      next: 15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4)
       next-compose-plugins: 2.2.1
       next-fonts: 1.5.1(webpack@5.95.0)
       next-images: 1.8.5(webpack@5.95.0)
@@ -13520,22 +13668,33 @@ snapshots:
     dependencies:
       '@trpc/server': 11.0.0-rc.413
 
-  '@trpc/next@11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
+  '@trpc/next@11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
       '@trpc/server': 11.0.0-rc.413
-      next: 15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      next: 15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4)
       react: 18.3.1
       react-dom: 18.2.0(react@18.3.1)
     optionalDependencies:
       '@tanstack/react-query': 5.59.0(react@18.3.1)
       '@trpc/react-query': 11.0.0-rc.413(@tanstack/react-query@5.59.0(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
 
-  '@trpc/next@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
+  '@trpc/next@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
       '@trpc/server': 11.0.0-rc.413
-      next: 15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      next: 15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4)
+      react: 18.3.1
+      react-dom: 18.2.0(react@18.3.1)
+    optionalDependencies:
+      '@tanstack/react-query': 5.59.15(react@18.3.1)
+      '@trpc/react-query': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+
+  '@trpc/next@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
+      '@trpc/server': 11.0.0-rc.413
+      next: 15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4)
       react: 18.3.1
       react-dom: 18.2.0(react@18.3.1)
     optionalDependencies:
@@ -13882,13 +14041,13 @@ snapshots:
       chai: 5.1.1
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.3(@vitest/spy@2.1.3)(vite@5.4.8(@types/node@22.7.8)(terser@5.36.0))':
+  '@vitest/mocker@2.1.3(@vitest/spy@2.1.3)(vite@5.4.8(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0))':
     dependencies:
       '@vitest/spy': 2.1.3
       estree-walker: 3.0.3
       magic-string: 0.30.11
     optionalDependencies:
-      vite: 5.4.8(@types/node@22.7.8)(terser@5.36.0)
+      vite: 5.4.8(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0)
 
   '@vitest/pretty-format@2.1.3':
     dependencies:
@@ -14134,19 +14293,19 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  app@file:src/interface(jtrh5s66sotjjxuedif5j2xl6m):
+  app@file:src/interface(oz3s6jqarczycccszcbqh2p6da):
     dependencies:
       '@expo-google-fonts/rubik': 0.2.3
       '@expo/html-elements': 0.10.1
       '@hexagon/base64': 1.1.28(patch_hash=bk3b67xqvbwrbmxnq32kp4kgs4)
       dripsy: 4.3.5
-      expo-font: 12.0.10(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
-      expo-splash-screen: 0.27.6(expo-modules-autolinking@1.11.3)(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
-      lib: file:src/lib(3y5fkuuwadqad7tmoeani4tb6i)
-      moti: 0.29.0(react-dom@18.2.0(react@18.3.1))(react-native-reanimated@3.10.1(@babel/core@7.25.2)(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react@18.3.1)
-      react-native: 0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1)
-      react-native-safe-area-context: 4.10.5(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
-      react-native-webview: 13.12.1(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
+      expo-font: 12.0.10(expo@51.0.36(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7)))
+      expo-splash-screen: 0.27.6(expo-modules-autolinking@1.11.3)(expo@51.0.36(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7)))
+      lib: file:src/lib(3rj2igyqzsbqirghej2c4lzk6e)
+      moti: 0.29.0(react-dom@18.2.0(react@18.3.1))(react-native-reanimated@3.10.1(@babel/core@7.24.7)(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      react-native: 0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1)
+      react-native-safe-area-context: 4.10.5(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
+      react-native-webview: 13.12.1(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
       react-turnstile: 1.1.4(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       solito: file:src/forks/solito
       turnstile-types: 1.2.3
@@ -14167,19 +14326,19 @@ snapshots:
       - utf-8-validate
       - zod
 
-  app@file:src/interface(u6h5p2ot6bkrnvhrlsiuzotl2i):
+  app@file:src/interface(pzruogjkt4a3yi47ebf34afhc4):
     dependencies:
       '@expo-google-fonts/rubik': 0.2.3
       '@expo/html-elements': 0.10.1
       '@hexagon/base64': 1.1.28(patch_hash=bk3b67xqvbwrbmxnq32kp4kgs4)
       dripsy: 4.3.5
-      expo-font: 12.0.10(expo@51.0.36(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7)))
-      expo-splash-screen: 0.27.6(expo-modules-autolinking@1.11.3)(expo@51.0.36(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7)))
-      lib: file:src/lib(bzeq5zbyc5jvgfax445iad46ou)
-      moti: 0.29.0(react-dom@18.2.0(react@18.3.1))(react-native-reanimated@3.10.1(@babel/core@7.24.7)(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react@18.3.1)
-      react-native: 0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1)
-      react-native-safe-area-context: 4.10.5(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
-      react-native-webview: 13.12.1(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
+      expo-font: 12.0.10(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
+      expo-splash-screen: 0.27.6(expo-modules-autolinking@1.11.3)(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
+      lib: file:src/lib(fkgfor7avtot32vyxfh2dsoyxi)
+      moti: 0.29.0(react-dom@18.2.0(react@18.3.1))(react-native-reanimated@3.10.1(@babel/core@7.25.2)(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      react-native: 0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1)
+      react-native-safe-area-context: 4.10.5(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
+      react-native-webview: 13.12.1(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
       react-turnstile: 1.1.4(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       solito: file:src/forks/solito
       turnstile-types: 1.2.3
@@ -14712,7 +14871,7 @@ snapshots:
       assertion-error: 2.0.1
       check-error: 2.1.1
       deep-eql: 5.0.2
-      loupe: 3.1.1
+      loupe: 3.1.2
       pathval: 2.0.0
 
   chalk@2.4.2:
@@ -14755,6 +14914,10 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
     optional: true
+
+  chokidar@4.0.1:
+    dependencies:
+      readdirp: 4.0.2
 
   chownr@2.0.0: {}
 
@@ -16688,8 +16851,6 @@ snapshots:
 
   get-caller-file@2.0.5: {}
 
-  get-func-name@2.0.2: {}
-
   get-intrinsic@1.2.4:
     dependencies:
       es-errors: 1.3.0
@@ -16977,6 +17138,8 @@ snapshots:
   image-size@1.1.1:
     dependencies:
       queue: 6.0.2
+
+  immutable@4.3.7: {}
 
   import-fresh@2.0.0:
     dependencies:
@@ -17911,16 +18074,16 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  lib@file:src/lib(3y5fkuuwadqad7tmoeani4tb6i):
+  lib@file:src/lib(3rj2igyqzsbqirghej2c4lzk6e):
     dependencies:
       '@simplewebauthn/browser': 10.0.0
       '@simplewebauthn/server': 10.0.1
       '@simplewebauthn/typescript-types': 8.3.4
-      '@stockedhome/react-native-passkeys': file:src/forks/react-native-passkeys(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
+      '@stockedhome/react-native-passkeys': file:src/forks/react-native-passkeys(expo@51.0.36(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7)))(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
       '@supabase/supabase-js': 2.45.4
       '@tanstack/react-query': 5.59.15(react@18.3.1)
       '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
-      '@trpc/next': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      '@trpc/next': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/react-query': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/server': 11.0.0-rc.413
       '@types/node': 22.7.8
@@ -17935,16 +18098,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  lib@file:src/lib(bzeq5zbyc5jvgfax445iad46ou):
+  lib@file:src/lib(fkgfor7avtot32vyxfh2dsoyxi):
     dependencies:
       '@simplewebauthn/browser': 10.0.0
       '@simplewebauthn/server': 10.0.1
       '@simplewebauthn/typescript-types': 8.3.4
-      '@stockedhome/react-native-passkeys': file:src/forks/react-native-passkeys(expo@51.0.36(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7)))(react-native@0.74.5(@babel/core@7.24.7)(@babel/preset-env@7.25.4(@babel/core@7.24.7))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
+      '@stockedhome/react-native-passkeys': file:src/forks/react-native-passkeys(expo@51.0.36(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(react-native@0.74.5(@babel/core@7.25.2)(@babel/preset-env@7.25.4(@babel/core@7.25.2))(@types/react@18.2.79)(react@18.3.1))(react@18.3.1)
       '@supabase/supabase-js': 2.45.4
       '@tanstack/react-query': 5.59.15(react@18.3.1)
       '@trpc/client': 11.0.0-rc.413(@trpc/server@11.0.0-rc.413)
-      '@trpc/next': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
+      '@trpc/next': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/react-query@11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1))(@trpc/server@11.0.0-rc.413)(next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4))(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/react-query': 11.0.0-rc.413(@tanstack/react-query@5.59.15(react@18.3.1))(@trpc/client@11.0.0-rc.413(@trpc/server@11.0.0-rc.413))(@trpc/server@11.0.0-rc.413)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)
       '@trpc/server': 11.0.0-rc.413
       '@types/node': 22.7.8
@@ -18079,10 +18242,6 @@ snapshots:
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 4.0.0
-
-  loupe@3.1.1:
-    dependencies:
-      get-func-name: 2.0.2
 
   loupe@3.1.2: {}
 
@@ -18524,7 +18683,7 @@ snapshots:
       url-loader: 4.1.1(file-loader@6.2.0(webpack@5.95.0))(webpack@5.95.0)
       webpack: 5.95.0
 
-  next@15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1):
+  next@15.0.1(@babel/core@7.24.7)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4):
     dependencies:
       '@next/env': 15.0.1
       '@swc/counter': 0.1.3
@@ -18544,6 +18703,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 15.0.1
       '@next/swc-win32-arm64-msvc': 15.0.1
       '@next/swc-win32-x64-msvc': 15.0.1
+      sass: 1.80.4
       sharp: 0.33.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -18574,11 +18734,39 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
+  next@15.0.1(@babel/core@7.25.2)(react-dom@18.2.0(react@18.3.1))(react@18.3.1)(sass@1.80.4):
+    dependencies:
+      '@next/env': 15.0.1
+      '@swc/counter': 0.1.3
+      '@swc/helpers': 0.5.13
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001669
+      postcss: 8.4.31
+      react: 18.3.1
+      react-dom: 18.2.0(react@18.3.1)
+      styled-jsx: 5.1.6(@babel/core@7.25.2)(react@18.3.1)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 15.0.1
+      '@next/swc-darwin-x64': 15.0.1
+      '@next/swc-linux-arm64-gnu': 15.0.1
+      '@next/swc-linux-arm64-musl': 15.0.1
+      '@next/swc-linux-x64-gnu': 15.0.1
+      '@next/swc-linux-x64-musl': 15.0.1
+      '@next/swc-win32-arm64-msvc': 15.0.1
+      '@next/swc-win32-x64-msvc': 15.0.1
+      sass: 1.80.4
+      sharp: 0.33.5
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
   nice-try@1.0.5: {}
 
   nocache@3.0.4: {}
 
   node-abort-controller@3.1.1: {}
+
+  node-addon-api@7.1.1: {}
 
   node-dir@0.1.17:
     dependencies:
@@ -19425,6 +19613,8 @@ snapshots:
       picomatch: 2.3.1
     optional: true
 
+  readdirp@4.0.2: {}
+
   readline@1.3.0: {}
 
   recast@0.21.5:
@@ -19618,6 +19808,13 @@ snapshots:
       is-regex: 1.1.4
 
   safer-buffer@2.1.2: {}
+
+  sass@1.80.4:
+    dependencies:
+      '@parcel/watcher': 2.4.1
+      chokidar: 4.0.1
+      immutable: 4.3.7
+      source-map-js: 1.2.1
 
   sax@1.4.1: {}
 
@@ -20661,12 +20858,12 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-node@2.1.3(@types/node@22.7.8)(terser@5.36.0):
+  vite-node@2.1.3(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0):
     dependencies:
       cac: 6.7.14
       debug: 4.3.7(supports-color@8.1.1)
       pathe: 1.1.2
-      vite: 5.4.8(@types/node@22.7.8)(terser@5.36.0)
+      vite: 5.4.8(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -20678,7 +20875,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.4.8(@types/node@22.7.8)(terser@5.36.0):
+  vite@5.4.8(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.47
@@ -20686,12 +20883,13 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.7.8
       fsevents: 2.3.3
+      sass: 1.80.4
       terser: 5.36.0
 
-  vitest@2.1.3(@types/node@22.7.8)(jsdom@20.0.3)(terser@5.36.0):
+  vitest@2.1.3(@types/node@22.7.8)(jsdom@20.0.3)(sass@1.80.4)(terser@5.36.0):
     dependencies:
       '@vitest/expect': 2.1.3
-      '@vitest/mocker': 2.1.3(@vitest/spy@2.1.3)(vite@5.4.8(@types/node@22.7.8)(terser@5.36.0))
+      '@vitest/mocker': 2.1.3(@vitest/spy@2.1.3)(vite@5.4.8(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0))
       '@vitest/pretty-format': 2.1.3
       '@vitest/runner': 2.1.3
       '@vitest/snapshot': 2.1.3
@@ -20706,8 +20904,8 @@ snapshots:
       tinyexec: 0.3.0
       tinypool: 1.0.1
       tinyrainbow: 1.2.0
-      vite: 5.4.8(@types/node@22.7.8)(terser@5.36.0)
-      vite-node: 2.1.3(@types/node@22.7.8)(terser@5.36.0)
+      vite: 5.4.8(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0)
+      vite-node: 2.1.3(@types/node@22.7.8)(sass@1.80.4)(terser@5.36.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.7.8

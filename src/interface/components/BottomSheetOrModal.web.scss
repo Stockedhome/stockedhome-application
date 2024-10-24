@@ -4,7 +4,7 @@ dialog {
 }
 
 dialog:not([open]) {
-    pointer-events: none;
+    &, * {  pointer-events: none !important;  }
 
     opacity: 0;
     transform: translateY(10%);

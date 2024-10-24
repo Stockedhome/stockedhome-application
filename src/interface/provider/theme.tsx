@@ -38,7 +38,7 @@ export function Fonts({ children }: React.PropsWithChildren<{}>) {
 const theme = makeTheme({
     customFonts: {
         rubik: {
-            bold: 'Rubik_400Regular',
+            bold: 'Rubik_600SemiBold',
             default: 'Rubik_400Regular',
             normal: 'Rubik_400Regular',
             400: 'Rubik_400Regular',
@@ -70,7 +70,10 @@ const theme = makeTheme({
         textSecondary: '#aaaaaa',
         secondary: '#aaaaaa',
         textMuted: '#666666',
+
+        mutedBrighter: '#777777',
         muted: '#666666',
+        mutedDarker: '#555555',
 
         errorRed: '#ff6666',
         successGreen: '#66ff66',
@@ -201,8 +204,8 @@ const theme = makeTheme({
             //    backgroundColor: 'highlight', // TODO: Find a way to actually do this
             //},
 
-            borderRadius: 4,
-            borderWidth: 2,
+            borderRadius: 8,
+            borderWidth: 3,
 
             paddingTop: 5,
             paddingBottom: 5,
@@ -215,7 +218,27 @@ const theme = makeTheme({
             marginRight: 10,
 
             cursor: 'pointer',
+        },
 
+        disabled: {
+            backgroundColor: 'muted',
+            borderColor: 'highlight',
+        },
+
+        hover_disabled: {
+            backgroundColor: 'mutedBrighter',
+        },
+
+        hover_enabled: {
+            backgroundColor: 'accent',
+        },
+
+        being_pressed_disabled: {
+            backgroundColor: 'mutedDarker',
+        },
+
+        being_pressed_enabled: {
+            backgroundColor: 'highlight',
         },
     },
     "styles": {

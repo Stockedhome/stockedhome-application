@@ -20,7 +20,7 @@ function HomeScreenInternal() {
     const { showLogInScreen } = useLogInScreen();
 
     return <>
-        <H1 sx={{marginTop: 0}}>Stockedhome  <Text sx={{fontWeight: 400}}>(Authentication)</Text></H1>
+        <H1 sx={{marginTop: 0}}>Stockedhome  <Text sx={{fontWeight: 400, letterSpacing: 0.15}}>(Authentication)</Text></H1>
 
         <View sx={{ maxWidth: 600 }}>
             <P sx={{ textAlign: 'center' }}>
@@ -34,7 +34,7 @@ function HomeScreenInternal() {
             {
                 auth.loading ? <P>Loading...</P>
                 : auth.user ? <>
-                    <P sx={{marginBottom: 0}}>Logged in as <Text sx={{ color: '#aaffaa' }}>{auth.user.username}</Text>.</P>
+                    <P sx={{marginBottom: 0}}>Logged in as <P style={{ color: '#7bdb7b', fontWeight: 600, letterSpacing: 0.25 }}>{auth.user.username}</P>.</P>
                     <Button sx={{marginBottom: 0}} onPress={auth.logOut}><ButtonText>Log Out</ButtonText></Button>
                 </>
                 : <>

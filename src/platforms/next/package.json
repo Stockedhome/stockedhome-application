@@ -4,23 +4,24 @@
   "type": "module",
   "___COMMENT_ON_DEPENDENCIES": "Any local packages MUST use the `link` protocol for the Next.js platform; otherwise, it doesn't watch files for changes properly",
   "dependencies": {
+    "@expo/next-adapter": "6.0.0",
     "@react-native/assets-registry": "link:../../forks/assets-registry",
     "interface": "link:../../interface",
-    "lib": "link:../../lib",
-    "@expo/next-adapter": "6.0.0",
     "json-loader": "^0.5.7",
+    "lib": "link:../../lib",
     "next-compose-plugins": "^2.2.1",
     "next-fonts": "^1.5.1",
     "next-images": "^1.8.5",
     "raf": "^3.4.1",
+    "sass": "^1.80.4",
     "setimmediate": "^1.0.5"
   },
   "peerDependencies": {
-    "next": "*",
     "@trpc/client": "*",
     "@trpc/next": "*",
     "@trpc/react-query": "*",
-    "@trpc/server": "*"
+    "@trpc/server": "*",
+    "next": "*"
   },
   "devDependencies": {
     "@types/node": "20.13.0",

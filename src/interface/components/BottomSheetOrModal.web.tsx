@@ -3,7 +3,7 @@
 import { View, useSx } from 'dripsy';
 import React from 'react';
 
-import './BottomSheetOrModal.web.css';
+import './BottomSheetOrModal.web.scss';
 
 export function BottomSheetOrModal({ hide, isVisible, children }: { hide(): void, isVisible: boolean, children: React.ReactNode }) {
     const sx = useSx();
